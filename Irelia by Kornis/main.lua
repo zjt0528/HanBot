@@ -169,7 +169,8 @@ menu.draws:boolean("drawr", "Draw R Range", true)
 menu.draws:color("colorr", "  ^- Color", 255, 0x66, 0x33, 0x00)
 menu.draws:boolean("drawtoggle", "Draw Farm Toggle", true)
 menu.draws:boolean("drawkill", "Draw Minions Killable with Q", true)
-menu.draws:boolean("drawgapclose", "Draw Gaclose Lines", true)
+menu.draws:boolean("drawgapclose", "Draw Gapclose Lines", true)
+menu.draws:boolean("drawdamage", "Draw Damage", true)
 
 menu:menu("Gap", "Gapcloser Settings")
 menu.Gap:boolean("GapA", "Use E for Anti-Gapclose", true)
@@ -964,11 +965,7 @@ local function OnDraw()
 			graphics.draw_text_2D("Farm: ON", 18, pos.x - 20, pos.y + 40, graphics.argb(255, 128, 255, 0))
 		end
 	end
-	if menu.draws.drawgapclose:get() then
-		local minion = GetClosestMobToEnemyForGap(targets)
-		local minions = GetClosestJungleEnemyToGap(targets)
-
-		local targets = GetTargetGap()
+	if menu.draws.drawdamage:get() then
 		local enemy = common.GetEnemyHeroes()
 		for i, enemies in ipairs(enemy) do
 			if
@@ -978,6 +975,13 @@ local function OnDraw()
 				DrawDamagesE(enemies)
 			end
 		end
+	end
+	if menu.draws.drawgapclose:get() then
+		local minion = GetClosestMobToEnemyForGap(targets)
+		local minions = GetClosestJungleEnemyToGap(targets)
+
+		local targets = GetTargetGap()
+
 		if common.IsValidTarget(targets) and minion then
 			if
 				targets and (targets.pos:dist(player) < spellQ.range + spellQ.range - 50) and
