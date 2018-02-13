@@ -217,50 +217,6 @@ end
 local GetTargetGap = function()
 	return TS.get_result(TargetSelectionGap).obj
 end
-local function AutoInterrupt(spell) -- Thank you Dew for this <3
-	if menu.interrupt.inte:get() and player:spellSlot(2).state == 0 then
-		if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY then
-			local enemyName = string.lower(spell.owner.charName)
-			if interruptableSpells[enemyName] then
-				for i = 1, #interruptableSpells[enemyName] do
-					local spellCheck = interruptableSpells[enemyName][i]
-					if
-						menu.interrupt.interruptmenu[spell.owner.charName .. spellCheck.menuslot]:get() and
-							string.lower(spell.name) == spellCheck.spellname
-					 then
-						if
-							player.pos2D:dist(spell.owner.pos2D) < spellE.range and spell.owner.health > player.health and
-								common.IsValidTarget(spell.owner) and
-								player:spellSlot(2).state == 0
-						 then
-							player:castSpell("obj", 2, spell.owner)
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
-local function WGapcloser()
-	if player:spellSlot(2).state == 0 and menu.Gap.GapA:get() then
-		for i = 0, objManager.enemies_n - 1 do
-			local dasher = objManager.enemies[i]
-			if dasher.type == TYPE_HERO and dasher.team == TEAM_ENEMY then
-				if
-					dasher and common.IsValidTarget(dasher) and dasher.path.isActive and dasher.path.isDashing and
-						player.pos:dist(dasher.path.point[1]) < spellE.range
-				 then
-					if player.pos2D:dist(dasher.path.point2D[1]) < player.pos2D:dist(dasher.path.point2D[0]) then
-						print("working")
-						player:castSpell("obj", 2, dasher)
-					end
-				end
-			end
-		end
-	end
-end
-
 local uhh = false
 local something = 0
 local function Toggle()
@@ -318,6 +274,198 @@ function CalcADmg(target, amount, from)
 	amount = amount * dmgMul
 	return math.floor(amount)
 end
+local function GetClosestMobToEnemy()
+	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+	local enemy = common.GetEnemyHeroes()
+	for i, enemies in ipairs(enemy) do
+		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
+			local hp = common.GetShieldedHealth("ad", enemies)
+
+			for i, minion in pairs(enemyMinions) do
+				if minion then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(enemies) < spellQ.range then
+						local minionDistanceToMouse = minionPos:dist(enemies)
+
+						if minionDistanceToMouse < closestMinionDistance then
+							closestMinion = minion
+							closestMinionDistance = minionDistanceToMouse
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return closestMinion
+end
+
+local function GetClosestMobToEnemyForR()
+	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+	local enemy = common.GetEnemyHeroes()
+	for i, enemies in ipairs(enemy) do
+		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
+			local hp = common.GetShieldedHealth("ad", enemies)
+
+			for i, minion in pairs(enemyMinions) do
+				if
+					minion and
+						(minion.health > QDamage(minion) and player.mana > player.manaCost0 + player.manaCost3 and
+							(minion.health - RDamage(minion) * 2) < QDamage(minion))
+				 then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(enemies) < spellQ.range then
+						local minionDistanceToMouse = minionPos:dist(enemies)
+
+						if minionDistanceToMouse < closestMinionDistance then
+							closestMinion = minion
+							closestMinionDistance = minionDistanceToMouse
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return closestMinion
+end
+local function GetClosestMobToEnemyForGap()
+	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+	local enemy = common.GetEnemyHeroes()
+	for i, enemies in ipairs(enemy) do
+		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
+			local hp = common.GetShieldedHealth("ad", enemies)
+
+			for i, minion in pairs(enemyMinions) do
+				if minion and minion.health < QDamage(minion) then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(enemies) < spellQ.range then
+						local minionDistanceToMouse = minionPos:dist(enemies)
+
+						if minionDistanceToMouse < closestMinionDistance then
+							closestMinion = minion
+							closestMinionDistance = minionDistanceToMouse
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return closestMinion
+end
+
+local function GetClosestJungleEnemy()
+	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+	local enemy = common.GetEnemyHeroes()
+	for i, enemies in ipairs(enemy) do
+		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
+			local hp = common.GetShieldedHealth("ad", enemies)
+
+			for i, minion in pairs(enemyMinions) do
+				if minion and minion.health < QDamage(minion) then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(enemies) < spellQ.range then
+						local minionDistanceToMouse = minionPos:dist(enemies)
+
+						if minionDistanceToMouse < closestMinionDistance then
+							closestMinion = minion
+							closestMinionDistance = minionDistanceToMouse
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return closestMinion
+end
+
+local function GetClosestJungleEnemyToGap()
+	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+	local enemy = common.GetEnemyHeroes()
+	for i, enemies in ipairs(enemy) do
+		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
+			local hp = common.GetShieldedHealth("ad", enemies)
+
+			for i, minion in pairs(enemyMinions) do
+				if minion then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(enemies) < spellQ.range then
+						local minionDistanceToMouse = minionPos:dist(enemies)
+
+						if minionDistanceToMouse < closestMinionDistance then
+							closestMinion = minion
+							closestMinionDistance = minionDistanceToMouse
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return closestMinion
+end
+local function AutoInterrupt(spell) -- Thank you Dew for this <3
+	if menu.interrupt.inte:get() and player:spellSlot(2).state == 0 then
+		if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY then
+			local enemyName = string.lower(spell.owner.charName)
+			if interruptableSpells[enemyName] then
+				for i = 1, #interruptableSpells[enemyName] do
+					local spellCheck = interruptableSpells[enemyName][i]
+					if
+						menu.interrupt.interruptmenu[spell.owner.charName .. spellCheck.menuslot]:get() and
+							string.lower(spell.name) == spellCheck.spellname
+					 then
+						if
+							player.pos2D:dist(spell.owner.pos2D) < spellE.range and spell.owner.health > player.health and
+								common.IsValidTarget(spell.owner) and
+								player:spellSlot(2).state == 0
+						 then
+							player:castSpell("obj", 2, spell.owner)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+local function WGapcloser()
+	if player:spellSlot(2).state == 0 and menu.Gap.GapA:get() then
+		for i = 0, objManager.enemies_n - 1 do
+			local dasher = objManager.enemies[i]
+			if dasher.type == TYPE_HERO and dasher.team == TEAM_ENEMY then
+				if
+					dasher and common.IsValidTarget(dasher) and dasher.path.isActive and dasher.path.isDashing and
+						player.pos:dist(dasher.path.point[1]) < spellE.range
+				 then
+					if player.pos2D:dist(dasher.path.point2D[1]) < player.pos2D:dist(dasher.path.point2D[0]) then
+						print("working")
+						player:castSpell("obj", 2, dasher)
+					end
+				end
+			end
+		end
+	end
+end
+
+
 
 orb.combat.register_f_after_attack(
 	function()
@@ -554,27 +702,8 @@ function DrawDamagesE(target)
 	end
 end
 
-local function OnTick()
-	if menu.Gap.GapA:get() then
-		WGapcloser()
-	end
-	Toggle()
-	if menu.keys.lastkey:get() then
-		LastHit()
-	end
-	KillSteal()
-	if menu.keys.clearkey:get() then
-		LaneClear()
-		JungleClear()
-	end
-	if menu.keys.harasskey:get() then
-		Harass()
-	end
-	if menu.keys.combokey:get() then
-		Combo()
-	end
-end
-function JungleClear()
+
+local function JungleClear()
 	if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
 		if menu.laneclear.farmq:get() then
 			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
@@ -601,7 +730,7 @@ function JungleClear()
 	end
 end
 
-function Harass()
+local function Harass()
 	if (player.mana / player.maxMana) * 100 >= menu.harass.manaharass:get() then
 		local target = GetTarget()
 		local targets = GetTargetGap()
@@ -656,7 +785,7 @@ function Harass()
 		end
 	end
 end
-function KillSteal()
+local function KillSteal()
 	local enemy = common.GetEnemyHeroes()
 	for i, enemies in ipairs(enemy) do
 		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
@@ -708,7 +837,7 @@ function KillSteal()
 		end
 	end
 end
-function LaneClear()
+local function LaneClear()
 	if uhh then
 		return
 	end
@@ -752,7 +881,7 @@ function LaneClear()
 		end
 	end
 end
-function LastHit()
+local function LastHit()
 	if (player.mana / player.maxMana) * 100 >= menu.lasthit.mana:get() then
 		if menu.lasthit.useq:get() then
 			local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
@@ -787,172 +916,27 @@ function LastHit()
 	end
 end
 
-function GetClosestMobToEnemy()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
-
-	local closestMinion = nil
-	local closestMinionDistance = 9999
-	local enemy = common.GetEnemyHeroes()
-	for i, enemies in ipairs(enemy) do
-		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
-			local hp = common.GetShieldedHealth("ad", enemies)
-
-			for i, minion in pairs(enemyMinions) do
-				if minion then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(enemies) < spellQ.range then
-						local minionDistanceToMouse = minionPos:dist(enemies)
-
-						if minionDistanceToMouse < closestMinionDistance then
-							closestMinion = minion
-							closestMinionDistance = minionDistanceToMouse
-						end
-					end
-				end
-			end
-		end
-	end
-
-	return closestMinion
-end
-
-function GetClosestMobToEnemyForR()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
-
-	local closestMinion = nil
-	local closestMinionDistance = 9999
-	local enemy = common.GetEnemyHeroes()
-	for i, enemies in ipairs(enemy) do
-		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
-			local hp = common.GetShieldedHealth("ad", enemies)
-
-			for i, minion in pairs(enemyMinions) do
-				if
-					minion and
-						(minion.health > QDamage(minion) and player.mana > player.manaCost0 + player.manaCost3 and
-							(minion.health - RDamage(minion) * 2) < QDamage(minion))
-				 then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(enemies) < spellQ.range then
-						local minionDistanceToMouse = minionPos:dist(enemies)
-
-						if minionDistanceToMouse < closestMinionDistance then
-							closestMinion = minion
-							closestMinionDistance = minionDistanceToMouse
-						end
-					end
-				end
-			end
-		end
-	end
-
-	return closestMinion
-end
-function GetClosestMobToEnemyForGap()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
-
-	local closestMinion = nil
-	local closestMinionDistance = 9999
-	local enemy = common.GetEnemyHeroes()
-	for i, enemies in ipairs(enemy) do
-		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
-			local hp = common.GetShieldedHealth("ad", enemies)
-
-			for i, minion in pairs(enemyMinions) do
-				if minion and minion.health < QDamage(minion) then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(enemies) < spellQ.range then
-						local minionDistanceToMouse = minionPos:dist(enemies)
-
-						if minionDistanceToMouse < closestMinionDistance then
-							closestMinion = minion
-							closestMinionDistance = minionDistanceToMouse
-						end
-					end
-				end
-			end
-		end
-	end
-
-	return closestMinion
-end
-
-function GetClosestJungleEnemy()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
-
-	local closestMinion = nil
-	local closestMinionDistance = 9999
-	local enemy = common.GetEnemyHeroes()
-	for i, enemies in ipairs(enemy) do
-		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
-			local hp = common.GetShieldedHealth("ad", enemies)
-
-			for i, minion in pairs(enemyMinions) do
-				if minion and minion.health < QDamage(minion) then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(enemies) < spellQ.range then
-						local minionDistanceToMouse = minionPos:dist(enemies)
-
-						if minionDistanceToMouse < closestMinionDistance then
-							closestMinion = minion
-							closestMinionDistance = minionDistanceToMouse
-						end
-					end
-				end
-			end
-		end
-	end
-
-	return closestMinion
-end
-
-function GetClosestJungleEnemyToGap()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
-
-	local closestMinion = nil
-	local closestMinionDistance = 9999
-	local enemy = common.GetEnemyHeroes()
-	for i, enemies in ipairs(enemy) do
-		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
-			local hp = common.GetShieldedHealth("ad", enemies)
-
-			for i, minion in pairs(enemyMinions) do
-				if minion then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(enemies) < spellQ.range then
-						local minionDistanceToMouse = minionPos:dist(enemies)
-
-						if minionDistanceToMouse < closestMinionDistance then
-							closestMinion = minion
-							closestMinionDistance = minionDistanceToMouse
-						end
-					end
-				end
-			end
-		end
-	end
-
-	return closestMinion
-end
 
 local function OnDraw()
-	if menu.draws.drawq:get() then
-		graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 100)
-	end
-	if menu.draws.drawe:get() then
-		graphics.draw_circle(player.pos, spellE.range, 2, menu.draws.colore:get(), 100)
-	end
-	if menu.draws.drawr:get() then
-		graphics.draw_circle(player.pos, spellR.range, 2, menu.draws.colorr:get(), 100)
-	end
-	if menu.draws.drawkill:get() and player:spellSlot(0).state == 0 then
-		local enemyMinionsE = common.GetMinionsInRange(spellQ.range + 300, TEAM_ENEMY)
-		for i, minion in pairs(enemyMinionsE) do
-			if minion and not minion.isDead and common.IsValidTarget(minion) then
-				local minionPos = vec3(minion.x, minion.y, minion.z)
-				local targets = GetTargetGap()
-				if (QDamage(minion) >= minion.health) then
-					graphics.draw_circle(minionPos, 100, 2, graphics.argb(255, 255, 255, 0), 100)
+	if player.isOnScreen then
+		if menu.draws.drawq:get() then
+			graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 100)
+		end
+		if menu.draws.drawe:get() then
+			graphics.draw_circle(player.pos, spellE.range, 2, menu.draws.colore:get(), 100)
+		end
+		if menu.draws.drawr:get() then
+			graphics.draw_circle(player.pos, spellR.range, 2, menu.draws.colorr:get(), 100)
+		end
+		if menu.draws.drawkill:get() and player:spellSlot(0).state == 0 then
+			local enemyMinionsE = common.GetMinionsInRange(spellQ.range + 300, TEAM_ENEMY)
+			for i, minion in pairs(enemyMinionsE) do
+				if minion and not minion.isDead and common.IsValidTarget(minion) then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					local targets = GetTargetGap()
+					if (QDamage(minion) >= minion.health) then
+						graphics.draw_circle(minionPos, 100, 2, graphics.argb(255, 255, 255, 0), 100)
+					end
 				end
 			end
 		end
@@ -1001,6 +985,26 @@ local function OnDraw()
 				end
 			end
 		end
+	end
+end
+local function OnTick()
+	if menu.Gap.GapA:get() then
+		WGapcloser()
+	end
+	Toggle()
+	if menu.keys.lastkey:get() then
+		LastHit()
+	end
+	KillSteal()
+	if menu.keys.clearkey:get() then
+		LaneClear()
+		JungleClear()
+	end
+	if menu.keys.harasskey:get() then
+		Harass()
+	end
+	if menu.keys.combokey:get() then
+		Combo()
 	end
 end
 

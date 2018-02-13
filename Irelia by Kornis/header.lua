@@ -1,5 +1,5 @@
 return {
-    id = 'Irelia',
+    id = 'IreliaKornis',
     name = 'Irelia',
     load = function()
       return player.charName == 'Irelia'
