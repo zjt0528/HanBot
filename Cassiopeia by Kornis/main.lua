@@ -491,6 +491,17 @@ local function Harass()
 		end
 	end
 end
+local function count_minions_in_range(pos, range)
+	local enemies_in_range = {}
+	for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+		local enemy = objManager.minions[TEAM_ENEMY][i]
+		if pos:dist(enemy.pos) < range and common.IsValidTarget(enemy) then
+			enemies_in_range[#enemies_in_range + 1] = enemy
+		end
+	end
+	return enemies_in_range
+end
+
 local function LaneClear()
 	if uhh == false then
 		if menu.laneclear.passive.farme:get() then
@@ -545,8 +556,24 @@ local function LaneClear()
 							end
 						end
 					end
+					
+				end
+				local enemyMinionsE = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
+				for i, minion in pairs(enemyMinionsE) do
+					if minion and minion.path.count == 0 and not minion.isDead and common.IsValidTarget(minion) then
+						local minionPos = vec3(minion.x, minion.y, minion.z)
+						if minionPos then
+							if #count_minions_in_range(minionPos, 150) >= menu.laneclear.push.hitq:get() then
+								local seg = preds.circular.get_prediction(spellQ, minion)
+								if seg and seg.startPos:dist(seg.endPos) < spellQ.range then
+									player:castSpell("pos", 0, vec3(seg.endPos.x, minionPos.y, seg.endPos.y))
+								end
+							end
+						end
+					end
 				end
 			end
+
 			if menu.laneclear.push.farme:get() then
 				local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
 				for i, minion in pairs(enemyMinionsE) do
