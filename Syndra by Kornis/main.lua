@@ -456,7 +456,7 @@ local objHolder = {}
 
 local function CreateObj(object)
 	if object and object.name then
-		if object.name == "Seed" then
+		if object.name == "Seed" and object.owner.charName == "Syndra" then
 			objHolder[object.networkID] = object
 		end
 	end
@@ -493,22 +493,23 @@ function Objects()
 	for _, objs in pairs(objHolder) do
 		if objs then
 			local somethings = objs.networkID
-			local obj = objManager.getByNetworkID(somethings)
-			if obj and obj.name == "Seed" and not obj.isDead then
-				if vec3(obj.x, obj.y, obj.z):dist(player.pos) <= spellW.range then
-					local minionPos = vec3(obj.x, obj.y, obj.z)
+			if somethings then
+				local obj = objManager.getByNetworkID(somethings)
+				if obj and obj.name == "Seed" and not obj.isDead then
+					if vec3(obj.x, obj.y, obj.z):dist(player.pos) <= spellW.range then
+						local minionPos = vec3(obj.x, obj.y, obj.z)
 
-					local minionDistanceToMouse = minionPos:dist(player.pos)
+						local minionDistanceToMouse = minionPos:dist(player.pos)
 
-					if minionDistanceToMouse < closestMinionDistance then
-						orbs = obj
-						closestMinionDistance = minionDistanceToMouse
+						if minionDistanceToMouse < closestMinionDistance then
+							orbs = obj
+							closestMinionDistance = minionDistanceToMouse
+						end
 					end
 				end
 			end
 		end
 	end
-
 	local enemyMinions = common.GetMinionsInRange(spellW.range, TEAM_ENEMY)
 
 	local closestMinion = nil
