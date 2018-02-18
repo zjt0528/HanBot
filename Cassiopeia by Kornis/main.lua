@@ -125,7 +125,7 @@ elseif player:spellSlot(5).name == "SummonerFlash" then
 end
 
 local tSelector = avada_lib.targetSelector
-local menu = menu("Cassiopeia By Kornis", "Cassiopeia By Kornis")
+local menu = menu("CassiopeiabyKornis", "Cassiopeia By Kornis")
 --dts = tSelector(menu, 1100, 1)
 --dts:addToMenu()
 menu:menu("combo", "Combo")

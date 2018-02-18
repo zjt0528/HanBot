@@ -42,7 +42,7 @@ local spellR = {
 	range = 700
 }
 local tSelector = avada_lib.targetSelector
-local menu = menu("Akali By Kornis", "Akali By Kornis")
+local menu = menu("AkaliKornis", "Akali By Kornis")
 --dts = tSelector(menu, 1100, 1)
 --dts:addToMenu()
 menu:menu("combo", "Combo")

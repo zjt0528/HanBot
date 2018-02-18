@@ -113,7 +113,7 @@ local interruptableSpells = {
 }
 
 local tSelector = avada_lib.targetSelector
-local menu = menu("Irelia By Kornis", "Irelia By Kornis")
+local menu = menu("IreliaKornis", "Irelia By Kornis")
 --dts = tSelector(menu, 1100, 1)
 --dts:addToMenu()
 menu:menu("combo", "Combo")
