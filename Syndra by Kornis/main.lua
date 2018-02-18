@@ -1343,43 +1343,6 @@ local function OnDraw()
 			end
 		end
 	end
-	local enemy = common.GetEnemyHeroes()
-	for i, target in ipairs(enemy) do
-		if target and target.isVisible and common.IsValidTarget(target) and not common.HasBuffType(target, 17) then
-			if common.IsValidTarget(target) then
-				if (target.pos:dist(player.pos) <= spellQE.range) then
-					for _, objsq in pairs(objSomething) do
-						if objsq and not objsq.isDead then
-							if vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellQE.range then
-								if
-									(vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellE.range) and
-										player.pos:dist(vec3(objsq.x, objsq.y, objsq.z)) >= 130 and
-										target.pos:dist(player.pos) <= 1100
-								 then
-									local pos = preds.linear.get_prediction(spellQE, target)
-									if pos and pos.startPos:dist(pos.endPos) <= spellQE.range then
-										local BallPosition = vec3(objsq.x, objsq.y, objsq.z)
-										local direction = (BallPosition - player.pos):norm()
-										local distance = player.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-										local extendedPos = player.pos + direction * distance
-
-										graphics.draw_circle(extendedPos, spellQE.width + target.boundingRadius - 20, 2, menu.draws.colorr:get(), 100)
-										graphics.draw_circle(
-											vec3(pos.endPos.x, mousePos.y, pos.endPos.y),
-											spellQE.width + target.boundingRadius - 20,
-											2,
-											menu.draws.colorr:get(),
-											100
-										)
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
 	if menu.draws.drawtoggle:get() then
 		local pos = graphics.world_to_screen(vec3(player.x, player.y, player.z))
 		if uhh == false then
