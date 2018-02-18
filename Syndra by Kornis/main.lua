@@ -214,6 +214,7 @@ menu.draws:color("colorr", "  ^- Color", 255, 233, 121, 121)
 menu.draws:boolean("drawtoggle", "Draw R Mode", true)
 menu.draws:boolean("drawfarmtoggle", "Draw Farm Toggle", true)
 menu.draws:boolean("drawdamage", "Draw R Damage", true)
+menu.draws:boolean("drawball", "Draw Ball Timer", true)
 
 menu:menu("misc", "Misc.")
 menu.misc:boolean("disable", "Disable Auto Attack", false)
@@ -238,13 +239,15 @@ for i = 1, #common.GetEnemyHeroes() do
 		end
 	end
 end
+
 menu:menu("keys", "Key Settings")
 menu.keys:keybind("combokey", "Combo Key", "Space", nil)
 menu.keys:keybind("harasskey", "Harass Key", "C", nil)
 menu.keys:keybind("clearkey", "Lane Clear Key", "V", nil)
 menu.keys:keybind("lastkey", "Last Hit", "X", nil)
 TS.load_to_menu(menu)
-
+local MaybeItHelps = 0
+local NoIdeaWhatImDoing = {}
 local TargetSelectionQ = function(res, obj, dist)
 	if dist < spellQ.range then
 		res.obj = obj
@@ -275,6 +278,8 @@ local TargetSelectionQE = function(res, obj, dist)
 		return true
 	end
 end
+local uhhh = 0
+local test = 0
 local GetTargetQ = function()
 	return TS.get_result(TargetSelectionQ).obj
 end
@@ -332,6 +337,7 @@ local function Toggle()
 	end
 end
 
+local gapcloserstuff = 0
 local uhhfarm = false
 local somethingfarm = 0
 
@@ -348,10 +354,42 @@ local function ToggleFarm()
 	end
 end
 
+local zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = 0
 local positionnnn = nil
 
 local zzzzz = 0
+local objHolder = {}
+local objSomething = {}
+local testW = {}
+local function DeleteObj(object)
+	if object and object.name == "Seed" and object.owner.charName == "Syndra" then
+		objSomething[object.ptr] = nil
+		NoIdeaWhatImDoing[object.ptr] = 0
+	end
+	if object and object.name then
+		if (object.name:find("_W_heldTarget_buf_02")) then
+			testW[object.ptr] = nil
+		end
+	end
+end
 
+local function CreateObj(object)
+	if object and object.name then
+		if (object.name:find("_W_heldTarget_buf_02")) then
+			testW[object.ptr] = object
+		end
+	end
+
+	if object and object.name == "Seed" and object.owner.charName == "Syndra" then
+		objSomething[object.ptr] = object
+		if (player:spellSlot(0).level < 6) then
+			NoIdeaWhatImDoing[object.ptr] = os.clock() + 7
+		end
+		if (player:spellSlot(0).level == 5) then
+			NoIdeaWhatImDoing[object.ptr] = os.clock() + 9
+		end
+	end
+end
 local function AutoInterrupt(spell)
 	if menu.misc.interrupt.inte:get() and player:spellSlot(2).state == 0 then
 		if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY then
@@ -375,6 +413,7 @@ local function AutoInterrupt(spell)
 		end
 	end
 	positionnnn = nil
+
 	if spell.owner.charName == "Syndra" then
 		if spell.name == "SyndraE" then
 			ECasting = os.clock()
@@ -385,38 +424,27 @@ local function AutoInterrupt(spell)
 	if (os.clock() - zzzzz > 0.10) then
 		test = 0.10
 	end
+	local gapcloseeeee = 0
+	if (os.clock() - gapcloserstuff < 0.08) then
+		gapcloseeeee = 0.08
+	end
+
 	if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY then
-		if spell.owner.charName == "Syndra" then
-			if spell.name == "SyndraQ" then
-				if (menu.keys.combokey:get()) and menu.combo.qecombo:get() and spell.endPos:dist(player.pos) <= 870 then
-					positionnnn = vec3(spell.endPos)
-					if (spell.endPos:dist(player.pos) > 100) then
-						common.DelayAction(
-							function(pos)
-								player:castSpell("pos", 2, pos)
-							end,
-							0.1 + test,
-							{positionnnn}
-						)
-						SomePotatoDelays = os.clock() + 0.75
-					end
-				--LastWCast = os.clock() + 0.75
-				end
-			end
-		end
-		if (menu.keys.harasskey:get()) and menu.harass.qeharass:get() and spell.endPos:dist(player.pos) <= 870 then
+		if (os.clock() - MaybeItHelps < 0.5) then
 			if spell.owner.charName == "Syndra" then
 				if spell.name == "SyndraQ" then
-					if (spell.endPos:dist(player.pos) > 100) then
+					if (menu.keys.combokey:get()) then
 						positionnnn = vec3(spell.endPos)
-						common.DelayAction(
-							function(pos)
-								player:castSpell("pos", 2, pos)
-							end,
-							0.1,
-							{positionnnn}
-						)
-						SomePotatoDelays = os.clock() + 0.75
+						if (spell.endPos:dist(player.pos) > 100) then
+							common.DelayAction(
+								function(pos)
+									player:castSpell("pos", 2, pos)
+								end,
+								0.1 + test + gapcloseeeee,
+								{positionnnn}
+							)
+							SomePotatoDelays = os.clock() + 0.75
+						end
 					--LastWCast = os.clock() + 0.75
 					end
 				end
@@ -432,7 +460,7 @@ local function AutoInterrupt(spell)
 								function(pos)
 									player:castSpell("pos", 2, pos)
 								end,
-								0.1,
+								0.1 + test,
 								{positionnnn}
 							)
 							SomePotatoDelays = os.clock() + 0.75
@@ -448,16 +476,10 @@ local function AutoInterrupt(spell)
 				LastWused = os.clock() + network.latency + 0.020
 				Delays = os.clock() + 1
 			end
-		end
-	end
-end
-
-local objHolder = {}
-
-local function CreateObj(object)
-	if object and object.name then
-		if object.name == "Seed" and object.owner.charName == "Syndra" then
-			objHolder[object.networkID] = object
+			if spell.name == "SyndraWCast" then
+				uhhh = 0
+				zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = os.clock() + 0.2
+			end
 		end
 	end
 end
@@ -489,23 +511,19 @@ function Objects()
 
 	local closestMinion = nil
 	local closestMinionDistance = 9999
+	local lowest = 9999999999
 
-	for _, objs in pairs(objHolder) do
-		if objs then
-			local somethings = objs.networkID
-			if somethings then
-				local obj = objManager.getByNetworkID(somethings)
-				if obj and obj.name == "Seed" and not obj.isDead then
-					if vec3(obj.x, obj.y, obj.z):dist(player.pos) <= spellW.range then
-						local minionPos = vec3(obj.x, obj.y, obj.z)
+	for _, objsq in pairs(objSomething) do
+		if objsq and not objsq.isDead then
+			if vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellW.range then
+				local minionPos = vec3(objsq.x, objsq.y, objsq.z)
 
-						local minionDistanceToMouse = minionPos:dist(player.pos)
+				local minionDistanceToMouse = minionPos:dist(player.pos)
 
-						if minionDistanceToMouse < closestMinionDistance then
-							orbs = obj
-							closestMinionDistance = minionDistanceToMouse
-						end
-					end
+				if lowest > NoIdeaWhatImDoing[objsq.ptr] then
+					lowest = NoIdeaWhatImDoing[objsq.ptr]
+					orbs = objsq
+					closestMinionDistance = minionDistanceToMouse
 				end
 			end
 		end
@@ -547,11 +565,13 @@ function Objects()
 	if (orbs) then
 		return orbs
 	end
-	if (closestMinion) then
-		return closestMinion
-	end
-	if (closestJungle) then
-		return closestJungle
+	if not orbs then
+		if (closestMinion) then
+			return closestMinion
+		end
+		if (closestJungle) then
+			return closestJungle
+		end
 	end
 end
 function CalcMagicDmg(target, amount, from)
@@ -863,32 +883,28 @@ local function Combo()
 				if target and target.isVisible and common.IsValidTarget(target) and not common.HasBuffType(target, 17) then
 					if common.IsValidTarget(target) then
 						if (target.pos:dist(player.pos) <= spellQE.range) then
-							for _, objs in pairs(objHolder) do
-								if objs then
-									local somethings = objs.networkID
-									local obj = objManager.getByNetworkID(somethings)
-									if obj and obj.name == "Seed" and not obj.isDead then
-										if vec3(obj.x, obj.y, obj.z):dist(player.pos) <= spellQE.range then
-											if
-												(vec3(obj.x, obj.y, obj.z):dist(player.pos) <= spellE.range) and
-													player.pos:dist(vec3(obj.x, obj.y, obj.z)) >= 130 and
-													target.pos:dist(player.pos) <= 1100
-											 then
-												local pos = preds.linear.get_prediction(spellQE, target)
-												if pos and pos.startPos:dist(pos.endPos) <= spellQE.range then
-													local BallPosition = vec3(obj.x, obj.y, obj.z)
-													local direction = (BallPosition - player.pos):norm()
-													local distance = player.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-													local extendedPos = player.pos + direction * distance
-													if
-														(extendedPos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) <
-															spellQE.width + target.boundingRadius - 40) and
-															target.pos:dist(player.pos) >= 50 and
-															obj.pos:dist(player.pos) >= 130 and
-															player.pos:dist(target.pos) <= spellQE.range
-													 then
-														player:castSpell("pos", 2, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-													end
+							for _, objsq in pairs(objSomething) do
+								if objsq and not objsq.isDead then
+									if vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellQE.range then
+										if
+											(vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellE.range) and
+												player.pos:dist(vec3(objsq.x, objsq.y, objsq.z)) >= 130 and
+												target.pos:dist(player.pos) <= 1100
+										 then
+											local pos = preds.linear.get_prediction(spellQE, target)
+											if pos and pos.startPos:dist(pos.endPos) <= spellQE.range then
+												local BallPosition = vec3(objsq.x, objsq.y, objsq.z)
+												local direction = (BallPosition - player.pos):norm()
+												local distance = player.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+												local extendedPos = player.pos + direction * distance
+												if
+													(extendedPos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) <
+														spellQE.width + target.boundingRadius - 20) and
+														target.pos:dist(player.pos) >= 50 and
+														objsq.pos:dist(player.pos) >= 80 and
+														player.pos:dist(target.pos) <= spellQE.range
+												 then
+													player:castSpell("pos", 2, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 												end
 											end
 										end
@@ -901,6 +917,7 @@ local function Combo()
 			end
 		end
 	end
+
 	--[[if menu.combo.qecombo:get() then
 		local target = GetTargetQE()
 		if target and target.isVisible then
@@ -981,6 +998,7 @@ local function Combo()
 							local pos = player.pos + 700 * (vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - player.pos):norm()
 							if (target.pos:dist(player.pos) > spellE.range) and player:spellSlot(2).state == 0 then
 								player:castSpell("pos", 0, pos)
+								MaybeItHelps = os.clock()
 							end
 						end
 					end
@@ -1180,32 +1198,28 @@ local function Harass()
 					if target and target.isVisible and common.IsValidTarget(target) and not common.HasBuffType(target, 17) then
 						if common.IsValidTarget(target) then
 							if (target.pos:dist(player.pos) <= spellQE.range) then
-								for _, objs in pairs(objHolder) do
-									if objs then
-										local somethings = objs.networkID
-										local obj = objManager.getByNetworkID(somethings)
-										if obj and obj.name == "Seed" and not obj.isDead then
-											if vec3(obj.x, obj.y, obj.z):dist(player.pos) <= spellQE.range then
-												if
-													(vec3(obj.x, obj.y, obj.z):dist(player.pos) <= spellE.range) and
-														player.pos:dist(vec3(obj.x, obj.y, obj.z)) >= 170 and
-														target.pos:dist(player.pos) <= 1100
-												 then
-													local pos = preds.linear.get_prediction(spellQE, target)
-													if pos and pos.startPos:dist(pos.endPos) <= spellQE.range then
-														local BallPosition = vec3(obj.x, obj.y, obj.z)
-														local direction = (BallPosition - player.pos):norm()
-														local distance = player.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-														local extendedPos = player.pos + direction * distance
-														if
-															(extendedPos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) <
-																spellQE.width + target.boundingRadius - 40) and
-																target.pos:dist(player.pos) >= 100 and
-																obj.pos:dist(player.pos) >= 170 and
-																player.pos:dist(target.pos) <= spellQE.range
-														 then
-															player:castSpell("pos", 2, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-														end
+								for _, objsq in pairs(objSomething) do
+									if objsq and not objsq.isDead then
+										if vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellQE.range then
+											if
+												(vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellE.range) and
+													player.pos:dist(vec3(obj.x, obj.y, obj.z)) >= 170 and
+													target.pos:dist(player.pos) <= 1100
+											 then
+												local pos = preds.linear.get_prediction(spellQE, target)
+												if pos and pos.startPos:dist(pos.endPos) <= spellQE.range then
+													local BallPosition = vec3(objsq.x, objsq.y, objsq.z)
+													local direction = (BallPosition - player.pos):norm()
+													local distance = player.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+													local extendedPos = player.pos + direction * distance
+													if
+														(extendedPos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) <
+															spellQE.width + target.boundingRadius - 20) and
+															target.pos:dist(player.pos) >= 50 and
+															objsq.pos:dist(player.pos) >= 80 and
+															player.pos:dist(target.pos) <= spellQE.range
+													 then
+														player:castSpell("pos", 2, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 													end
 												end
 											end
@@ -1288,19 +1302,19 @@ end
 local function OnDraw()
 	if player.isOnScreen then
 		if menu.draws.drawq:get() then
-			graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 40)
+			graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 70)
 		end
 		if menu.draws.drawe:get() then
-			graphics.draw_circle(player.pos, spellE.range, 2, menu.draws.colore:get(), 40)
+			graphics.draw_circle(player.pos, spellE.range, 2, menu.draws.colore:get(), 70)
 		end
 		if menu.draws.drawqe:get() then
-			graphics.draw_circle(player.pos, spellQE.range, 2, menu.draws.colorqe:get(), 40)
+			graphics.draw_circle(player.pos, spellQE.range, 2, menu.draws.colorqe:get(), 70)
 		end
 		if menu.draws.draww:get() then
-			graphics.draw_circle(player.pos, spellW.range, 2, menu.draws.colorw:get(), 40)
+			graphics.draw_circle(player.pos, spellW.range, 2, menu.draws.colorw:get(), 70)
 		end
 		if menu.draws.drawr:get() then
-			graphics.draw_circle(player.pos, spellR.range, 2, menu.draws.colorr:get(), 40)
+			graphics.draw_circle(player.pos, spellR.range, 2, menu.draws.colorr:get(), 70)
 		end
 	end
 
@@ -1312,6 +1326,57 @@ local function OnDraw()
 					not common.HasBuffType(enemies, 17)
 			 then
 				DrawDamagesE(enemies)
+			end
+		end
+	end
+	if (menu.draws.drawball:get()) then
+		for _, objs in pairs(objSomething) do
+			if objs and not objs.isDead then
+				local pos = graphics.world_to_screen(vec3(objs.x, objs.y, objs.z))
+				graphics.draw_text_2D(
+					"Timer: " .. math.floor(NoIdeaWhatImDoing[objs.ptr] - os.clock()),
+					17,
+					pos.x + 40,
+					pos.y + 30,
+					graphics.argb(255, 255, 204, 204)
+				)
+			end
+		end
+	end
+	local enemy = common.GetEnemyHeroes()
+	for i, target in ipairs(enemy) do
+		if target and target.isVisible and common.IsValidTarget(target) and not common.HasBuffType(target, 17) then
+			if common.IsValidTarget(target) then
+				if (target.pos:dist(player.pos) <= spellQE.range) then
+					for _, objsq in pairs(objSomething) do
+						if objsq and not objsq.isDead then
+							if vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellQE.range then
+								if
+									(vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellE.range) and
+										player.pos:dist(vec3(objsq.x, objsq.y, objsq.z)) >= 130 and
+										target.pos:dist(player.pos) <= 1100
+								 then
+									local pos = preds.linear.get_prediction(spellQE, target)
+									if pos and pos.startPos:dist(pos.endPos) <= spellQE.range then
+										local BallPosition = vec3(objsq.x, objsq.y, objsq.z)
+										local direction = (BallPosition - player.pos):norm()
+										local distance = player.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+										local extendedPos = player.pos + direction * distance
+
+										graphics.draw_circle(extendedPos, spellQE.width + target.boundingRadius - 20, 2, menu.draws.colorr:get(), 100)
+										graphics.draw_circle(
+											vec3(pos.endPos.x, mousePos.y, pos.endPos.y),
+											spellQE.width + target.boundingRadius - 20,
+											2,
+											menu.draws.colorr:get(),
+											100
+										)
+									end
+								end
+							end
+						end
+					end
+				end
 			end
 		end
 	end
@@ -1352,11 +1417,34 @@ local function AutoDash()
 		if pred_pos and pred_pos:dist(player.path.serverPos2D) <= spellQ.range then
 			--orb.core.set_server_pause()
 			player:castSpell("pos", 0, vec3(pred_pos.x, target.y, pred_pos.y))
+			gapcloserstuff = os.clock()
 		end
 	end
 end
 
 local function OnTick()
+	if (os.clock() - zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz > 0) then
+		for _, objsw in pairs(testW) do
+			if objsw then
+				for _, objsq in pairs(objSomething) do
+					if objsq and not objsq.isDead then
+						if (objsq.pos:dist(objsw.pos) < 80 and uhhh ~= objsq.ptr) then
+							uhhh = objsq.ptr
+							if (player:spellSlot(0).level < 6) then
+								NoIdeaWhatImDoing[objsq.ptr] = os.clock() + 7
+								test = os.clock() + 7
+							end
+							if (player:spellSlot(0).level == 5) then
+								NoIdeaWhatImDoing[objsq.ptr] = os.clock() + 9
+								test = os.clock() + 9
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
 	if (Objects() and player:spellSlot(2).state ~= 0) then
 		spellW.delay = 0.15 + Objects().pos:dist(player.pos) / 3000
 	end
@@ -1377,10 +1465,12 @@ local function OnTick()
 								if (menu.harass.turret2:get()) then
 									if not common.is_under_tower(player.pos) then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+										zzzzz = os.clock()
 									end
 								end
 								if not menu.harass.turret2:get() then
 									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+									zzzzz = os.clock()
 								end
 							end
 						end
@@ -1477,6 +1567,6 @@ local function OnTick()
 end
 cb.add(cb.tick, OnTick)
 cb.add(cb.draw, OnDraw)
-cb.add(cb.spell, AutoInterrupt)
-
 cb.add(cb.createobj, CreateObj)
+cb.add(cb.deleteobj, DeleteObj)
+cb.add(cb.spell, AutoInterrupt)

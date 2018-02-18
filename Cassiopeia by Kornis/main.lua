@@ -116,6 +116,14 @@ local spellR = {
 	speed = math.huge,
 	boundingRadiusMod = 0
 }
+
+local FlashSlot = nil
+if player:spellSlot(4).name == "SummonerFlash" then
+	FlashSlot = 4
+elseif player:spellSlot(5).name == "SummonerFlash" then
+	FlashSlot = 5
+end
+
 local tSelector = avada_lib.targetSelector
 local menu = menu("Cassiopeia By Kornis", "Cassiopeia By Kornis")
 --dts = tSelector(menu, 1100, 1)
@@ -149,6 +157,8 @@ menu.combo.rset:slider("hitr", "Min. Enemies to Hit", 2, 2, 5, 1)
 menu.combo.rset:boolean("facer", " ^-Only count if Facing", true)
 
 menu.combo:boolean("rylais", "Rylais Combo ( Starts with E )", false)
+menu.combo:keybind("rflash", "R-Flash Key", "G", nil)
+menu.combo:boolean("flashrface", " ^- Only if Facing", true)
 menu:menu("blacklist", "R Blacklist")
 local enemy = common.GetEnemyHeroes()
 for i, allies in ipairs(enemy) do
@@ -226,6 +236,8 @@ menu.draws:boolean("drawe", "Draw E Range", true)
 menu.draws:color("colore", "  ^- Color", 255, 255, 255, 255)
 menu.draws:boolean("drawr", "Draw R Range", false)
 menu.draws:color("colorr", "  ^- Color", 255, 233, 121, 121)
+menu.draws:boolean("drawrf", "Draw R-Flash Range", false)
+menu.draws:color("colorrf", "  ^- Color", 255, 233, 121, 121)
 menu.draws:boolean("drawtoggle", "Draw Farm Toggle", true)
 menu.draws:boolean("drawdamage", "Draw Damage", true)
 menu.draws:boolean("drawkill", "Draw Killable Minions with E", true)
@@ -339,6 +351,59 @@ local function WGapcloser()
 					if player.pos2D:dist(dasher.path.point2D[1]) < player.pos2D:dist(dasher.path.point2D[0]) then
 						if ((player.health / player.maxHealth) * 100 <= menu.misc.health:get()) then
 							player:castSpell("pos", 3, dasher.path.point2D[1])
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+local TargetSelectionFR = function(res, obj, dist)
+	if dist < spellR.range + 410 then
+		res.obj = obj
+		return true
+	end
+end
+local GetTargetFR = function()
+	return TS.get_result(TargetSelectionFR).obj
+end
+local function FlashR()
+	if menu.combo.rflash:get() then
+		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
+		local target = GetTargetFR()
+		if target and target.isVisible then
+			if common.IsValidTarget(target) then
+				if (target.pos:dist(player.pos) <= spellR.range + 410) then
+					if (FlashSlot and player:spellSlot(FlashSlot).state) then
+						if (target.pos:dist(player.pos) > spellR.range) then
+							if (menu.combo.flashrface:get()) and IsFacing(target) then
+								local pos = preds.linear.get_prediction(spellR, target)
+								if pos and pos.startPos:dist(pos.endPos) < spellR.range + 410 then
+									player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+
+									common.DelayAction(
+										function()
+											player:castSpell("pos", FlashSlot, target.pos)
+										end,
+										0.25 + network.latency
+									)
+								end
+							end
+
+							if not (menu.combo.flashrface:get()) then
+								local pos = preds.linear.get_prediction(spellR, target)
+								if pos and pos.startPos:dist(pos.endPos) < spellR.range + 410 then
+									player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+
+									common.DelayAction(
+										function()
+											player:castSpell("pos", FlashSlot, target.pos)
+										end,
+										0.25 + network.latency
+									)
+								end
+							end
 						end
 					end
 				end
@@ -556,7 +621,6 @@ local function LaneClear()
 							end
 						end
 					end
-					
 				end
 				local enemyMinionsE = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 				for i, minion in pairs(enemyMinionsE) do
@@ -863,6 +927,7 @@ local function Combo()
 	end
 end
 local function OnTick()
+	FlashR()
 	Toggle()
 	KillSteal()
 	if (orb.combat.is_active()) then
@@ -1044,6 +1109,9 @@ local function OnDraw()
 		end
 		if menu.draws.drawr:get() then
 			graphics.draw_circle(player.pos, spellR.range, 2, menu.draws.colorr:get(), 100)
+		end
+		if menu.draws.drawrf:get() then
+			graphics.draw_circle(player.pos, spellR.range + 410, 2, menu.draws.colorrf:get(), 100)
 		end
 	end
 
