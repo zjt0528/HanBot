@@ -1,4 +1,3 @@
-
 local version = "1.0"
 local evade = module.seek("evade")
 local avada_lib = module.lib("avada_lib")
@@ -65,6 +64,8 @@ menu.combo.rset:boolean("cancelr", "Cancel R if no Enemies", true)
 menu.combo.rset:boolean("cancelrks", "Cancel R for Killsteal", true)
 menu.combo.rset:slider("waster", " ^- Don't waste R if Enemy Health <= ", 100, 0, 500, 1)
 menu.combo:boolean("items", "Use Items", true)
+menu.combo:boolean("magnet", "Magnet to Daggers", false)
+menu.combo.magnet:set("tooltip", "It might be Potato, no idea actually. :c")
 
 menu:menu("harass", "Harass")
 menu.harass:dropdown("harassmode", "Harass Mode: ", 2, {"Q E", "E Q"})
@@ -133,6 +134,7 @@ local function DeleteObj(object)
 		objHolder[object.ptr] = nil
 	end
 end
+
 local function updatebuff(buff)
 	if buff.name == "katarinarsound" then
 		allowing = false
@@ -274,6 +276,27 @@ local function ToggleHarass()
 		end
 	end
 end
+local function GetClosestJungle()
+	local enemyMinions = common.GetMinionsInRange(spellE.range, TEAM_NEUTRAL, mousePos)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+
+	for i, minion in pairs(enemyMinions) do
+		if minion then
+			local minionPos = vec3(minion.x, minion.y, minion.z)
+			if minionPos:dist(mousePos) < 200 then
+				local minionDistanceToMouse = minionPos:dist(mousePos)
+
+				if minionDistanceToMouse < closestMinionDistance then
+					closestMinion = minion
+					closestMinionDistance = minionDistanceToMouse
+				end
+			end
+		end
+	end
+	return closestMinion
+end
 
 local function GetClosestMob()
 	local enemyMinions = common.GetMinionsInRange(spellE.range, TEAM_ENEMY, mousePos)
@@ -296,25 +319,77 @@ local function GetClosestMob()
 	end
 	return closestMinion
 end
-local function GetClosestJungle()
-	local enemyMinions = common.GetMinionsInRange(spellE.range, TEAM_NEUTRAL, mousePos)
+local function GetClosestDagger()
+	local closestDagger = nil
+	local closestDaggerDistance = 9999
+	for _, objs in pairs(objHolder) do
+		if objs then
+			if objs.pos:dist(player.pos) < 360 then
+				local DaggerDist = objs.pos:dist(player.pos)
 
-	local closestMinion = nil
-	local closestMinionDistance = 9999
-
-	for i, minion in pairs(enemyMinions) do
-		if minion then
-			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 200 then
-				local minionDistanceToMouse = minionPos:dist(mousePos)
-
-				if minionDistanceToMouse < closestMinionDistance then
-					closestMinion = minion
-					closestMinionDistance = minionDistanceToMouse
+				if DaggerDist < closestDaggerDistance then
+					closestDagger = objs
+					closestDaggerDistance = DaggerDist
 				end
 			end
 		end
 	end
+	return closestDagger
+end
+local function GetClosestMobToEnemy()
+	local enemyMinions = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+	local enemy = common.GetEnemyHeroes()
+	for i, enemies in ipairs(enemy) do
+		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
+			local hp = common.GetShieldedHealth("ap", enemies)
+
+			for i, minion in pairs(enemyMinions) do
+				if minion then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(enemies) < spellQ.range then
+						local minionDistanceToMouse = minionPos:dist(enemies)
+
+						if minionDistanceToMouse < closestMinionDistance then
+							closestMinion = minion
+							closestMinionDistance = minionDistanceToMouse
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return closestMinion
+end
+local function GetClosestJungleEnemy()
+	local enemyMinions = common.GetMinionsInRange(spellE.range, TEAM_NEUTRAL)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+	local enemy = common.GetEnemyHeroes()
+	for i, enemies in ipairs(enemy) do
+		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
+			local hp = common.GetShieldedHealth("ap", enemies)
+
+			for i, minion in pairs(enemyMinions) do
+				if minion then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(enemies) < spellQ.range then
+						local minionDistanceToMouse = minionPos:dist(enemies)
+
+						if minionDistanceToMouse < closestMinionDistance then
+							closestMinion = minion
+							closestMinionDistance = minionDistanceToMouse
+						end
+					end
+				end
+			end
+		end
+	end
+
 	return closestMinion
 end
 local function Flee()
@@ -406,62 +481,6 @@ local function PDamage(target)
 	end
 	return damage
 end
-local function GetClosestMobToEnemy()
-	local enemyMinions = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
-
-	local closestMinion = nil
-	local closestMinionDistance = 9999
-	local enemy = common.GetEnemyHeroes()
-	for i, enemies in ipairs(enemy) do
-		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
-			local hp = common.GetShieldedHealth("ap", enemies)
-
-			for i, minion in pairs(enemyMinions) do
-				if minion then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(enemies) < spellQ.range then
-						local minionDistanceToMouse = minionPos:dist(enemies)
-
-						if minionDistanceToMouse < closestMinionDistance then
-							closestMinion = minion
-							closestMinionDistance = minionDistanceToMouse
-						end
-					end
-				end
-			end
-		end
-	end
-
-	return closestMinion
-end
-local function GetClosestJungleEnemy()
-	local enemyMinions = common.GetMinionsInRange(spellE.range, TEAM_NEUTRAL)
-
-	local closestMinion = nil
-	local closestMinionDistance = 9999
-	local enemy = common.GetEnemyHeroes()
-	for i, enemies in ipairs(enemy) do
-		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
-			local hp = common.GetShieldedHealth("ap", enemies)
-
-			for i, minion in pairs(enemyMinions) do
-				if minion then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(enemies) < spellQ.range then
-						local minionDistanceToMouse = minionPos:dist(enemies)
-
-						if minionDistanceToMouse < closestMinionDistance then
-							closestMinion = minion
-							closestMinionDistance = minionDistanceToMouse
-						end
-					end
-				end
-			end
-		end
-	end
-
-	return closestMinion
-end
 
 local function LastHit()
 	if menu.lasthit.farmq:get() then
@@ -470,7 +489,7 @@ local function LastHit()
 			if minion and not minion.isDead then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-				
+
 				if (dmglib.GetSpellDamage(0, minion) >= orb.farm.predict_hp(minion, 0.25, true)) then
 					if (menu.lasthit.lastaa:get() and player.pos:dist(minion) > 300) then
 						player:castSpell("obj", 0, minion)
@@ -550,7 +569,6 @@ local function LaneClear()
 				if minion and not minion.isDead and common.IsValidTarget(minion) then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-					
 
 					if (dmglib.GetSpellDamage(0, minion) >= orb.farm.predict_hp(minion, 0.25, true)) then
 						if not (menu.laneclear.lasthitaa:get()) then
@@ -1777,7 +1795,6 @@ local function OnDraw()
 			graphics.draw_circle(player.pos, spellR.range, 2, menu.draws.colorr:get(), 100)
 		end
 	end
-
 	if (menu.draws.drawdaggers:get()) then
 		for _, objs in pairs(objHolder) do
 			if objs then
@@ -1794,6 +1811,7 @@ local function OnDraw()
 			end
 		end
 	end
+
 	if menu.draws.drawdamage:get() then
 		local enemy = common.GetEnemyHeroes()
 		for i, enemies in ipairs(enemy) do
@@ -1830,6 +1848,35 @@ local function OnDraw()
 end
 
 local function OnTick()
+	if (size() == 0) then
+		orb.core.set_pause_move(0)
+		orb.core.set_pause_move(0)
+	end
+	if (menu.combo.magnet:get()) then
+		local enemy = common.GetEnemyHeroes()
+		for i, enemies in ipairs(enemy) do
+			if
+				enemies and common.IsValidTarget(enemies) and player.pos:dist(enemies) < 1000 and
+					not common.HasBuffType(enemies, 17)
+			 then
+				if not (player.buff["katarinarsound"]) then
+					if (GetClosestDagger()) and enemies.pos:dist(player.pos) < 500 then
+						local direction = (GetClosestDagger().pos - enemies.pos):norm()
+						local extendedPos = GetClosestDagger().pos - direction * 150
+						if (menu.keys.combokey:get() and GetClosestDagger().pos:dist(player.pos) >= 160) then
+							orb.core.set_pause_move(1)
+							orb.core.set_pause_move(1)
+							player:move(extendedPos)
+						else
+							orb.core.set_pause_move(0)
+							orb.core.set_pause_move(0)
+						end
+					end
+				end
+			end
+		end
+	end
+
 	ToggleFarm()
 	KillSteal()
 	ToggleHarass()
