@@ -1848,6 +1848,9 @@ local function OnDraw()
 end
 
 local function OnTick()
+	if not player.buff["katarinarsound"] then
+		allowing = true
+	end
 	if (size() == 0) then
 		orb.core.set_pause_move(0)
 		orb.core.set_pause_move(0)
