@@ -1203,7 +1203,7 @@ local function Harass()
 										if vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellQE.range then
 											if
 												(vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellE.range) and
-													player.pos:dist(vec3(obj.x, obj.y, obj.z)) >= 170 and
+													player.pos:dist(vec3(objsq.x, objsq.y, objsq.z)) >= 170 and
 													target.pos:dist(player.pos) <= 1100
 											 then
 												local pos = preds.linear.get_prediction(spellQE, target)
