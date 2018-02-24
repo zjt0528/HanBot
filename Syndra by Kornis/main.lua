@@ -743,7 +743,10 @@ local function LaneClear()
 					if minion and minion.path.count == 0 and not minion.isDead and common.IsValidTarget(minion) then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos then
-							if #count_minions_in_range(minionPos, spellQ.radius) >= menu.laneclear.lane.hitq:get() then
+							if
+								#count_minions_in_range(minionPos, spellQ.radius) >= menu.laneclear.lane.hitq:get() and
+									#count_minions_in_range(minionPos, spellQ.radius) < 7
+							 then
 								local seg = preds.circular.get_prediction(spellQ, minion)
 								if seg and seg.startPos:dist(seg.endPos) < spellQ.range then
 									player:castSpell("pos", 0, vec3(seg.endPos.x, minionPos.y, seg.endPos.y))
@@ -802,7 +805,10 @@ local function LaneClear()
 					if minion and minion.path.count == 0 and not minion.isDead and common.IsValidTarget(minion) then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos then
-							if #count_minions_in_range(minionPos, spellW.radius) + aaa >= menu.laneclear.lane.hitw:get() then
+							if
+								#count_minions_in_range(minionPos, spellW.radius) + aaa >= menu.laneclear.lane.hitw:get() and
+									#count_minions_in_range(minionPos, spellQ.radius) < 7 + aaa
+							 then
 								if (Objects()) then
 									if
 										(player:spellSlot(1).name == "SyndraW") and os.clock() - LastWCast > 0.26 + network.latency and

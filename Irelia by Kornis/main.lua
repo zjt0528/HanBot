@@ -192,6 +192,11 @@ for i = 1, #common.GetEnemyHeroes() do
 	end
 end
 
+menu:menu("flee", "Flee")
+menu.flee:boolean("fleeq", "Use Q to Flee", true)
+menu.flee:boolean("fleekill", " ^- Only if Minion is Killable", true)
+menu.flee:keybind("fleekey", "Flee Key", "G", nil)
+
 menu:menu("keys", "Key Settings")
 menu.keys:keybind("combokey", "Combo Key", "Space", nil)
 menu.keys:keybind("harasskey", "Harass Key", "C", nil)
@@ -464,8 +469,121 @@ local function WGapcloser()
 		end
 	end
 end
+local function GetClosestMob()
+	local enemyMinions = common.GetMinionsInRange(700, TEAM_ENEMY, mousePos)
 
+	local closestMinion = nil
+	local closestMinionDistance = 9999
 
+	for i, minion in pairs(enemyMinions) do
+		if minion then
+			local minionPos = vec3(minion.x, minion.y, minion.z)
+			if minionPos:dist(mousePos) < 300 then
+				local minionDistanceToMouse = minionPos:dist(mousePos)
+
+				if minionDistanceToMouse < closestMinionDistance then
+					closestMinion = minion
+					closestMinionDistance = minionDistanceToMouse
+				end
+			end
+		end
+	end
+	return closestMinion
+end
+
+local function GetClosestJungle()
+	local enemyMinions = common.GetMinionsInRange(700, TEAM_NEUTRAL, mousePos)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+
+	for i, minion in pairs(enemyMinions) do
+		if minion then
+			local minionPos = vec3(minion.x, minion.y, minion.z)
+			if minionPos:dist(mousePos) < 300 then
+				local minionDistanceToMouse = minionPos:dist(mousePos)
+
+				if minionDistanceToMouse < closestMinionDistance then
+					closestMinion = minion
+					closestMinionDistance = minionDistanceToMouse
+				end
+			end
+		end
+	end
+	return closestMinion
+end
+local function GetClosestMobKill()
+	local enemyMinions = common.GetMinionsInRange(700, TEAM_ENEMY, mousePos)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+
+	for i, minion in pairs(enemyMinions) do
+		if minion and minion.health < QDamage(minion) then
+			local minionPos = vec3(minion.x, minion.y, minion.z)
+			if minionPos:dist(mousePos) < 300 then
+				local minionDistanceToMouse = minionPos:dist(mousePos)
+
+				if minionDistanceToMouse < closestMinionDistance then
+					closestMinion = minion
+					closestMinionDistance = minionDistanceToMouse
+				end
+			end
+		end
+	end
+	return closestMinion
+end
+
+local function GetClosestJungleKill()
+	local enemyMinions = common.GetMinionsInRange(700, TEAM_NEUTRAL, mousePos)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+
+	for i, minion in pairs(enemyMinions) do
+		if minion and minion.health < QDamage(minion) then
+			local minionPos = vec3(minion.x, minion.y, minion.z)
+			if minionPos:dist(mousePos) < 300 then
+				local minionDistanceToMouse = minionPos:dist(mousePos)
+
+				if minionDistanceToMouse < closestMinionDistance then
+					closestMinion = minion
+					closestMinionDistance = minionDistanceToMouse
+				end
+			end
+		end
+	end
+	return closestMinion
+end
+local function Flee()
+	if menu.flee.fleekey:get() then
+		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
+		if menu.flee.fleeq:get() then
+			if not menu.flee.fleekill:get() then
+				local minion = GetClosestMob(target)
+				if minion then
+					player:castSpell("obj", 0, minion)
+				end
+				local jungleeeee = GetClosestJungle(target)
+				if jungleeeee then
+					player:castSpell("obj", 0, jungleeeee)
+				end
+			end
+		end
+		if menu.flee.fleeq:get() then
+			if  menu.flee.fleekill:get() then
+				local minion = GetClosestMobKill(target)
+				if minion then
+					player:castSpell("obj", 0, minion)
+				end
+				local jungleeeee = GetClosestJungleKill(target)
+				if jungleeeee then
+					player:castSpell("obj", 0, jungleeeee)
+				end
+			end
+		end
+	end
+end
 
 orb.combat.register_f_after_attack(
 	function()
@@ -702,7 +820,6 @@ function DrawDamagesE(target)
 	end
 end
 
-
 local function JungleClear()
 	if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
 		if menu.laneclear.farmq:get() then
@@ -916,7 +1033,6 @@ local function LastHit()
 	end
 end
 
-
 local function OnDraw()
 	if player.isOnScreen then
 		if menu.draws.drawq:get() then
@@ -988,6 +1104,7 @@ local function OnDraw()
 	end
 end
 local function OnTick()
+	Flee()
 	if menu.Gap.GapA:get() then
 		WGapcloser()
 	end
