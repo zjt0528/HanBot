@@ -140,6 +140,7 @@ local menu = menu("SyndraKornis", "Syndra By Kornis")
 --dts = tSelector(menu, 1100, 1)
 --dts:addToMenu()
 menu:menu("combo", "Combo")
+menu.combo:boolean("items", "Use Spellbinder ( Item )", true)
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:boolean("autoq", "Use Auto Q on Dash", true)
 menu.combo:boolean("qecombo", "Use QE in Combo.", true)
@@ -745,7 +746,7 @@ local function LaneClear()
 						if minionPos then
 							if
 								#count_minions_in_range(minionPos, spellQ.radius) >= menu.laneclear.lane.hitq:get() and
-									#count_minions_in_range(minionPos, spellQ.radius) < 7
+									#count_minions_in_range(minionPos, spellQ.range) < 7
 							 then
 								local seg = preds.circular.get_prediction(spellQ, minion)
 								if seg and seg.startPos:dist(seg.endPos) < spellQ.range then
@@ -807,7 +808,7 @@ local function LaneClear()
 						if minionPos then
 							if
 								#count_minions_in_range(minionPos, spellW.radius) + aaa >= menu.laneclear.lane.hitw:get() and
-									#count_minions_in_range(minionPos, spellQ.radius) < 7 + aaa
+									#count_minions_in_range(minionPos, spellW.range) < 7 + aaa
 							 then
 								if (Objects()) then
 									if
@@ -839,6 +840,22 @@ local function LaneClear()
 	end
 end
 local function Combo()
+	if menu.combo.items:get() then
+		for i = 6, 11 do
+			local item = player:spellSlot(i).name
+
+			if item and item == "3907Cast" and player:spellSlot(i).state == 0 then
+				local target = GetTargetQ()
+				if target and target.isVisible then
+					if common.IsValidTarget(target) then
+						if (target.pos:dist(player.pos) <= spellQ.range) then
+							player:castSpell("self", i)
+						end
+					end
+				end
+			end
+		end
+	end
 	if (menu.combo.qcombo:get()) then
 		local target = GetTargetQ()
 		if target and target.isVisible then
