@@ -453,7 +453,6 @@ end
 
 local function LastHit()
 	if menu.lasthit.qlasthit:get() then
-		local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
 		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 			local minion = objManager.minions[TEAM_ENEMY][i]
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
@@ -473,11 +472,10 @@ end
 function JungleClear()
 	if (player.mana / player.maxMana) * 100 >= menu.laneclear.jungle.mana:get() then
 		if menu.laneclear.jungle.useq:get() then
-			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
-			for i, minion in pairs(enemyMinionsQ) do
-				if minion and not minion.isDead and common.IsValidTarget(minion) then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(player.pos) <= spellQ.range then
+			for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
+				local minion = objManager.minions[TEAM_NEUTRAL][i]
+				if minion and not minion.isDead and minion.isVisible and minion.type == TYPE_MINION then
+					if minion.pos:dist(player.pos) <= spellQ.range then
 						local pos = preds.circular.get_prediction(spellQ, minion)
 						if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
 							player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -487,11 +485,10 @@ function JungleClear()
 			end
 		end
 		if menu.laneclear.jungle.usee:get() then
-			local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_NEUTRAL)
-			for i, minion in pairs(enemyMinionsE) do
-				if minion and not minion.isDead and common.IsValidTarget(minion) then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(player.pos) <= spellE.range then
+			for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
+				local minion = objManager.minions[TEAM_NEUTRAL][i]
+				if minion and not minion.isDead and minion.isVisible and minion.type == TYPE_MINION then
+					if minion.pos:dist(player.pos) <= spellE.range then
 						player:castSpell("obj", 2, minion)
 					end
 				end
@@ -501,7 +498,6 @@ function JungleClear()
 end
 local function Harass()
 	if menu.harass.laste:get() then
-		local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
 		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 			local minion = objManager.minions[TEAM_ENEMY][i]
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
@@ -565,7 +561,6 @@ end
 local function LaneClear()
 	if uhh == false then
 		if menu.laneclear.passive.farme:get() then
-			local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
@@ -614,9 +609,12 @@ local function LaneClear()
 						end
 					end
 				end
-				local enemyMinionsE = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
-				for i, minion in pairs(enemyMinionsE) do
-					if minion and minion.path.count == 0 and not minion.isDead and common.IsValidTarget(minion) then
+				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+					local minion = objManager.minions[TEAM_ENEMY][i]
+					if
+						minion and minion.pos:dist(player.pos) <= spellQ.range and minion.path.count == 0 and not minion.isDead and
+							common.IsValidTarget(minion)
+					 then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos then
 							if #count_minions_in_range(minionPos, 150) >= menu.laneclear.push.hitq:get() then
@@ -631,7 +629,6 @@ local function LaneClear()
 			end
 
 			if menu.laneclear.push.farme:get() then
-				local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
 				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 					local minion = objManager.minions[TEAM_ENEMY][i]
 					if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
@@ -646,7 +643,8 @@ local function LaneClear()
 						end
 					end
 				end
-				for i, minion in pairs(enemyMinionsE) do
+				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+					local minion = objManager.minions[TEAM_ENEMY][i]
 					if minion and not minion.isDead and common.IsValidTarget(minion) then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos:dist(player.pos) <= spellE.range then
@@ -663,7 +661,8 @@ local function LaneClear()
 						end
 					end
 				end
-				for i, minion in pairs(enemyMinionsE) do
+				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+					local minion = objManager.minions[TEAM_ENEMY][i]
 					if
 						minion and
 							(minion.buff["poisontrailtarget"] or minion.buff["TwitchDeadlyVenom"] or minion.buff["cassiopeiawpoison"] or
@@ -681,7 +680,8 @@ local function LaneClear()
 						end
 					end
 				end
-				for i, minion in pairs(enemyMinionsE) do
+				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+					local minion = objManager.minions[TEAM_ENEMY][i]
 					if minion and not minion.isDead and common.IsValidTarget(minion) then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos:dist(player.pos) <= spellE.range then
@@ -1105,8 +1105,6 @@ local function OnDraw()
 	end
 
 	if menu.draws.drawkill:get() and player:spellSlot(2).state == 0 then
-		local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
-
 		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 			local minion = objManager.minions[TEAM_ENEMY][i]
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
