@@ -416,7 +416,7 @@ local function AutoInterrupt(spell)
 	positionnnn = nil
 
 	if spell.owner.charName == "Syndra" then
-		if spell.name == "SyndraE" then
+		if spell.name == "SyndraE" or spell.name == "SyndraE5" then
 			ECasting = os.clock()
 			LastWCast = os.clock() + 0.4
 		end
@@ -436,7 +436,7 @@ local function AutoInterrupt(spell)
 				if spell.name == "SyndraQ" then
 					if (menu.keys.combokey:get()) then
 						positionnnn = vec3(spell.endPos)
-						if (spell.endPos:dist(player.pos) > 100) then
+						if (spell.endPos:dist(player.pos) > 80) then
 							common.DelayAction(
 								function(pos)
 									player:castSpell("pos", 2, pos)
@@ -489,10 +489,10 @@ local function LastHit()
 	if menu.laneclear.lane.lastq:get() then
 		local enemyMinionsE = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 		for i, minion in pairs(enemyMinionsE) do
-			if minion and not minion.isDead and common.IsValidTarget(minion) then
+			if minion and minion.isVisible and not minion.isDead and common.IsValidTarget(minion) then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-				delay = 1.2
+				local delay = 1.2
 
 				if (dmglib.GetSpellDamage(0, minion) >= orb.farm.predict_hp(minion, delay / 2, true)) then
 					if not (menu.laneclear.lane.lastqaa:get()) then
@@ -1356,11 +1356,13 @@ local function OnDraw()
 		for _, objs in pairs(objSomething) do
 			if objs and not objs.isDead then
 				local pos = graphics.world_to_screen(vec3(objs.x, objs.y, objs.z))
+				graphics.draw_circle(objs.pos, 30, 2, graphics.argb(255, 255, 204, 204), 70)
+
 				graphics.draw_text_2D(
 					"Timer: " .. math.floor(NoIdeaWhatImDoing[objs.ptr] - os.clock()),
 					17,
-					pos.x + 40,
-					pos.y + 30,
+					pos.x - 40,
+					pos.y,
 					graphics.argb(255, 255, 204, 204)
 				)
 			end

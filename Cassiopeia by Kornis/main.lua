@@ -220,7 +220,7 @@ for i = 1, #common.GetEnemyHeroes() do
 		end
 	end
 end
-
+local delay = 0
 local hello = 0
 
 -- Thanks to Avada's Cassiopeia. <3
@@ -454,15 +454,13 @@ end
 local function LastHit()
 	if menu.lasthit.qlasthit:get() then
 		local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
-		for i, minion in pairs(enemyMinionsE) do
-			if minion and not minion.isDead and common.IsValidTarget(minion) then
+		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+			local minion = objManager.minions[TEAM_ENEMY][i]
+			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 				delay = 0.125 + player.pos:dist(minion.pos) / 890
-				if
-					(EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) and
-						player:spellSlot(2).level
-				 then
+				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 					orb.core.set_pause_attack(1)
 				end
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true)) then
@@ -504,16 +502,13 @@ end
 local function Harass()
 	if menu.harass.laste:get() then
 		local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
-		for i, minion in pairs(enemyMinionsE) do
-			if minion and not minion.isDead and common.IsValidTarget(minion) then
+		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+			local minion = objManager.minions[TEAM_ENEMY][i]
+			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 				delay = 0.125 + player.pos:dist(minion.pos) / 890
-				if
-					(EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) and
-						player:spellSlot(2).level
-				 then
-					player:basicAttack(0)
+				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 					orb.core.set_pause_attack(1)
 				end
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true)) then
@@ -571,16 +566,13 @@ local function LaneClear()
 	if uhh == false then
 		if menu.laneclear.passive.farme:get() then
 			local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
-			for i, minion in pairs(enemyMinionsE) do
-				if minion and not minion.isDead and common.IsValidTarget(minion) then
+			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+				local minion = objManager.minions[TEAM_ENEMY][i]
+				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 					delay = 0.125 + player.pos:dist(minion.pos) / 890
-					if
-						(EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) and
-							player:spellSlot(2).level
-					 then
-						player:basicAttack(0)
+					if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 						orb.core.set_pause_attack(1)
 					end
 					if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true)) then
@@ -640,16 +632,13 @@ local function LaneClear()
 
 			if menu.laneclear.push.farme:get() then
 				local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
-				for i, minion in pairs(enemyMinionsE) do
-					if minion and not minion.isDead and common.IsValidTarget(minion) then
+				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+					local minion = objManager.minions[TEAM_ENEMY][i]
+					if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 						delay = 0.125 + player.pos:dist(minion.pos) / 890
-						if
-							(EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) and
-								player:spellSlot(2).level
-						 then
-							player:basicAttack(0)
+						if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 							orb.core.set_pause_attack(1)
 						end
 						if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true)) then
@@ -1115,11 +1104,12 @@ local function OnDraw()
 		end
 	end
 
-	local delay = 0
 	if menu.draws.drawkill:get() and player:spellSlot(2).state == 0 then
 		local enemyMinionsE = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
-		for i, minion in pairs(enemyMinionsE) do
-			if minion and not minion.isDead and common.IsValidTarget(minion) then
+
+		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+			local minion = objManager.minions[TEAM_ENEMY][i]
+			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 				delay = 0.125 + player.pos:dist(minion.pos) / 890
@@ -1134,7 +1124,7 @@ local function OnDraw()
 		local enemy = common.GetEnemyHeroes()
 		for i, enemies in ipairs(enemy) do
 			if
-				enemies and common.IsValidTarget(enemies) and player.pos:dist(enemies) < 1000 and
+				enemies and enemies.isVisible and common.IsValidTarget(enemies) and player.pos:dist(enemies) < 1000 and
 					not common.HasBuffType(enemies, 17)
 			 then
 				DrawDamagesE(enemies)
