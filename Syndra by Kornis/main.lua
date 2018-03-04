@@ -1553,7 +1553,8 @@ local function OnTick()
 		JungleClear()
 	end
 end
-cb.add(cb.tick, OnTick)
+orb.combat.register_f_pre_tick(OnTick)
+--cb.add(cb.tick, OnTick)
 cb.add(cb.draw, OnDraw)
 cb.add(cb.createobj, CreateObj)
 cb.add(cb.deleteobj, DeleteObj)

@@ -725,5 +725,6 @@ local function OnTick()
 		Combo()
 	end
 end
-cb.add(cb.tick, OnTick)
+orb.combat.register_f_pre_tick(OnTick)
+--cb.add(cb.tick, OnTick)
 cb.add(cb.draw, OnDraw)

@@ -677,8 +677,10 @@ end
 
 local function Combo()
 	if menu.combo.rset.cancelr:get() then
-		if (#count_enemies_in_range(player.pos, spellR.range + 10) == 0) then
-			player:move(mousePos)
+		if (player.buff["katarinarsound"]) then
+			if (#count_enemies_in_range(player.pos, spellR.range + 10) == 0) then
+				player:move(mousePos)
+			end
 		end
 	end
 	if menu.combo.rset.cancelrks:get() then
@@ -1908,7 +1910,8 @@ local function OnTick()
 		LaneClear()
 	end
 end
-cb.add(cb.tick, OnTick)
+orb.combat.register_f_pre_tick(OnTick)
+--cb.add(cb.tick, OnTick)
 cb.add(cb.draw, OnDraw)
 
 cb.add(cb.createobj, CreateObj)

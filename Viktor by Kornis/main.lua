@@ -279,7 +279,7 @@ local function AutoInterrupt(spell)
 			orb.core.set_pause_attack(0.2)
 			player:move(mousePos)
 			if (orb.core.can_attack()) then
-				orb.core.reset()
+			orb.core.reset()
 			end
 		end
 	end
@@ -294,7 +294,6 @@ local function WGapcloser()
 						player.pos:dist(dasher.path.point[1]) < 700
 				 then
 					if player.pos2D:dist(dasher.path.point2D[1]) < player.pos2D:dist(dasher.path.point2D[0]) then
-						
 						if ((player.health / player.maxHealth) * 100 <= menu.misc.health:get()) then
 							player:castSpell("pos", 1, dasher.path.point2D[1])
 						end
@@ -919,7 +918,7 @@ local function OnDraw()
 		end
 	end
 end
-
-cb.add(cb.tick, OnTick)
+orb.combat.register_f_pre_tick(OnTick)
+--cb.add(cb.tick, OnTick)
 cb.add(cb.spell, AutoInterrupt)
 cb.add(cb.draw, OnDraw)

@@ -1127,4 +1127,5 @@ end
 
 cb.add(cb.draw, OnDraw)
 cb.add(cb.spell, AutoInterrupt)
-cb.add(cb.tick, OnTick)
+orb.combat.register_f_pre_tick(OnTick)
+--cb.add(cb.tick, OnTick)
