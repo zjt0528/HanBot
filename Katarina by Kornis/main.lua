@@ -848,48 +848,107 @@ local function Combo()
 				end
 			end
 		end
-		local target = GetTargetE()
-		if target and target.isVisible then
-			if common.IsValidTarget(target) then
-				if not player.buff["katarinarsound"] then
-					if menu.combo.items:get() then
-						if (target.pos:dist(player) <= 700) then
-							for i = 6, 11 do
-								local item = player:spellSlot(i).name
-								if item and (item == "HextechGunblade") then
-									player:castSpell("obj", i, target)
-								end
-								if item and (item == "BilgewaterCutlass") then
-									player:castSpell("obj", i, target)
-								end
+	end
+	local target = GetTargetE()
+	if target and target.isVisible then
+		if common.IsValidTarget(target) then
+			if not player.buff["katarinarsound"] then
+				if menu.combo.items:get() then
+					if (target.pos:dist(player) <= 700) then
+						for i = 6, 11 do
+							local item = player:spellSlot(i).name
+							if item and (item == "HextechGunblade") then
+								player:castSpell("obj", i, target)
+							end
+							if item and (item == "BilgewaterCutlass") then
+								player:castSpell("obj", i, target)
 							end
 						end
 					end
-					if menu.combo.combomode:get() == 1 then
-						if (menu.combo.qcombo:get()) then
-							if (target.pos:dist(player.pos) <= spellQ.range) then
-								player:castSpell("obj", 0, target)
-							end
+				end
+				if menu.combo.combomode:get() == 1 then
+					if (menu.combo.qcombo:get()) then
+						if (target.pos:dist(player.pos) <= spellQ.range) then
+							player:castSpell("obj", 0, target)
 						end
-						if (menu.combo.ecombo:get()) and player:spellSlot(0).state ~= 0 then
-							if (size() > 0) then
-								for _, objs in pairs(objHolder) do
-									if objs then
-										if not menu.combo.savee:get() then
-											if (target.pos:dist(objs.pos) < 450) then
-												if menu.combo.eturret:get() then
-													if not common.is_under_tower(objs.pos) then
-														local direction = (objs.pos - target.pos):norm()
-														local extendedPos = objs.pos - direction * 200
-														player:castSpell("pos", 2, extendedPos)
-													end
-												else
+					end
+					if (menu.combo.ecombo:get()) and player:spellSlot(0).state ~= 0 then
+						if (size() > 0) then
+							for _, objs in pairs(objHolder) do
+								if objs then
+									if not menu.combo.savee:get() then
+										if (target.pos:dist(objs.pos) < 450) then
+											if menu.combo.eturret:get() then
+												if not common.is_under_tower(objs.pos) then
 													local direction = (objs.pos - target.pos):norm()
 													local extendedPos = objs.pos - direction * 200
 													player:castSpell("pos", 2, extendedPos)
 												end
+											else
+												local direction = (objs.pos - target.pos):norm()
+												local extendedPos = objs.pos - direction * 200
+												player:castSpell("pos", 2, extendedPos)
 											end
-											if menu.combo.emode:get() == 1 then
+										end
+										if menu.combo.emode:get() == 1 then
+											if objs.pos:dist(player.pos) > spellE.range then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * 50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+											if (objs.pos:dist(target.pos) > 450) then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * 50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+										end
+										if menu.combo.emode:get() == 2 then
+											if objs.pos:dist(player.pos) > spellE.range then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * -50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+
+											if (objs.pos:dist(target.pos) > 450) then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * -50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+										end
+										if menu.combo.emode:get() == 3 then
+											if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
 												if objs.pos:dist(player.pos) > spellE.range then
 													if menu.combo.eturret:get() then
 														if not common.is_under_tower(target.pos) then
@@ -917,7 +976,8 @@ local function Combo()
 													end
 												end
 											end
-											if menu.combo.emode:get() == 2 then
+
+											if player:spellSlot(3).state == 0 then
 												if objs.pos:dist(player.pos) > spellE.range then
 													if menu.combo.eturret:get() then
 														if not common.is_under_tower(target.pos) then
@@ -943,92 +1003,62 @@ local function Combo()
 														local direction = (target.pos - player.pos):norm()
 														local extendedPos = target.pos - direction * -50
 														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-											end
-											if menu.combo.emode:get() == 3 then
-												if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
-													if objs.pos:dist(player.pos) > spellE.range then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * 50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-													if (objs.pos:dist(target.pos) > 450) then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * 50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-												end
-
-												if player:spellSlot(3).state == 0 then
-													if objs.pos:dist(player.pos) > spellE.range then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * -50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-
-													if (objs.pos:dist(target.pos) > 450) then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * -50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
 													end
 												end
 											end
 										end
+									end
 
-										if menu.combo.savee:get() then
-											if (target.pos:dist(objs.pos) < 450) then
-												if menu.combo.eturret:get() then
-													if not common.is_under_tower(objs.pos) then
-														local direction = (objs.pos - target.pos):norm()
-														local extendedPos = objs.pos - direction * 200
-														player:castSpell("pos", 2, extendedPos)
-													end
-												else
+									if menu.combo.savee:get() then
+										if (target.pos:dist(objs.pos) < 450) then
+											if menu.combo.eturret:get() then
+												if not common.is_under_tower(objs.pos) then
 													local direction = (objs.pos - target.pos):norm()
 													local extendedPos = objs.pos - direction * 200
 													player:castSpell("pos", 2, extendedPos)
 												end
+											else
+												local direction = (objs.pos - target.pos):norm()
+												local extendedPos = objs.pos - direction * 200
+												player:castSpell("pos", 2, extendedPos)
 											end
 										end
 									end
 								end
 							end
-							if (size() == 0) then
-								if not menu.combo.savee:get() then
-									if menu.combo.emode:get() == 1 then
+						end
+						if (size() == 0) then
+							if not menu.combo.savee:get() then
+								if menu.combo.emode:get() == 1 then
+									if menu.combo.eturret:get() then
+										if not common.is_under_tower(target.pos) then
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * 50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									else
+										local direction = (target.pos - player.pos):norm()
+										local extendedPos = target.pos - direction * 50
+										player:castSpell("pos", 2, extendedPos)
+									end
+								end
+
+								if menu.combo.emode:get() == 2 then
+									if menu.combo.eturret:get() then
+										if not common.is_under_tower(target.pos) then
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * -50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									else
+										local direction = (target.pos - player.pos):norm()
+										local extendedPos = target.pos - direction * -50
+										player:castSpell("pos", 2, extendedPos)
+									end
+								end
+
+								if menu.combo.emode:get() == 3 then
+									if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
 										if menu.combo.eturret:get() then
 											if not common.is_under_tower(target.pos) then
 												local direction = (target.pos - player.pos):norm()
@@ -1042,7 +1072,7 @@ local function Combo()
 										end
 									end
 
-									if menu.combo.emode:get() == 2 then
+									if player:spellSlot(3).state == 0 then
 										if menu.combo.eturret:get() then
 											if not common.is_under_tower(target.pos) then
 												local direction = (target.pos - player.pos):norm()
@@ -1053,575 +1083,545 @@ local function Combo()
 											local direction = (target.pos - player.pos):norm()
 											local extendedPos = target.pos - direction * -50
 											player:castSpell("pos", 2, extendedPos)
-										end
-									end
-
-									if menu.combo.emode:get() == 3 then
-										if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
-											if menu.combo.eturret:get() then
-												if not common.is_under_tower(target.pos) then
-													local direction = (target.pos - player.pos):norm()
-													local extendedPos = target.pos - direction * 50
-													player:castSpell("pos", 2, extendedPos)
-												end
-											else
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * 50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										end
-
-										if player:spellSlot(3).state == 0 then
-											if menu.combo.eturret:get() then
-												if not common.is_under_tower(target.pos) then
-													local direction = (target.pos - player.pos):norm()
-													local extendedPos = target.pos - direction * -50
-													player:castSpell("pos", 2, extendedPos)
-												end
-											else
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * -50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										end
-									end
-								end
-							end
-						end
-						if (menu.combo.wcombo:get()) then
-							if (#count_enemies_in_range(player.pos, spellW.range) > 0) then
-								local target = GetTargetW()
-								if target and target.isVisible then
-									if common.IsValidTarget(target) then
-										if (target.pos:dist(player.pos) <= spellW.range) then
-											player:castSpell("pos", 1, target.pos)
-										end
-									end
-								end
-							end
-						end
-						if menu.combo.rset.rmod:get() == 1 and player:spellSlot(3).state == 0 then
-							if (target.pos:dist(player.pos) <= spellR.range - 50) then
-								if (#count_enemies_in_range(player.pos, spellR.range - 100) >= menu.combo.rset.rhit:get()) then
-									if (target.health >= menu.combo.rset.waster:get() and player:spellSlot(0).state ~= 0) then
-										if (player:spellSlot(1).state ~= 0) then
-											player:castSpell("pos", 3, player.pos)
-										end
-									end
-								end
-							end
-						end
-						if menu.combo.rset.rmod:get() == 2 and player:spellSlot(3).state == 0 then
-							if (target.pos:dist(player.pos) <= spellR.range - 50) then
-								if (target.health <= RDamage(target) + EDamage(target) + PDamage(target) + dmglib.GetSpellDamage(0, target)) then
-									if (target.health >= menu.combo.rset.waster:get() and player:spellSlot(0).state ~= 0) then
-										if (player:spellSlot(1).state ~= 0) then
-											player:castSpell("pos", 3, player.pos)
 										end
 									end
 								end
 							end
 						end
 					end
-					if menu.combo.combomode:get() == 2 then
-						if (menu.combo.ecombo:get()) then
-							if (size() > 0) then
-								for _, objs in pairs(objHolder) do
-									if objs then
-										if not menu.combo.savee:get() then
-											if (target.pos:dist(objs.pos) < 450) then
-												if menu.combo.eturret:get() then
-													if not common.is_under_tower(objs.pos) then
-														local direction = (objs.pos - target.pos):norm()
-														local extendedPos = objs.pos - direction * 200
-														player:castSpell("pos", 2, extendedPos)
-													end
-												else
-													local direction = (objs.pos - target.pos):norm()
-													local extendedPos = objs.pos - direction * 200
-													player:castSpell("pos", 2, extendedPos)
-												end
-											end
-											if menu.combo.emode:get() == 1 then
-												if objs.pos:dist(player.pos) > spellE.range then
-													if menu.combo.eturret:get() then
-														if not common.is_under_tower(target.pos) then
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													else
-														local direction = (target.pos - player.pos):norm()
-														local extendedPos = target.pos - direction * 50
-														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-												if (objs.pos:dist(target.pos) > 450) then
-													if menu.combo.eturret:get() then
-														if not common.is_under_tower(target.pos) then
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													else
-														local direction = (target.pos - player.pos):norm()
-														local extendedPos = target.pos - direction * 50
-														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-											end
-											if menu.combo.emode:get() == 2 then
-												if objs.pos:dist(player.pos) > spellE.range then
-													if menu.combo.eturret:get() then
-														if not common.is_under_tower(target.pos) then
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													else
-														local direction = (target.pos - player.pos):norm()
-														local extendedPos = target.pos - direction * -50
-														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-
-												if (objs.pos:dist(target.pos) > 450) then
-													if menu.combo.eturret:get() then
-														if not common.is_under_tower(target.pos) then
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													else
-														local direction = (target.pos - player.pos):norm()
-														local extendedPos = target.pos - direction * -50
-														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-											end
-											if menu.combo.emode:get() == 3 then
-												if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
-													if objs.pos:dist(player.pos) > spellE.range then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * 50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-													if (objs.pos:dist(target.pos) > 450) then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * 50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-												end
-
-												if player:spellSlot(3).state == 0 then
-													if objs.pos:dist(player.pos) > spellE.range then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * -50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-
-													if (objs.pos:dist(target.pos) > 450) then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * -50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-												end
-											end
-										end
-
-										if menu.combo.savee:get() then
-											if (target.pos:dist(objs.pos) < 450) then
-												if menu.combo.eturret:get() then
-													if not common.is_under_tower(objs.pos) then
-														local direction = (objs.pos - target.pos):norm()
-														local extendedPos = objs.pos - direction * 200
-														player:castSpell("pos", 2, extendedPos)
-													end
-												else
-													local direction = (objs.pos - target.pos):norm()
-													local extendedPos = objs.pos - direction * 200
-													player:castSpell("pos", 2, extendedPos)
-												end
-											end
-										end
-									end
-								end
-							end
-							if (size() == 0) then
-								if not menu.combo.savee:get() then
-									if menu.combo.emode:get() == 1 then
-										if menu.combo.eturret:get() then
-											if not common.is_under_tower(target.pos) then
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * 50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										else
-											local direction = (target.pos - player.pos):norm()
-											local extendedPos = target.pos - direction * 50
-											player:castSpell("pos", 2, extendedPos)
-										end
-									end
-
-									if menu.combo.emode:get() == 2 then
-										if menu.combo.eturret:get() then
-											if not common.is_under_tower(target.pos) then
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * -50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										else
-											local direction = (target.pos - player.pos):norm()
-											local extendedPos = target.pos - direction * -50
-											player:castSpell("pos", 2, extendedPos)
-										end
-									end
-
-									if menu.combo.emode:get() == 3 then
-										if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
-											if menu.combo.eturret:get() then
-												if not common.is_under_tower(target.pos) then
-													local direction = (target.pos - player.pos):norm()
-													local extendedPos = target.pos - direction * 50
-													player:castSpell("pos", 2, extendedPos)
-												end
-											else
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * 50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										end
-
-										if player:spellSlot(3).state == 0 then
-											if menu.combo.eturret:get() then
-												if not common.is_under_tower(target.pos) then
-													local direction = (target.pos - player.pos):norm()
-													local extendedPos = target.pos - direction * -50
-													player:castSpell("pos", 2, extendedPos)
-												end
-											else
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * -50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										end
-									end
-								end
-							end
-						end
-
-						if (menu.combo.wcombo:get()) then
-							if (#count_enemies_in_range(player.pos, spellW.range) > 0) then
-								local target = GetTargetW()
-								if target and target.isVisible then
-									if common.IsValidTarget(target) then
-										if (target.pos:dist(player.pos) <= spellW.range) then
-											player:castSpell("pos", 1, target.pos)
-										end
-									end
-								end
-							end
-						end
-						if (menu.combo.qcombo:get()) then
-							if (target.pos:dist(player.pos) <= spellQ.range) and player:spellSlot(0).state == 0 then
-								player:castSpell("obj", 0, target)
-							end
-						end
-						if menu.combo.rset.rmod:get() == 1 and player:spellSlot(3).state == 0 then
-							if (target.pos:dist(player.pos) <= spellR.range - 50) then
-								if (#count_enemies_in_range(player.pos, spellR.range - 100) >= menu.combo.rset.rhit:get()) then
-									if (target.health >= menu.combo.rset.waster:get() and player:spellSlot(0).state ~= 0) then
-										if (player:spellSlot(1).state ~= 0) then
-											player:castSpell("pos", 3, player.pos)
-										end
-									end
-								end
-							end
-						end
-						if menu.combo.rset.rmod:get() == 2 and player:spellSlot(3).state == 0 then
-							if (target.pos:dist(player.pos) <= spellR.range - 50) then
-								if (target.health <= RDamage(target) + EDamage(target) + PDamage(target) + dmglib.GetSpellDamage(0, target)) then
-									if (target.health >= menu.combo.rset.waster:get() and player:spellSlot(0).state ~= 0) then
-										if (player:spellSlot(1).state ~= 0) then
-											player:castSpell("pos", 3, player.pos)
-										end
+					if (menu.combo.wcombo:get()) then
+						if (#count_enemies_in_range(player.pos, spellW.range) > 0) then
+							local target = GetTargetW()
+							if target and target.isVisible then
+								if common.IsValidTarget(target) then
+									if (target.pos:dist(player.pos) <= spellW.range) then
+										player:castSpell("pos", 1, target.pos)
 									end
 								end
 							end
 						end
 					end
-					if menu.combo.combomode:get() == 3 then
-						if (menu.combo.qcombo:get() and player:spellSlot(3).state ~= 0) and TimeR < os.clock() then
-							if (target.pos:dist(player.pos) <= spellQ.range) then
-								player:castSpell("obj", 0, target)
-							end
-						end
-						if (menu.combo.ecombo:get()) then
-							if (size() > 0) then
-								for _, objs in pairs(objHolder) do
-									if objs then
-										if not menu.combo.savee:get() then
-											if (target.pos:dist(objs.pos) < 450) then
-												if menu.combo.eturret:get() then
-													if not common.is_under_tower(objs.pos) then
-														local direction = (objs.pos - target.pos):norm()
-														local extendedPos = objs.pos - direction * 200
-														player:castSpell("pos", 2, extendedPos)
-													end
-												else
-													local direction = (objs.pos - target.pos):norm()
-													local extendedPos = objs.pos - direction * 200
-													player:castSpell("pos", 2, extendedPos)
-												end
-											end
-											if menu.combo.emode:get() == 1 then
-												if objs.pos:dist(player.pos) > spellE.range then
-													if menu.combo.eturret:get() then
-														if not common.is_under_tower(target.pos) then
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													else
-														local direction = (target.pos - player.pos):norm()
-														local extendedPos = target.pos - direction * 50
-														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-												if (objs.pos:dist(target.pos) > 450) then
-													if menu.combo.eturret:get() then
-														if not common.is_under_tower(target.pos) then
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													else
-														local direction = (target.pos - player.pos):norm()
-														local extendedPos = target.pos - direction * 50
-														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-											end
-											if menu.combo.emode:get() == 2 then
-												if objs.pos:dist(player.pos) > spellE.range then
-													if menu.combo.eturret:get() then
-														if not common.is_under_tower(target.pos) then
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													else
-														local direction = (target.pos - player.pos):norm()
-														local extendedPos = target.pos - direction * -50
-														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-
-												if (objs.pos:dist(target.pos) > 450) then
-													if menu.combo.eturret:get() then
-														if not common.is_under_tower(target.pos) then
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													else
-														local direction = (target.pos - player.pos):norm()
-														local extendedPos = target.pos - direction * -50
-														player:castSpell("pos", 2, extendedPos)
-													end
-												end
-											end
-											if menu.combo.emode:get() == 3 then
-												if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
-													if objs.pos:dist(player.pos) > spellE.range then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * 50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-													if (objs.pos:dist(target.pos) > 450) then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * 50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * 50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-												end
-
-												if player:spellSlot(3).state == 0 then
-													if objs.pos:dist(player.pos) > spellE.range then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * -50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-
-													if (objs.pos:dist(target.pos) > 450) then
-														if menu.combo.eturret:get() then
-															if not common.is_under_tower(target.pos) then
-																local direction = (target.pos - player.pos):norm()
-																local extendedPos = target.pos - direction * -50
-																player:castSpell("pos", 2, extendedPos)
-															end
-														else
-															local direction = (target.pos - player.pos):norm()
-															local extendedPos = target.pos - direction * -50
-															player:castSpell("pos", 2, extendedPos)
-														end
-													end
-												end
-											end
-										end
-
-										if menu.combo.savee:get() then
-											if (target.pos:dist(objs.pos) < 450) then
-												if menu.combo.eturret:get() then
-													if not common.is_under_tower(objs.pos) then
-														local direction = (objs.pos - target.pos):norm()
-														local extendedPos = objs.pos - direction * 200
-														player:castSpell("pos", 2, extendedPos)
-													end
-												else
-													local direction = (objs.pos - target.pos):norm()
-													local extendedPos = objs.pos - direction * 200
-													player:castSpell("pos", 2, extendedPos)
-												end
-											end
-										end
-									end
-								end
-							end
-							if (size() == 0) then
-								if not menu.combo.savee:get() then
-									if menu.combo.emode:get() == 1 then
-										if menu.combo.eturret:get() then
-											if not common.is_under_tower(target.pos) then
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * 50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										else
-											local direction = (target.pos - player.pos):norm()
-											local extendedPos = target.pos - direction * 50
-											player:castSpell("pos", 2, extendedPos)
-										end
-									end
-
-									if menu.combo.emode:get() == 2 then
-										if menu.combo.eturret:get() then
-											if not common.is_under_tower(target.pos) then
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * -50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										else
-											local direction = (target.pos - player.pos):norm()
-											local extendedPos = target.pos - direction * -50
-											player:castSpell("pos", 2, extendedPos)
-										end
-									end
-
-									if menu.combo.emode:get() == 3 then
-										if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
-											if menu.combo.eturret:get() then
-												if not common.is_under_tower(target.pos) then
-													local direction = (target.pos - player.pos):norm()
-													local extendedPos = target.pos - direction * 50
-													player:castSpell("pos", 2, extendedPos)
-												end
-											else
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * 50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										end
-
-										if player:spellSlot(3).state == 0 then
-											if menu.combo.eturret:get() then
-												if not common.is_under_tower(target.pos) then
-													local direction = (target.pos - player.pos):norm()
-													local extendedPos = target.pos - direction * -50
-													player:castSpell("pos", 2, extendedPos)
-												end
-											else
-												local direction = (target.pos - player.pos):norm()
-												local extendedPos = target.pos - direction * -50
-												player:castSpell("pos", 2, extendedPos)
-											end
-										end
-									end
-								end
-							end
-						end
-						if (menu.combo.wcombo:get()) then
-							if (#count_enemies_in_range(player.pos, spellW.range) > 0) then
-								local target = GetTargetW()
-								if target and target.isVisible then
-									if common.IsValidTarget(target) then
-										if (target.pos:dist(player.pos) <= spellW.range) then
-											player:castSpell("pos", 1, target.pos)
-										end
-									end
-								end
-							end
-						end
-
+					if menu.combo.rset.rmod:get() == 1 and player:spellSlot(3).state == 0 then
 						if (target.pos:dist(player.pos) <= spellR.range - 50) then
-							if (player:spellSlot(1).state ~= 0) then
-								player:castSpell("pos", 3, player.pos)
+							if (#count_enemies_in_range(player.pos, spellR.range - 100) >= menu.combo.rset.rhit:get()) then
+								if (target.health >= menu.combo.rset.waster:get() and player:spellSlot(0).state ~= 0) then
+									if (player:spellSlot(1).state ~= 0) then
+										player:castSpell("pos", 3, player.pos)
+									end
+								end
 							end
+						end
+					end
+					if menu.combo.rset.rmod:get() == 2 and player:spellSlot(3).state == 0 then
+						if (target.pos:dist(player.pos) <= spellR.range - 50) then
+							if (target.health <= RDamage(target) + EDamage(target) + PDamage(target) + dmglib.GetSpellDamage(0, target)) then
+								if (target.health >= menu.combo.rset.waster:get() and player:spellSlot(0).state ~= 0) then
+									if (player:spellSlot(1).state ~= 0) then
+										player:castSpell("pos", 3, player.pos)
+									end
+								end
+							end
+						end
+					end
+				end
+				if menu.combo.combomode:get() == 2 then
+					if (menu.combo.ecombo:get()) then
+						if (size() > 0) then
+							for _, objs in pairs(objHolder) do
+								if objs then
+									if not menu.combo.savee:get() then
+										if (target.pos:dist(objs.pos) < 450) then
+											if menu.combo.eturret:get() then
+												if not common.is_under_tower(objs.pos) then
+													local direction = (objs.pos - target.pos):norm()
+													local extendedPos = objs.pos - direction * 200
+													player:castSpell("pos", 2, extendedPos)
+												end
+											else
+												local direction = (objs.pos - target.pos):norm()
+												local extendedPos = objs.pos - direction * 200
+												player:castSpell("pos", 2, extendedPos)
+											end
+										end
+										if menu.combo.emode:get() == 1 then
+											if objs.pos:dist(player.pos) > spellE.range then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * 50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+											if (objs.pos:dist(target.pos) > 450) then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * 50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+										end
+										if menu.combo.emode:get() == 2 then
+											if objs.pos:dist(player.pos) > spellE.range then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * -50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+
+											if (objs.pos:dist(target.pos) > 450) then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * -50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+										end
+										if menu.combo.emode:get() == 3 then
+											if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
+												if objs.pos:dist(player.pos) > spellE.range then
+													if menu.combo.eturret:get() then
+														if not common.is_under_tower(target.pos) then
+															local direction = (target.pos - player.pos):norm()
+															local extendedPos = target.pos - direction * 50
+															player:castSpell("pos", 2, extendedPos)
+														end
+													else
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												end
+												if (objs.pos:dist(target.pos) > 450) then
+													if menu.combo.eturret:get() then
+														if not common.is_under_tower(target.pos) then
+															local direction = (target.pos - player.pos):norm()
+															local extendedPos = target.pos - direction * 50
+															player:castSpell("pos", 2, extendedPos)
+														end
+													else
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												end
+											end
+
+											if player:spellSlot(3).state == 0 then
+												if objs.pos:dist(player.pos) > spellE.range then
+													if menu.combo.eturret:get() then
+														if not common.is_under_tower(target.pos) then
+															local direction = (target.pos - player.pos):norm()
+															local extendedPos = target.pos - direction * -50
+															player:castSpell("pos", 2, extendedPos)
+														end
+													else
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												end
+
+												if (objs.pos:dist(target.pos) > 450) then
+													if menu.combo.eturret:get() then
+														if not common.is_under_tower(target.pos) then
+															local direction = (target.pos - player.pos):norm()
+															local extendedPos = target.pos - direction * -50
+															player:castSpell("pos", 2, extendedPos)
+														end
+													else
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												end
+											end
+										end
+									end
+
+									if menu.combo.savee:get() then
+										if (target.pos:dist(objs.pos) < 450) then
+											if menu.combo.eturret:get() then
+												if not common.is_under_tower(objs.pos) then
+													local direction = (objs.pos - target.pos):norm()
+													local extendedPos = objs.pos - direction * 200
+													player:castSpell("pos", 2, extendedPos)
+												end
+											else
+												local direction = (objs.pos - target.pos):norm()
+												local extendedPos = objs.pos - direction * 200
+												player:castSpell("pos", 2, extendedPos)
+											end
+										end
+									end
+								end
+							end
+						end
+						if (size() == 0) then
+							if not menu.combo.savee:get() then
+								if menu.combo.emode:get() == 1 then
+									if menu.combo.eturret:get() then
+										if not common.is_under_tower(target.pos) then
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * 50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									else
+										local direction = (target.pos - player.pos):norm()
+										local extendedPos = target.pos - direction * 50
+										player:castSpell("pos", 2, extendedPos)
+									end
+								end
+
+								if menu.combo.emode:get() == 2 then
+									if menu.combo.eturret:get() then
+										if not common.is_under_tower(target.pos) then
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * -50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									else
+										local direction = (target.pos - player.pos):norm()
+										local extendedPos = target.pos - direction * -50
+										player:castSpell("pos", 2, extendedPos)
+									end
+								end
+
+								if menu.combo.emode:get() == 3 then
+									if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
+										if menu.combo.eturret:get() then
+											if not common.is_under_tower(target.pos) then
+												local direction = (target.pos - player.pos):norm()
+												local extendedPos = target.pos - direction * 50
+												player:castSpell("pos", 2, extendedPos)
+											end
+										else
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * 50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									end
+
+									if player:spellSlot(3).state == 0 then
+										if menu.combo.eturret:get() then
+											if not common.is_under_tower(target.pos) then
+												local direction = (target.pos - player.pos):norm()
+												local extendedPos = target.pos - direction * -50
+												player:castSpell("pos", 2, extendedPos)
+											end
+										else
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * -50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									end
+								end
+							end
+						end
+					end
+
+					if (menu.combo.wcombo:get()) then
+						if (#count_enemies_in_range(player.pos, spellW.range) > 0) then
+							local target = GetTargetW()
+							if target and target.isVisible then
+								if common.IsValidTarget(target) then
+									if (target.pos:dist(player.pos) <= spellW.range) then
+										player:castSpell("pos", 1, target.pos)
+									end
+								end
+							end
+						end
+					end
+					if (menu.combo.qcombo:get()) then
+						if (target.pos:dist(player.pos) <= spellQ.range) and player:spellSlot(0).state == 0 then
+							player:castSpell("obj", 0, target)
+						end
+					end
+					if menu.combo.rset.rmod:get() == 1 and player:spellSlot(3).state == 0 then
+						if (target.pos:dist(player.pos) <= spellR.range - 50) then
+							if (#count_enemies_in_range(player.pos, spellR.range - 100) >= menu.combo.rset.rhit:get()) then
+								if (target.health >= menu.combo.rset.waster:get() and player:spellSlot(0).state ~= 0) then
+									if (player:spellSlot(1).state ~= 0) then
+										player:castSpell("pos", 3, player.pos)
+									end
+								end
+							end
+						end
+					end
+					if menu.combo.rset.rmod:get() == 2 and player:spellSlot(3).state == 0 then
+						if (target.pos:dist(player.pos) <= spellR.range - 50) then
+							if (target.health <= RDamage(target) + EDamage(target) + PDamage(target) + dmglib.GetSpellDamage(0, target)) then
+								if (target.health >= menu.combo.rset.waster:get() and player:spellSlot(0).state ~= 0) then
+									if (player:spellSlot(1).state ~= 0) then
+										player:castSpell("pos", 3, player.pos)
+									end
+								end
+							end
+						end
+					end
+				end
+				if menu.combo.combomode:get() == 3 then
+					if (menu.combo.qcombo:get() and player:spellSlot(3).state ~= 0) and TimeR < os.clock() then
+						if (target.pos:dist(player.pos) <= spellQ.range) then
+							player:castSpell("obj", 0, target)
+						end
+					end
+					if (menu.combo.ecombo:get()) then
+						if (size() > 0) then
+							for _, objs in pairs(objHolder) do
+								if objs then
+									if not menu.combo.savee:get() then
+										if (target.pos:dist(objs.pos) < 450) then
+											if menu.combo.eturret:get() then
+												if not common.is_under_tower(objs.pos) then
+													local direction = (objs.pos - target.pos):norm()
+													local extendedPos = objs.pos - direction * 200
+													player:castSpell("pos", 2, extendedPos)
+												end
+											else
+												local direction = (objs.pos - target.pos):norm()
+												local extendedPos = objs.pos - direction * 200
+												player:castSpell("pos", 2, extendedPos)
+											end
+										end
+										if menu.combo.emode:get() == 1 then
+											if objs.pos:dist(player.pos) > spellE.range then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * 50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+											if (objs.pos:dist(target.pos) > 450) then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * 50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+										end
+										if menu.combo.emode:get() == 2 then
+											if objs.pos:dist(player.pos) > spellE.range then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * -50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+
+											if (objs.pos:dist(target.pos) > 450) then
+												if menu.combo.eturret:get() then
+													if not common.is_under_tower(target.pos) then
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												else
+													local direction = (target.pos - player.pos):norm()
+													local extendedPos = target.pos - direction * -50
+													player:castSpell("pos", 2, extendedPos)
+												end
+											end
+										end
+										if menu.combo.emode:get() == 3 then
+											if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
+												if objs.pos:dist(player.pos) > spellE.range then
+													if menu.combo.eturret:get() then
+														if not common.is_under_tower(target.pos) then
+															local direction = (target.pos - player.pos):norm()
+															local extendedPos = target.pos - direction * 50
+															player:castSpell("pos", 2, extendedPos)
+														end
+													else
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												end
+												if (objs.pos:dist(target.pos) > 450) then
+													if menu.combo.eturret:get() then
+														if not common.is_under_tower(target.pos) then
+															local direction = (target.pos - player.pos):norm()
+															local extendedPos = target.pos - direction * 50
+															player:castSpell("pos", 2, extendedPos)
+														end
+													else
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * 50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												end
+											end
+
+											if player:spellSlot(3).state == 0 then
+												if objs.pos:dist(player.pos) > spellE.range then
+													if menu.combo.eturret:get() then
+														if not common.is_under_tower(target.pos) then
+															local direction = (target.pos - player.pos):norm()
+															local extendedPos = target.pos - direction * -50
+															player:castSpell("pos", 2, extendedPos)
+														end
+													else
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												end
+
+												if (objs.pos:dist(target.pos) > 450) then
+													if menu.combo.eturret:get() then
+														if not common.is_under_tower(target.pos) then
+															local direction = (target.pos - player.pos):norm()
+															local extendedPos = target.pos - direction * -50
+															player:castSpell("pos", 2, extendedPos)
+														end
+													else
+														local direction = (target.pos - player.pos):norm()
+														local extendedPos = target.pos - direction * -50
+														player:castSpell("pos", 2, extendedPos)
+													end
+												end
+											end
+										end
+									end
+
+									if menu.combo.savee:get() then
+										if (target.pos:dist(objs.pos) < 450) then
+											if menu.combo.eturret:get() then
+												if not common.is_under_tower(objs.pos) then
+													local direction = (objs.pos - target.pos):norm()
+													local extendedPos = objs.pos - direction * 200
+													player:castSpell("pos", 2, extendedPos)
+												end
+											else
+												local direction = (objs.pos - target.pos):norm()
+												local extendedPos = objs.pos - direction * 200
+												player:castSpell("pos", 2, extendedPos)
+											end
+										end
+									end
+								end
+							end
+						end
+						if (size() == 0) then
+							if not menu.combo.savee:get() then
+								if menu.combo.emode:get() == 1 then
+									if menu.combo.eturret:get() then
+										if not common.is_under_tower(target.pos) then
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * 50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									else
+										local direction = (target.pos - player.pos):norm()
+										local extendedPos = target.pos - direction * 50
+										player:castSpell("pos", 2, extendedPos)
+									end
+								end
+
+								if menu.combo.emode:get() == 2 then
+									if menu.combo.eturret:get() then
+										if not common.is_under_tower(target.pos) then
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * -50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									else
+										local direction = (target.pos - player.pos):norm()
+										local extendedPos = target.pos - direction * -50
+										player:castSpell("pos", 2, extendedPos)
+									end
+								end
+
+								if menu.combo.emode:get() == 3 then
+									if player:spellSlot(3).state ~= 0 or player:spellSlot(3).level == 0 then
+										if menu.combo.eturret:get() then
+											if not common.is_under_tower(target.pos) then
+												local direction = (target.pos - player.pos):norm()
+												local extendedPos = target.pos - direction * 50
+												player:castSpell("pos", 2, extendedPos)
+											end
+										else
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * 50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									end
+
+									if player:spellSlot(3).state == 0 then
+										if menu.combo.eturret:get() then
+											if not common.is_under_tower(target.pos) then
+												local direction = (target.pos - player.pos):norm()
+												local extendedPos = target.pos - direction * -50
+												player:castSpell("pos", 2, extendedPos)
+											end
+										else
+											local direction = (target.pos - player.pos):norm()
+											local extendedPos = target.pos - direction * -50
+											player:castSpell("pos", 2, extendedPos)
+										end
+									end
+								end
+							end
+						end
+					end
+					if (menu.combo.wcombo:get()) then
+						if (#count_enemies_in_range(player.pos, spellW.range) > 0) then
+							local target = GetTargetW()
+							if target and target.isVisible then
+								if common.IsValidTarget(target) then
+									if (target.pos:dist(player.pos) <= spellW.range) then
+										player:castSpell("pos", 1, target.pos)
+									end
+								end
+							end
+						end
+					end
+
+					if (target.pos:dist(player.pos) <= spellR.range - 50) then
+						if (player:spellSlot(1).state ~= 0) then
+							player:castSpell("pos", 3, player.pos)
 						end
 					end
 				end
@@ -1629,6 +1629,7 @@ local function Combo()
 		end
 	end
 end
+
 local function Harass()
 	local target = GetTargetE()
 	if target and target.isVisible then
