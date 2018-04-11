@@ -199,6 +199,8 @@ menu.killsteal:boolean("ksr", "Killsteal with R", true)
 menu.killsteal:slider("saver", "Don't waste R if Enemy Health < X", 100, 0, 500, 1)
 
 menu:menu("misc", "Misc.")
+menu.misc:slider("lasthittimer", "Last Hit E Delay", 125, 50, 200, 1);
+menu.misc.lasthittimer:set("tooltip", "Lower - Casts later, Higher - Casts earlier // Default is 125")
 menu.misc:boolean("disable", "Disable Auto Attack", true)
 menu.misc:slider("level", "Disable AA at X Level", 6, 1, 18, 1)
 menu.misc:boolean("GapA", "Use R for Anti-Gapclose", true)
@@ -458,7 +460,7 @@ local function LastHit()
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-				delay = 0.125 + player.pos:dist(minion.pos) / 890
+				delay = menu.misc.lasthittimer:get()/1000 + player.pos:dist(minion.pos) / 840
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 					orb.core.set_pause_attack(1)
 				end
@@ -503,7 +505,7 @@ local function Harass()
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-				delay = 0.125 + player.pos:dist(minion.pos) / 890
+				delay = menu.misc.lasthittimer:get()/1000 + player.pos:dist(minion.pos) / 840
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 					orb.core.set_pause_attack(1)
 				end
@@ -566,7 +568,7 @@ local function LaneClear()
 				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-					delay = 0.125 + player.pos:dist(minion.pos) / 890
+					delay = menu.misc.lasthittimer:get()/1000 + player.pos:dist(minion.pos) / 840
 					if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 						orb.core.set_pause_attack(1)
 					end
@@ -634,7 +636,7 @@ local function LaneClear()
 					if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-						delay = 0.125 + player.pos:dist(minion.pos) / 890
+						delay = menu.misc.lasthittimer:get()/1000 + player.pos:dist(minion.pos) / 840
 						if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 							orb.core.set_pause_attack(1)
 						end
@@ -1110,7 +1112,7 @@ local function OnDraw()
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-				delay = 0.125 + player.pos:dist(minion.pos) / 890
+				delay = (menu.misc.lasthittimer:get()/1000) + (player.pos:dist(minion.pos) / 840)
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true)) then
 					graphics.draw_circle(minionPos, 100, 2, graphics.argb(255, 255, 255, 0), 100)
 				end
