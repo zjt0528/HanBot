@@ -743,7 +743,7 @@ local function Combo()
 				target and (target.health / target.maxHealth) * 100 <= menu.combo.rset.hpr:get() and
 					target.health >= menu.combo.rset.waster:get()
 			 then
-				if not menu.blacklist[target.charName]:get() then
+				if menu.blacklist[target.charName] and not menu.blacklist[target.charName]:get() then
 					local pos = preds.linear.get_prediction(spellR, target)
 					if pos and pos.startPos:dist(pos.endPos) < spellR.range and #count_enemies_in_range(player.pos, 900) == 1 then
 						if (menu.combo.rset.face:get()) then
@@ -762,7 +762,7 @@ local function Combo()
 				target and target.health < EDamage(target) * 3 + dmglib.GetSpellDamage(3, target) + dmglib.GetSpellDamage(0, target) and
 					target.health >= menu.combo.rset.waster:get()
 			 then
-				if not menu.blacklist[target.charName]:get() then
+				if menu.blacklist[target.charName] and not menu.blacklist[target.charName]:get() then
 					local pos = preds.linear.get_prediction(spellR, target)
 					if pos and pos.startPos:dist(pos.endPos) < spellR.range and #count_enemies_in_range(player.pos, 900) == 1 then
 						if (menu.combo.rset.face:get()) then
