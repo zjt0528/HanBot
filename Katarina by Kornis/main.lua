@@ -1865,7 +1865,7 @@ local function OnTick()
 				enemies and common.IsValidTarget(enemies) and player.pos:dist(enemies) < 1000 and
 					not common.HasBuffType(enemies, 17)
 			 then
-				if not (player.buff["katarinarsound"]) then
+				if not (player.buff["katarinarsound"]) and size() > 0 then
 					if (GetClosestDagger()) and enemies.pos:dist(player.pos) < 500 then
 						local direction = (GetClosestDagger().pos - enemies.pos):norm()
 						local extendedPos = GetClosestDagger().pos - direction * 150
