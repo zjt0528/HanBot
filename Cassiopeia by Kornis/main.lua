@@ -159,6 +159,7 @@ menu.combo.rset:boolean("facer", " ^-Only count if Facing", true)
 menu.combo:boolean("rylais", "Rylais Combo ( Starts with E )", false)
 menu.combo:keybind("rflash", "R-Flash Key", "G", nil)
 menu.combo:boolean("flashrface", " ^- Only if Facing", true)
+menu.combo:keybind("semir", "Semi-R Key", "T", nil)
 menu:menu("blacklist", "R Blacklist")
 local enemy = common.GetEnemyHeroes()
 for i, allies in ipairs(enemy) do
@@ -199,7 +200,7 @@ menu.killsteal:boolean("ksr", "Killsteal with R", true)
 menu.killsteal:slider("saver", "Don't waste R if Enemy Health < X", 100, 0, 500, 1)
 
 menu:menu("misc", "Misc.")
-menu.misc:slider("lasthittimer", "Last Hit E Delay", 125, 50, 200, 1);
+menu.misc:slider("lasthittimer", "Last Hit E Delay", 125, 50, 200, 1)
 menu.misc.lasthittimer:set("tooltip", "Lower - Casts later, Higher - Casts earlier // Default is 125")
 menu.misc:boolean("disable", "Disable Auto Attack", true)
 menu.misc:slider("level", "Disable AA at X Level", 6, 1, 18, 1)
@@ -460,7 +461,7 @@ local function LastHit()
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-				delay = menu.misc.lasthittimer:get()/1000 + player.pos:dist(minion.pos) / 840
+				delay = menu.misc.lasthittimer:get() / 1000 + player.pos:dist(minion.pos) / 840
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 					orb.core.set_pause_attack(1)
 				end
@@ -505,7 +506,7 @@ local function Harass()
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-				delay = menu.misc.lasthittimer:get()/1000 + player.pos:dist(minion.pos) / 840
+				delay = menu.misc.lasthittimer:get() / 1000 + player.pos:dist(minion.pos) / 840
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 					orb.core.set_pause_attack(1)
 				end
@@ -568,7 +569,7 @@ local function LaneClear()
 				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-					delay = menu.misc.lasthittimer:get()/1000 + player.pos:dist(minion.pos) / 840
+					delay = menu.misc.lasthittimer:get() / 1000 + player.pos:dist(minion.pos) / 840
 					if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 						orb.core.set_pause_attack(1)
 					end
@@ -636,7 +637,7 @@ local function LaneClear()
 					if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-						delay = menu.misc.lasthittimer:get()/1000 + player.pos:dist(minion.pos) / 840
+						delay = menu.misc.lasthittimer:get() / 1000 + player.pos:dist(minion.pos) / 840
 						if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true) - 150 and player.mana > player.manaCost2) then
 							orb.core.set_pause_attack(1)
 						end
@@ -698,8 +699,7 @@ local function LaneClear()
 	end
 end
 
-local GetNumberOfHits =
-	function(res, obj, dist)
+local GetNumberOfHits = function(res, obj, dist)
 	if dist > spellR.range then
 		return
 	end
@@ -918,6 +918,17 @@ local function Combo()
 	end
 end
 local function OnTick()
+	if menu.combo.semir:get() then
+		local target = GetTarget()
+		if common.IsValidTarget(target) then
+			if target and target.isVisible then
+				local pos = preds.linear.get_prediction(spellR, target)
+				if pos and pos.startPos:dist(pos.endPos) < spellR.range then
+					player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+				end
+			end
+		end
+	end
 	FlashR()
 	Toggle()
 	KillSteal()
@@ -1112,7 +1123,7 @@ local function OnDraw()
 			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
-				delay = (menu.misc.lasthittimer:get()/1000) + (player.pos:dist(minion.pos) / 840)
+				delay = (menu.misc.lasthittimer:get() / 1000) + (player.pos:dist(minion.pos) / 840)
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true)) then
 					graphics.draw_circle(minionPos, 100, 2, graphics.argb(255, 255, 255, 0), 100)
 				end
