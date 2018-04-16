@@ -679,7 +679,7 @@ end
 local function LaneClear()
 	if uhh then
 		if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
-			if menu.laneclear.farmq:get() then
+			if menu.laneclear.farmq:get() and player:spellSlot(0).state == 0 then
 				local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 				for i, minion in pairs(enemyMinionsQ) do
 					if minion and not minion.isDead and common.IsValidTarget(minion) then
@@ -730,7 +730,7 @@ local function LaneClear()
 	end
 	if not uhh and not player.buff["pyromania_particle"] then
 		if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
-			if menu.laneclear.farmq:get() then
+			if menu.laneclear.farmq:get() and player:spellSlot(0).state == 0 then
 				local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 				for i, minion in pairs(enemyMinionsQ) do
 					if minion and not minion.isDead and common.IsValidTarget(minion) then
@@ -780,7 +780,7 @@ local function LaneClear()
 end
 local function LastHit()
 	if uhh then
-		if menu.lasthit.useq:get() then
+		if menu.lasthit.useq:get() and player:spellSlot(0).state == 0 then
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellQ.range then
@@ -798,7 +798,7 @@ local function LastHit()
 		end
 	end
 	if not uhh and not player.buff["pyromania_particle"] then
-		if menu.lasthit.useq:get() then
+		if menu.lasthit.useq:get() and player:spellSlot(0).state == 0 then
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellQ.range then
