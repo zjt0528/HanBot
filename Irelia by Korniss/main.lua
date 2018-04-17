@@ -171,6 +171,8 @@ menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:slider("minq", " ^- Min. Q Range", 300, 0, 400, 1)
 menu.combo:boolean("gapq", "Use Q for Gapclose on Minion", true)
 menu.combo:boolean("outofq", " ^-Only if out of Q Range", false)
+menu.combo:boolean("jumparound", "Use Q to Jump-Around Enemy on Minions", false)
+menu.combo:slider("jumpmana", " ^- Mana Manager", 30, 0, 100, 1)
 --menu.combo:boolean("waitq", "Wait for Mark", true)
 menu.combo:boolean("wcombo", "Use W in Combo", true)
 menu.combo:slider("chargew", " ^- Charge Timer", 100, 1, 1500, 1)
@@ -180,7 +182,7 @@ menu.combo:boolean("ecombo", "Use E in Combo", true)
 menu.combo:dropdown("emode", "E Mode", 2, {"First", "Second"})
 menu.combo.emode:set("tooltip", "Different E1 position")
 menu.combo:dropdown("rusage", "R Usage", 2, {"Always", "Only if Killable", "Never"})
-menu.combo:slider("hitr", " ^- If Hits X Enemies", 3, 1, 5, 1)
+menu.combo:slider("hitr", " ^- If Hits X Enemies", 2, 1, 5, 1)
 menu.combo.hitr:set("tooltip", "Only if Usage is 'Always'")
 menu.combo:slider("saver", "Don't waste R if Enemy Health Percent <=", 10, 1, 100, 1)
 menu.combo:boolean("items", "Use Items", true)
@@ -203,7 +205,7 @@ menu.laneclear:slider("mana", "Mana Manager", 30, 0, 100, 1)
 menu.laneclear:boolean("farmq", "Use Q to Farm", true)
 menu.laneclear:boolean("lastq", " ^-Only for Last Hit", true)
 menu.laneclear:boolean("turret", " ^-Don't use Q Under the Turret", true)
-
+menu.laneclear:boolean("usee", "Use E in Jungle Clear", true)
 menu:menu("lasthit", "Last Hit")
 menu.lasthit:slider("mana", "Mana Manager", 30, 0, 100, 1)
 menu.lasthit:boolean("useq", "Use Q to Last Hit", true)
@@ -835,16 +837,59 @@ local function GetClosestJungleMark()
 	end
 	return closestMinion
 end
+local function GetClosestMob()
+	local enemyMinions = common.GetMinionsInRange(700, TEAM_ENEMY, mousePos)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+
+	for i, minion in pairs(enemyMinions) do
+		if minion then
+			local minionPos = vec3(minion.x, minion.y, minion.z)
+			if minionPos:dist(mousePos) < 300 then
+				local minionDistanceToMouse = minionPos:dist(mousePos)
+
+				if minionDistanceToMouse < closestMinionDistance then
+					closestMinion = minion
+					closestMinionDistance = minionDistanceToMouse
+				end
+			end
+		end
+	end
+	return closestMinion
+end
+
+local function GetClosestJungle()
+	local enemyMinions = common.GetMinionsInRange(700, TEAM_NEUTRAL, mousePos)
+
+	local closestMinion = nil
+	local closestMinionDistance = 9999
+
+	for i, minion in pairs(enemyMinions) do
+		if minion then
+			local minionPos = vec3(minion.x, minion.y, minion.z)
+			if minionPos:dist(mousePos) < 300 then
+				local minionDistanceToMouse = minionPos:dist(mousePos)
+
+				if minionDistanceToMouse < closestMinionDistance then
+					closestMinion = minion
+					closestMinionDistance = minionDistanceToMouse
+				end
+			end
+		end
+	end
+	return closestMinion
+end
 local function Flee()
 	if menu.flee.fleekey:get() then
 		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
 		if menu.flee.fleeq:get() then
 			if not menu.flee.fleekill:get() then
-				local minion = GetClosestMob(target)
+				local minion = GetClosestMob()
 				if minion then
 					player:castSpell("obj", 0, minion)
 				end
-				local jungleeeee = GetClosestJungle(target)
+				local jungleeeee = GetClosestJungle()
 				if jungleeeee then
 					player:castSpell("obj", 0, jungleeeee)
 				end
@@ -852,19 +897,19 @@ local function Flee()
 		end
 		if menu.flee.fleeq:get() then
 			if menu.flee.fleekill:get() then
-				local minion = GetClosestMobKill(target)
+				local minion = GetClosestMobKill()
 				if minion then
 					player:castSpell("obj", 0, minion)
 				end
-				local jungleeeee = GetClosestJungleKill(target)
+				local jungleeeee = GetClosestJungleKill()
 				if jungleeeee then
 					player:castSpell("obj", 0, jungleeeee)
 				end
-				local minionm = GetClosestMobMark(target)
+				local minionm = GetClosestMobMark()
 				if minionm then
 					player:castSpell("obj", 0, minionm)
 				end
-				local jungleeeeem = GetClosestJungleMark(target)
+				local jungleeeeem = GetClosestJungleMark()
 				if jungleeeeem then
 					player:castSpell("obj", 0, jungleeeeem)
 				end
@@ -959,7 +1004,26 @@ local function Combo()
 			end
 		end
 	end
-
+	if menu.combo.jumparound:get() and menu.combo.jumpmana:get() <= (player.mana / player.maxMana) * 100 then
+		if common.IsValidTarget(target) then
+			if menu.combo.qcombo:get() then
+				if common.IsValidTarget(target) then
+					for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+						local minion = objManager.minions[TEAM_ENEMY][i]
+						if
+							minion and minion.isVisible and not minion.isDead and minion.type == TYPE_MINION and
+								minion.pos:dist(player.pos) < spellQ.range and
+								minion.pos:dist(target.pos) < spellQ.range - 50
+						 then
+							if (GetQDamage(minion) >= minion.health) then
+								player:castSpell("obj", 0, minion)
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 	if common.IsValidTarget(target) then
 		if menu.combo.ecombo:get() then
 			if common.IsValidTarget(target) then
@@ -1224,6 +1288,7 @@ function DrawDamagesE(target)
 end
 
 local function JungleClear()
+	local meow = 0
 	if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
 		if menu.laneclear.farmq:get() then
 			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
@@ -1231,7 +1296,98 @@ local function JungleClear()
 				if minion and not minion.isDead and common.IsValidTarget(minion) then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					if minionPos:dist(player.pos) <= spellQ.range then
-						player:castSpell("obj", 0, minion)
+						if (meow < os.clock()) then
+							if minion.buff["ireliamark"] then
+								player:castSpell("obj", 0, minion)
+								meow = os.clock() + 0.5
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if menu.laneclear.usee:get() then
+		local enemyMinionsQ = common.GetMinionsInRange(spellE.range, TEAM_NEUTRAL)
+		for i, minion in pairs(enemyMinionsQ) do
+			if minion and not minion.isDead and common.IsValidTarget(minion) then
+				local minionPos = vec3(minion.x, minion.y, minion.z)
+				if minionPos:dist(player.pos) <= spellE.range then
+					if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
+						if menu.combo.emode:get() == 2 then
+							-- Thanks to asdf. ♡
+							if not minion.path.isActive then
+								if minion.pos:dist(player.pos) <= 900 then
+									local cast1 = player.pos + (minion.pos - player.pos):norm() * 900
+									if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
+										player:castSpell("pos", 2, cast1)
+									end
+								end
+							else
+								local pathStartPos = minion.path.point[0]
+								local pathEndPos = minion.path.point[minion.path.count]
+								local pathNorm = (pathEndPos - pathStartPos):norm()
+								local tempPred = common.GetPredictedPos(minion, 1)
+								if tempPred then
+									local dist1 = player.pos:dist(tempPred)
+									if dist1 <= 900 then
+										local dist2 = player.pos:dist(minion.pos)
+										if dist1 < dist2 then
+											pathNorm = pathNorm * -1
+										end
+										local cast2 = RaySetDist(minion.pos, pathNorm, player.pos, 900)
+										if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
+											player:castSpell("pos", 2, cast2)
+										end
+									end
+								end
+							end
+							delayyyyyyy = os.clock() + 0.5
+						end
+					end
+
+					for _, objsq in pairs(blade) do
+						if objsq and not objsq.isDead and not minion.buff["ireliamark"] then
+							local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
+							if pos and player:spellSlot(2).name == "IreliaE2" then
+								local EPOS =
+									objsq.pos +
+									(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
+										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 300)
+								if (minion.pos:dist(objsq.pos) > 300) then
+									spellE.speed = EPOS:dist(objsq.pos)
+								end
+
+								local pos2 = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
+								if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
+									local EPOS2 =
+										objsq.pos +
+										(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
+											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 300)
+									player:castSpell("pos", 2, EPOS2)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
+		if menu.laneclear.farmq:get() then
+			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
+			for i, minion in pairs(enemyMinionsQ) do
+				if minion and not minion.isDead and common.IsValidTarget(minion) then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(player.pos) <= spellQ.range then
+						if (delayyyyyyy < os.clock()) then
+							if not minion.buff["ireliamark"] then
+								if (os.clock() > waiting) then
+									player:castSpell("obj", 0, minion)
+								end
+							end
+						end
 					end
 				end
 			end
@@ -1275,7 +1431,7 @@ local function Harass()
 							end
 						end
 						if menu.combo.emode:get() == 2 then
-								-- Thanks to asdf. ♡
+							-- Thanks to asdf. ♡
 							if not target.path.isActive then
 								if target.pos:dist(player.pos) <= 900 then
 									local cast1 = player.pos + (target.pos - player.pos):norm() * 900
@@ -1460,7 +1616,7 @@ local function KillSteal()
 										end
 									end
 									if menu.combo.emode:get() == 2 then
-											-- Thanks to asdf. ♡
+										-- Thanks to asdf. ♡
 										if not enemies.path.isActive then
 											if enemies.pos:dist(player.pos) <= 900 then
 												local cast1 = player.pos + (enemies.pos - player.pos):norm() * 900
