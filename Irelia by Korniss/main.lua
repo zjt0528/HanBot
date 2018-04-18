@@ -167,24 +167,31 @@ local menu = menu("IreliaKornis", "Irelia By Kornis")
 --dts = tSelector(menu, 1100, 1)
 --dts:addToMenu()
 menu:menu("combo", "Combo")
+menu.combo:header("uhhh", "-- Q Settings --")
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
-menu.combo:slider("minq", " ^- Min. Q Range", 300, 0, 400, 1)
+menu.combo:slider("minq", " ^- Min. Q Range", 300, 0, 900, 1)
+menu.combo.minq:set("tooltip", "Setting Max Value will use Q only if Marked / Killable.")
+
 menu.combo:boolean("gapq", "Use Q for Gapclose on Minion", true)
 menu.combo:boolean("outofq", " ^-Only if out of Q Range", false)
 menu.combo:boolean("jumparound", "Use Q to Jump-Around Enemy on Minions", false)
-menu.combo:slider("jumpmana", " ^- Mana Manager", 30, 0, 100, 1)
+menu.combo:slider("jumpmana", " ^- Mana Manager", 50, 0, 100, 1)
 --menu.combo:boolean("waitq", "Wait for Mark", true)
+menu.combo:header("uhhh", "-- W Settings --")
 menu.combo:boolean("wcombo", "Use W in Combo", true)
 menu.combo:slider("chargew", " ^- Charge Timer", 100, 1, 1500, 1)
 menu.combo:boolean("forcew", " ^- Force W if Enemy leaving range", true)
 menu.combo.forcew:set("tooltip", "Forces charged W if Enemy is Leaving Range")
+menu.combo:header("uhhh", "-- E Settings --")
 menu.combo:boolean("ecombo", "Use E in Combo", true)
 menu.combo:dropdown("emode", "E Mode", 2, {"First", "Second"})
 menu.combo.emode:set("tooltip", "Different E1 position")
+menu.combo:header("uhhh", "-- R Settings --")
 menu.combo:dropdown("rusage", "R Usage", 2, {"Always", "Only if Killable", "Never"})
 menu.combo:slider("hitr", " ^- If Hits X Enemies", 2, 1, 5, 1)
 menu.combo.hitr:set("tooltip", "Only if Usage is 'Always'")
 menu.combo:slider("saver", "Don't waste R if Enemy Health Percent <=", 10, 1, 100, 1)
+menu.combo:keybind("semir", "Semi-R", "T", nil)
 menu.combo:boolean("items", "Use Items", true)
 
 menu:menu("harass", "Harass")
@@ -275,6 +282,7 @@ menu:menu("flee", "Flee")
 menu.flee:boolean("fleeq", "Use Q to Flee", true)
 menu.flee:boolean("fleekill", " ^- Only if Minion is Killable/Marked", true)
 menu.flee:keybind("fleekey", "Flee Key", "G", nil)
+menu.flee:boolean("fleee", "Use E in Flee", true)
 
 menu:menu("keys", "Key Settings")
 menu.keys:keybind("combokey", "Combo Key", "Space", nil)
@@ -372,7 +380,7 @@ function GetQDamage(target)
 	local ratio = common.GetTotalAD() * 0.7
 	local total = flat + ratio
 	if target.type == TYPE_MINION and target.team ~= TEAM_NEUTRAL then
-		total = total * 1.6
+		total = total * 1.7
 	end
 	totalPhysical = total + totalPhysical
 
@@ -464,7 +472,7 @@ function GetQDamage(target)
 	end
 	return (totalPhysical * common.PhysicalReduction(target) + totalMagical * common.MagicReduction(target)) - 20
 end
-local RLevelDamage = {150, 275, 400}
+local RLevelDamage = {125, 225, 325}
 function RDamage(target)
 	local damage = 0
 	if player:spellSlot(3).level > 0 then
@@ -882,6 +890,7 @@ local function GetClosestJungle()
 end
 local function Flee()
 	if menu.flee.fleekey:get() then
+		local target = GetTarget()
 		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
 		if menu.flee.fleeq:get() then
 			if not menu.flee.fleekill:get() then
@@ -912,6 +921,79 @@ local function Flee()
 				local jungleeeeem = GetClosestJungleMark()
 				if jungleeeeem then
 					player:castSpell("obj", 0, jungleeeeem)
+				end
+			end
+		end
+		if menu.flee.fleee:get() then
+			if common.IsValidTarget(target) then
+				if (target.pos:dist(player) <= spellE.range) then
+					if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
+						if menu.combo.emode:get() == 1 then
+							local pos2 = preds.linear.get_prediction(spellEA, target)
+							if (pos2) and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 900 then
+								local EPOS2 =
+									target.path.serverPos +
+									(((player.pos:dist(target.pos)) * -0.5 + 600 + target.path.serverPos:dist(player.path.serverPos)) /
+										target.path.serverPos:dist(player.path.serverPos)) *
+										(player.path.serverPos - target.path.serverPos)
+								player:castSpell("pos", 2, EPOS2)
+								delayyyyyyy = os.clock() + 0.5
+							end
+						end
+						if menu.combo.emode:get() == 2 then
+							-- Thanks to asdf. ♡
+							if not target.path.isActive then
+								if target.pos:dist(player.pos) <= 900 then
+									local cast1 = player.pos + (target.pos - player.pos):norm() * 900
+									player:castSpell("pos", 2, cast1)
+								end
+							else
+								local pathStartPos = target.path.point[0]
+								local pathEndPos = target.path.point[target.path.count]
+								local pathNorm = (pathEndPos - pathStartPos):norm()
+								local tempPred = common.GetPredictedPos(target, 1)
+								if tempPred then
+									local dist1 = player.pos:dist(tempPred)
+									if dist1 <= 900 then
+										local dist2 = player.pos:dist(target.pos)
+										if dist1 < dist2 then
+											pathNorm = pathNorm * -1
+										end
+										local cast2 = RaySetDist(target.pos, pathNorm, player.pos, 900)
+										player:castSpell("pos", 2, cast2)
+									end
+								end
+							end
+							delayyyyyyy = os.clock() + 0.5
+						end
+					end
+				end
+			end
+			if common.IsValidTarget(target) then
+				if (target.pos:dist(player) <= spellE.range) then
+					for _, objsq in pairs(blade) do
+						if objsq and not objsq.isDead and not target.buff["ireliamark"] then
+							local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
+							if pos and player:spellSlot(2).name == "IreliaE2" then
+								local EPOS =
+									objsq.pos +
+									(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
+										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 320)
+								if (target.pos:dist(objsq.pos) > 300) then
+									spellE.speed = EPOS:dist(objsq.pos)
+								end
+
+								local pos2 = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
+								if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
+									local EPOS2 =
+										objsq.pos +
+										(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
+											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 320)
+									player:castSpell("pos", 2, EPOS2)
+								end
+							end
+						end
+					end
 				end
 			end
 		end
@@ -1004,7 +1086,7 @@ local function Combo()
 			end
 		end
 	end
-	if menu.combo.jumparound:get() and menu.combo.jumpmana:get() <= (player.mana / player.maxMana) * 100 then
+	if menu.combo.jumparound:get() and menu.combo.jumpmana:get() <= (player.mana / player.maxMana) * 100 and (first == 0) then
 		if common.IsValidTarget(target) then
 			if menu.combo.qcombo:get() then
 				if common.IsValidTarget(target) then
@@ -1920,6 +2002,17 @@ local function OnDraw()
 end
 
 local function OnTick()
+	if menu.combo.semir:get() then
+		local target = GetTarget()
+		if common.IsValidTarget(target) and target then
+			if (target.pos:dist(player) < spellR.range) then
+				local pos = preds.linear.get_prediction(spellR, target)
+				if pos and pos.startPos:dist(pos.endPos) < spellR.range then
+					player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+				end
+			end
+		end
+	end
 	if not player.buff["ireliawdefense"] then
 		if
 			menu.dodgew["Karthus" .. "R"] and menu.dodgew["Karthus" .. "R"]:get() and player.buff["karthusfallenonetarget"] and
