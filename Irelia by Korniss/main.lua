@@ -1,5 +1,5 @@
 local version = "1.0"
-
+local evade = module.seek("evade")
 local avada_lib = module.lib("avada_lib")
 if not avada_lib then
 	console.set_color(12)
@@ -95,6 +95,288 @@ local dodgeWs = {
 	},
 	["malzahar"] = {
 		{menuslot = "R", slot = 3}
+	},
+	["tristana"] = {
+		{menuslot = "R", slot = 3}
+	},
+	["chogath"] = {
+		{menuslot = "R", slot = 3}
+	},
+	["lissandra"] = {
+		{menuslot = "R", slot = 3}
+	},
+	["jarvaniv"] = {
+		{menuslot = "R", slot = 3}
+	},
+	["skarner"] = {
+		{menuslot = "R", slot = 3}
+	},
+	["kalista"] = {
+		{menuslot = "E", slot = 2}
+	},
+	["brand"] = {
+		{menuslot = "R", slot = 3}
+	},
+	["akali"] = {
+		{menuslot = "R", slot = 3}
+	},
+	["diana"] = {
+		{menuslot = "R", slot = 3}
+	},
+	["khazix"] = {
+		{menuslot = "Q", slot = 0}
+	},
+	["nocturne"] = {
+		{menuslot = "R", slot = 3}
+	}
+}
+local Spells = {
+	["Pulverize"] = {
+		charName = "Alistar",
+		slot = 0,
+		type = "circular",
+		speed = math.huge,
+		range = 0,
+		delay = 0.25,
+		radius = 365,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["InfernalGuardian"] = {
+		charName = "Annie",
+		slot = 3,
+		type = "circular",
+		speed = math.huge,
+		range = 600,
+		delay = 0.25,
+		radius = 290,
+		hitbox = true,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
+	["EkkoR"] = {
+		charName = "Ekko",
+		slot = 3,
+		type = "circular",
+		speed = 1650,
+		range = 1600,
+		delay = 0.25,
+		radius = 375,
+		hitbox = false,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
+	["ZoeQ"] = {
+		charName = "Zoe",
+		slot = 0,
+		type = "linear",
+		speed = 1280,
+		range = 800,
+		delay = 0.25,
+		radius = 40,
+		hitbox = true,
+		aoe = false,
+		cc = false,
+		collision = true
+	},
+	["ZoeQRecast"] = {
+		charName = "Zoe",
+		slot = 0,
+		type = "linear",
+		speed = 2370,
+		range = 1600,
+		delay = 0,
+		radius = 40,
+		hitbox = true,
+		aoe = false,
+		cc = false,
+		collision = true
+	},
+	["CurseoftheSadMummy"] = {
+		charName = "Amumu",
+		slot = 3,
+		type = "circular",
+		speed = math.huge,
+		range = 0,
+		delay = 0.25,
+		radius = 550,
+		hitbox = false,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["AurelionSolR"] = {
+		charName = "AurelionSol",
+		slot = 3,
+		type = "linear",
+		speed = 4285,
+		range = 1500,
+		delay = 0.35,
+		radius = 120,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["StaticField"] = {
+		charName = "Blitzcrank",
+		slot = 3,
+		type = "circular",
+		speed = math.huge,
+		range = 0,
+		delay = 0.25,
+		radius = 600,
+		hitbox = false,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["EvelynnR"] = {
+		charName = "Evelynn",
+		slot = 3,
+		type = "conic",
+		speed = math.huge,
+		range = 450,
+		delay = 0.35,
+		angle = 180,
+		hitbox = false,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
+	["GnarR"] = {
+		charName = "Gnar",
+		slot = 3,
+		type = "linear",
+		speed = math.huge,
+		range = 475,
+		delay = 0.25,
+		radius = 475,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["UFSlash"] = {
+		charName = "Malphite",
+		slot = 3,
+		type = "circular",
+		speed = 2170,
+		range = 1000,
+		delay = 0,
+		radius = 300,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["RivenIzunaBlade"] = {
+		charName = "Riven",
+		slot = 3,
+		type = "conic",
+		speed = 1600,
+		range = 900,
+		delay = 0.25,
+		angle = 50,
+		hitbox = true,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
+	["SonaR"] = {
+		charName = "Sona",
+		slot = 3,
+		type = "linear",
+		speed = 2250,
+		range = 900,
+		delay = 0.25,
+		radius = 120,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["GravesChargeShot"] = {
+		charName = "Graves",
+		slot = 3,
+		type = "linear",
+		speed = 1950,
+		range = 1000,
+		delay = 0.25,
+		radius = 100,
+		hitbox = true,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
+	["GravesChargeShotFxMissile"] = {
+		charName = "Graves",
+		slot = 3,
+		type = "conic",
+		speed = math.huge,
+		range = 800,
+		delay = 0.3,
+		angle = 80,
+		hitbox = true,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
+	["GragasR"] = {
+		charName = "Gragas",
+		slot = 3,
+		type = "circular",
+		speed = 1800,
+		range = 1000,
+		delay = 0.25,
+		radius = 400,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["TalonR"] = {
+		charName = "Talon",
+		slot = 3,
+		type = "circular",
+		speed = math.huge,
+		range = 0,
+		delay = 0.25,
+		radius = 550,
+		hitbox = false,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
+	["MonkeyKingSpinToWin"] = {
+		charName = "MonkeyKing",
+		slot = 3,
+		type = "circular",
+		speed = math.huge,
+		range = 0,
+		delay = 0,
+		radius = 325,
+		hitbox = false,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["ZiggsR"] = {
+		charName = "Ziggs",
+		slot = 3,
+		type = "circular",
+		speed = 1500,
+		range = 5300,
+		delay = 0.375,
+		radius = 550,
+		hitbox = true,
+		aoe = true,
+		cc = false,
+		collision = false
 	}
 }
 local interruptableSpells = {
@@ -161,7 +443,7 @@ local interruptableSpells = {
 		{menuslot = "R", slot = 3, spellname = "xerathlocusofpower2", channelduration = 3}
 	}
 }
-
+local str = {[-1] = "P", [0] = "Q", [1] = "W", [2] = "E", [3] = "R"}
 local tSelector = avada_lib.targetSelector
 local menu = menu("IreliaKornis", "Irelia By Kornis")
 --dts = tSelector(menu, 1100, 1)
@@ -213,6 +495,7 @@ menu.farming.laneclear:slider("mana", "Mana Manager", 30, 0, 100, 1)
 menu.farming.laneclear:boolean("farmq", "Use Q to Farm", true)
 menu.farming.laneclear:boolean("lastq", " ^-Only for Last Hit", true)
 menu.farming.laneclear:boolean("turret", " ^-Don't use Q Under the Turret", true)
+menu.farming.laneclear:boolean("farme", "Use E in Lane Clear", true)
 menu.farming:menu("jungleclear", "Jungle Clear")
 menu.farming.jungleclear:boolean("useq", "Use Q in Jungle Clear", true)
 menu.farming.jungleclear:boolean("markedq", " ^- Only if Marked", true)
@@ -267,7 +550,31 @@ for i = 1, #common.GetEnemyHeroes() do
 end
 
 menu:menu("dodgew", "W Dodge")
+menu.dodgew:header("hello", " -- Enemy Skillshots -- ")
+for _, i in pairs(Spells) do
+	for l, k in pairs(common.GetEnemyHeroes()) do
+		-- k = myHero
+		if not Spells[_] then
+			return
+		end
+		if i.charName == k.charName then
+			if i.displayname == "" then
+				i.displayname = _
+			end
+			if i.danger == 0 then
+				i.danger = 1
+			end
+			if (menu.dodgew[i.charName] == nil) then
+				menu.dodgew:menu(i.charName, i.charName)
+			end
+			menu.dodgew[i.charName]:menu(_, "" .. i.charName .. " | " .. (str[i.slot] or "?") .. " " .. _)
 
+			menu.dodgew[i.charName][_]:boolean("Dodge", "Enable Block", true)
+
+			menu.dodgew[i.charName][_]:slider("hp", "HP to Dodge", 100, 1, 100, 5)
+		end
+	end
+end
 for i = 1, #common.GetEnemyHeroes() do
 	local enemy = common.GetEnemyHeroes()[i]
 	local name = string.lower(enemy.charName)
@@ -1825,6 +2132,69 @@ local function LaneClear()
 				end
 			end
 		end
+		if menu.farming.laneclear.farme:get() then
+			local enemyMinionsQ = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
+			for i, minion in pairs(enemyMinionsQ) do
+				if minion and not minion.isDead and common.IsValidTarget(minion) then
+					local minionPos = vec3(minion.x, minion.y, minion.z)
+					if minionPos:dist(player.pos) <= spellE.range then
+						if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
+							if menu.combo.emode:get() == 2 then
+								-- Thanks to asdf. ♡
+								if not minion.path.isActive then
+									if minion.pos:dist(player.pos) <= 900 then
+										local cast1 = player.pos + (minion.pos - player.pos):norm() * 900
+	
+										player:castSpell("pos", 2, cast1)
+									end
+								else
+									local pathStartPos = minion.path.point[0]
+									local pathEndPos = minion.path.point[minion.path.count]
+									local pathNorm = (pathEndPos - pathStartPos):norm()
+									local tempPred = common.GetPredictedPos(minion, 1)
+									if tempPred then
+										local dist1 = player.pos:dist(tempPred)
+										if dist1 <= 900 then
+											local dist2 = player.pos:dist(minion.pos)
+											if dist1 < dist2 then
+												pathNorm = pathNorm * -1
+											end
+											local cast2 = RaySetDist(minion.pos, pathNorm, player.pos, 900)
+											player:castSpell("pos", 2, cast2)
+										end
+									end
+								end
+								delayyyyyyy = os.clock() + 0.5
+							end
+						end
+	
+						for _, objsq in pairs(blade) do
+							if objsq and not objsq.isDead and not minion.buff["ireliamark"] then
+								local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
+								if pos and player:spellSlot(2).name == "IreliaE2" then
+									local EPOS =
+										objsq.pos +
+										(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
+											(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 300)
+									if (minion.pos:dist(objsq.pos) > 300) then
+										spellE.speed = EPOS:dist(objsq.pos)
+									end
+	
+									local pos2 = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
+									if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
+										local EPOS2 =
+											objsq.pos +
+											(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
+												(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 300)
+										player:castSpell("pos", 2, EPOS2)
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
 	end
 end
 local function LastHit()
@@ -2010,6 +2380,33 @@ local function OnDraw()
 end
 
 local function OnTick()
+	for i = 1, #evade.core.active_spells do
+		local spell = evade.core.active_spells[i]
+
+		if
+			spell.polygon and spell.polygon:Contains(player.path.serverPos) ~= 0 and
+				(not spell.data.collision or #spell.data.collision == 0)
+		 then
+			for _, k in pairs(Spells) do
+				if menu.dodgew[k.charName] then
+					if
+						spell.name:find(_:lower()) and menu.dodgew[k.charName][_].Dodge:get() and
+							menu.dodgew[k.charName][_].hp:get() >= (player.health / player.maxHealth) * 100
+					 then
+						if spell.missile then
+							if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+								player:castSpell("pos", 1, player.pos)
+							end
+						end
+						if k.speed == math.huge then
+							player:castSpell("pos", 1, player.pos)
+						end
+					end
+				end
+			end
+		end
+	end
+
 	if menu.combo.semir:get() then
 		local target = GetTarget()
 		if common.IsValidTarget(target) and target then
