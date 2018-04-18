@@ -206,13 +206,18 @@ menu.harass:boolean("forcew", " ^- Force W if Enemy leaving range", true)
 menu.harass.forcew:set("tooltip", "Forces charged W if Enemy is Leaving Range")
 menu.harass:boolean("ecombo", "Use E in Harass", true)
 
-menu:menu("laneclear", "Lane Clear")
-menu.laneclear:keybind("toggle", "Farm Toggle", "Z", nil)
-menu.laneclear:slider("mana", "Mana Manager", 30, 0, 100, 1)
-menu.laneclear:boolean("farmq", "Use Q to Farm", true)
-menu.laneclear:boolean("lastq", " ^-Only for Last Hit", true)
-menu.laneclear:boolean("turret", " ^-Don't use Q Under the Turret", true)
-menu.laneclear:boolean("usee", "Use E in Jungle Clear", true)
+menu:menu("farming", "Farming")
+menu.farming:menu("laneclear", "Lane Clear")
+menu.farming.laneclear:keybind("toggle", "Farm Toggle", "Z", nil)
+menu.farming.laneclear:slider("mana", "Mana Manager", 30, 0, 100, 1)
+menu.farming.laneclear:boolean("farmq", "Use Q to Farm", true)
+menu.farming.laneclear:boolean("lastq", " ^-Only for Last Hit", true)
+menu.farming.laneclear:boolean("turret", " ^-Don't use Q Under the Turret", true)
+menu.farming:menu("jungleclear", "Jungle Clear")
+menu.farming.jungleclear:boolean("useq", "Use Q in Jungle Clear", true)
+menu.farming.jungleclear:boolean("markedq", " ^- Only if Marked", true)
+
+menu.farming.jungleclear:boolean("usee", "Use E in Jungle Clear", true)
 menu:menu("lasthit", "Last Hit")
 menu.lasthit:slider("mana", "Mana Manager", 30, 0, 100, 1)
 menu.lasthit:boolean("useq", "Use Q to Last Hit", true)
@@ -345,7 +350,7 @@ end
 local uhh = false
 local something = 0
 local function Toggle()
-	if menu.laneclear.toggle:get() then
+	if menu.farming.laneclear.toggle:get() then
 		if (uhh == false and os.clock() > something) then
 			uhh = true
 			something = os.clock() + 0.3
@@ -356,6 +361,7 @@ local function Toggle()
 		end
 	end
 end
+local delayyyyyyy = 0
 -- Thanks to asdf. ♡
 passiveBaseScale = {
 	4
@@ -1371,18 +1377,16 @@ end
 
 local function JungleClear()
 	local meow = 0
-	if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
-		if menu.laneclear.farmq:get() then
-			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
-			for i, minion in pairs(enemyMinionsQ) do
-				if minion and not minion.isDead and common.IsValidTarget(minion) then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(player.pos) <= spellQ.range then
-						if (meow < os.clock()) then
-							if minion.buff["ireliamark"] then
-								player:castSpell("obj", 0, minion)
-								meow = os.clock() + 0.5
-							end
+	if menu.farming.jungleclear.useq:get() then
+		local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
+		for i, minion in pairs(enemyMinionsQ) do
+			if minion and not minion.isDead and common.IsValidTarget(minion) then
+				local minionPos = vec3(minion.x, minion.y, minion.z)
+				if minionPos:dist(player.pos) <= spellQ.range then
+					if (meow < os.clock()) then
+						if minion.buff["ireliamark"] then
+							player:castSpell("obj", 0, minion)
+							meow = os.clock() + 0.5
 						end
 					end
 				end
@@ -1390,7 +1394,7 @@ local function JungleClear()
 		end
 	end
 
-	if menu.laneclear.usee:get() then
+	if menu.farming.jungleclear.usee:get() then
 		local enemyMinionsQ = common.GetMinionsInRange(spellE.range, TEAM_NEUTRAL)
 		for i, minion in pairs(enemyMinionsQ) do
 			if minion and not minion.isDead and common.IsValidTarget(minion) then
@@ -1402,9 +1406,8 @@ local function JungleClear()
 							if not minion.path.isActive then
 								if minion.pos:dist(player.pos) <= 900 then
 									local cast1 = player.pos + (minion.pos - player.pos):norm() * 900
-									if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
-										player:castSpell("pos", 2, cast1)
-									end
+
+									player:castSpell("pos", 2, cast1)
 								end
 							else
 								local pathStartPos = minion.path.point[0]
@@ -1419,9 +1422,7 @@ local function JungleClear()
 											pathNorm = pathNorm * -1
 										end
 										local cast2 = RaySetDist(minion.pos, pathNorm, player.pos, 900)
-										if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
-											player:castSpell("pos", 2, cast2)
-										end
+										player:castSpell("pos", 2, cast2)
 									end
 								end
 							end
@@ -1456,14 +1457,21 @@ local function JungleClear()
 			end
 		end
 	end
-	if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
-		if menu.laneclear.farmq:get() then
-			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
-			for i, minion in pairs(enemyMinionsQ) do
-				if minion and not minion.isDead and common.IsValidTarget(minion) then
-					local minionPos = vec3(minion.x, minion.y, minion.z)
-					if minionPos:dist(player.pos) <= spellQ.range then
-						if (delayyyyyyy < os.clock()) then
+	if menu.farming.jungleclear.useq:get() then
+		local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
+		for i, minion in pairs(enemyMinionsQ) do
+			if minion and not minion.isDead and common.IsValidTarget(minion) then
+				local minionPos = vec3(minion.x, minion.y, minion.z)
+				if minionPos:dist(player.pos) <= spellQ.range then
+					if (delayyyyyyy < os.clock()) then
+						if menu.farming.jungleclear.markedq:get() then
+							if minion.buff["ireliamark"] then
+								if (os.clock() > waiting) then
+									player:castSpell("obj", 0, minion)
+								end
+							end
+						end
+						if not menu.farming.jungleclear.markedq:get() then
 							if not minion.buff["ireliamark"] then
 								if (os.clock() > waiting) then
 									player:castSpell("obj", 0, minion)
@@ -1790,26 +1798,26 @@ local function LaneClear()
 	if uhh then
 		return
 	end
-	if (player.mana / player.maxMana) * 100 >= menu.laneclear.mana:get() then
-		if menu.laneclear.farmq:get() then
+	if (player.mana / player.maxMana) * 100 >= menu.farming.laneclear.mana:get() then
+		if menu.farming.laneclear.farmq:get() then
 			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 			for i, minion in pairs(enemyMinionsQ) do
 				if minion and not minion.isDead and common.IsValidTarget(minion) then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					if minionPos:dist(player.pos) <= spellQ.range then
-						if not menu.laneclear.lastq:get() then
-							if menu.laneclear.turret:get() and not common.is_under_tower(vec3(minion.x, minion.y, minion.z)) then
+						if not menu.farming.laneclear.lastq:get() then
+							if menu.farming.laneclear.turret:get() and not common.is_under_tower(vec3(minion.x, minion.y, minion.z)) then
 								player:castSpell("obj", 0, minion)
 							end
-							if not menu.laneclear.turret:get() then
+							if not menu.farming.laneclear.turret:get() then
 								player:castSpell("obj", 0, minion)
 							end
 						end
-						if menu.laneclear.lastq:get() and GetQDamage(minion) > minion.health then
-							if menu.laneclear.turret:get() and not common.is_under_tower(vec3(minion.x, minion.y, minion.z)) then
+						if menu.farming.laneclear.lastq:get() and GetQDamage(minion) > minion.health then
+							if menu.farming.laneclear.turret:get() and not common.is_under_tower(vec3(minion.x, minion.y, minion.z)) then
 								player:castSpell("obj", 0, minion)
 							end
-							if not menu.laneclear.turret:get() then
+							if not menu.farming.laneclear.turret:get() then
 								player:castSpell("obj", 0, minion)
 							end
 						end
