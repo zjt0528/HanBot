@@ -952,7 +952,7 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 							common.DelayAction(
 								function()
 									for _, objsq in pairs(blade) do
-										if objsq and not objsq.isDead and enemy then
+										if objsq and not objsq.isDead and objsq.x and objsq.z and enemy then
 											local pos = preds.linear.get_prediction(spellE, enemy, vec2(objsq.x, objsq.z))
 											if pos and player:spellSlot(2).name == "IreliaE2" then
 												local EPOS =
@@ -1026,7 +1026,7 @@ local function WGapcloser()
 						common.DelayAction(
 							function()
 								for _, objsq in pairs(blade) do
-									if objsq and not objsq.isDead and enemy then
+									if objsq and not objsq.isDead and objsq.x and objsq.z and enemy then
 										local pos = preds.linear.get_prediction(spellE, enemy, vec2(objsq.x, objsq.z))
 										if pos and player:spellSlot(2).name == "IreliaE2" then
 											local EPOS =
@@ -1285,7 +1285,7 @@ local function Flee()
 			if common.IsValidTarget(target) then
 				if (target.pos:dist(player) <= spellE.range) then
 					for _, objsq in pairs(blade) do
-						if objsq and not objsq.isDead and not target.buff["ireliamark"] then
+						if objsq and not objsq.isDead and objsq.x and objsq.z and not target.buff["ireliamark"] then
 							local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
@@ -1499,7 +1499,7 @@ local function Combo()
 			if common.IsValidTarget(target) then
 				if (target.pos:dist(player) <= spellE.range) then
 					for _, objsq in pairs(blade) do
-						if objsq and not objsq.isDead and not target.buff["ireliamark"] then
+						if objsq and not objsq.isDead and objsq.x and objsq.z and not target.buff["ireliamark"] then
 							local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
@@ -1738,7 +1738,7 @@ local function JungleClear()
 					end
 
 					for _, objsq in pairs(blade) do
-						if objsq and not objsq.isDead and not minion.buff["ireliamark"] then
+						if objsq and not objsq.isDead and objsq.x and objsq.z and not minion.buff["ireliamark"] then
 							local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
@@ -1864,7 +1864,7 @@ local function Harass()
 			if common.IsValidTarget(target) then
 				if (target.pos:dist(player) <= spellE.range) then
 					for _, objsq in pairs(blade) do
-						if objsq and not objsq.isDead and not target.buff["ireliamark"] then
+						if objsq and not objsq.isDead and objsq.x and objsq.z and not target.buff["ireliamark"] then
 							local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
@@ -2045,7 +2045,7 @@ local function KillSteal()
 
 					if (enemies.pos:dist(player) <= spellE.range) then
 						for _, objsq in pairs(blade) do
-							if objsq and not objsq.isDead then
+							if objsq and not objsq.isDead and objsq.x and objsq.z then
 								local pos = preds.linear.get_prediction(spellE, enemies, vec2(objsq.x, objsq.z))
 								if pos and player:spellSlot(2).name == "IreliaE2" then
 									local EPOS =
@@ -2144,7 +2144,7 @@ local function LaneClear()
 								if not minion.path.isActive then
 									if minion.pos:dist(player.pos) <= 900 then
 										local cast1 = player.pos + (minion.pos - player.pos):norm() * 900
-	
+
 										player:castSpell("pos", 2, cast1)
 									end
 								else
@@ -2167,9 +2167,9 @@ local function LaneClear()
 								delayyyyyyy = os.clock() + 0.5
 							end
 						end
-	
+
 						for _, objsq in pairs(blade) do
-							if objsq and not objsq.isDead and not minion.buff["ireliamark"] then
+							if objsq and not objsq.isDead and objsq.x and objsq.z and not minion.buff["ireliamark"] then
 								local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
 								if pos and player:spellSlot(2).name == "IreliaE2" then
 									local EPOS =
@@ -2179,7 +2179,7 @@ local function LaneClear()
 									if (minion.pos:dist(objsq.pos) > 300) then
 										spellE.speed = EPOS:dist(objsq.pos)
 									end
-	
+
 									local pos2 = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
 									if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
 										local EPOS2 =
@@ -2443,7 +2443,7 @@ local function OnTick()
 		if common.IsValidTarget(target) then
 			if (target.pos:dist(player) < spellE.range) then
 				for _, objsq in pairs(blade) do
-					if objsq and not objsq.isDead then
+					if objsq and not objsq.isDead and objsq.x and objsq.z then
 						local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 
 						local EPOS =
