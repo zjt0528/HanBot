@@ -685,6 +685,10 @@ local function count_enemies_in_range(pos, range)
 	end
 	return enemies_in_range
 end
+
+local last_item_update = 0
+
+
 function GetQDamage(target)
 	local totalPhysical = 0
 	local totalMagical = 0
@@ -696,8 +700,6 @@ function GetQDamage(target)
 		total = total * 1.7
 	end
 	totalPhysical = total + totalPhysical
-
-	--onhit
 	local hasSheen = false
 	local hasTF = false
 	local hasBOTRK = false
@@ -705,30 +707,35 @@ function GetQDamage(target)
 	local hasWitsEnd = false
 	local hasRecurve = false
 	local hasGuinsoo = false
-	for i = 0, 5 do
-		if player:itemID(i) == 3078 then
-			hasTF = true
-		end
-		if player:itemID(i) == 3057 then
-			hasSheen = true
-		end
-		if player:itemID(i) == 3153 then
-			hasBOTRK = true
-		end
-		if player:itemID(i) == 3748 then
-			hasTitanic = true
-		end
-		if player:itemID(i) == 3748 then
-			hasTitanic = true
-		end
-		if player:itemID(i) == 3091 then
-			hasWitsEnd = true
-		end
-		if player:itemID(i) == 1043 then
-			hasRecurve = true
-		end
-		if player:itemID(i) == 3124 then
-			hasGuinsoo = true
+	
+	if os.clock() > last_item_update then
+	
+		last_item_update = os.clock() + 10
+		for i = 0, 5 do
+			if player:itemID(i) == 3078 then
+				hasTF = true
+			end
+			if player:itemID(i) == 3057 then
+				hasSheen = true
+			end
+			if player:itemID(i) == 3153 then
+				hasBOTRK = true
+			end
+			if player:itemID(i) == 3748 then
+				hasTitanic = true
+			end
+			if player:itemID(i) == 3748 then
+				hasTitanic = true
+			end
+			if player:itemID(i) == 3091 then
+				hasWitsEnd = true
+			end
+			if player:itemID(i) == 1043 then
+				hasRecurve = true
+			end
+			if player:itemID(i) == 3124 then
+				hasGuinsoo = true
+			end
 		end
 	end
 
