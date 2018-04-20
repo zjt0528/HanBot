@@ -1621,32 +1621,6 @@ end
 -- Credits to Avada's Kalista. <3
 function DrawDamagesE(target)
 	if target.isVisible and not target.isDead then
-		for i = 0, graphics.anchor_n - 1 do
-			local obj = objManager.toluaclass(graphics.anchor[i].ptr)
-			if obj.type == player.type and obj.team ~= player.team and obj.isOnScreen then
-				local hp_bar_pos = graphics.anchor[i].pos
-				local xPos = hp_bar_pos.x - 46
-				local yPos = hp_bar_pos.y + 11.5
-				if obj.charName == "Annie" then
-					yPos = yPos + 2
-				end
-
-				local Qdmg = GetQDamage(obj)
-				local Edmg = EDamage(obj)
-				local Wdmg = RDamage(obj) * 2
-
-				local damage = obj.health - (Qdmg + Wdmg + Edmg)
-
-				local x1 = xPos + ((obj.health / obj.maxHealth) * 102)
-				local x2 = xPos + (((damage > 0 and damage or 0) / obj.maxHealth) * 102)
-				if ((Qdmg + Wdmg + Edmg) < obj.health) then
-					graphics.draw_line_2D(x1, yPos, x2, yPos, 10, 0xFFEE9922)
-				end
-				if ((Qdmg + Wdmg + Edmg) > obj.health) then
-					graphics.draw_line_2D(x1, yPos, x2, yPos, 10, 0xFF2DE04A)
-				end
-			end
-		end
 		local pos = graphics.world_to_screen(target.pos)
 		if (math.floor((GetQDamage(target) + RDamage(target) * 2 + EDamage(target)) / target.health * 100) < 100) then
 			graphics.draw_line_2D(pos.x, pos.y - 30, pos.x + 30, pos.y - 80, 1, graphics.argb(255, 255, 153, 51))
