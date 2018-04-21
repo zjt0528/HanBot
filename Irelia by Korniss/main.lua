@@ -377,7 +377,33 @@ local Spells = {
 		aoe = true,
 		cc = false,
 		collision = false
-	}
+	},
+	["OrianaDetonateCommand"] = {
+		charName = "Orianna",
+		slot = 3,
+		type = "circular",
+		speed = math.huge,
+		range = 0,
+		delay = 0.5,
+		radius = 325,
+		hitbox = false,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["VarusR"] = {
+		charName = "Varus",
+		slot = 3,
+		type = "linear",
+		speed = 1850,
+		range = 1075,
+		delay = 0.242,
+		radius = 120,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
 }
 local interruptableSpells = {
 	["anivia"] = {
@@ -451,9 +477,8 @@ local menu = menu("IreliaKornis", "Irelia By Kornis")
 menu:menu("combo", "Combo")
 menu.combo:header("uhhh", "-- Q Settings --")
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
-menu.combo:slider("minq", " ^- Min. Q Range", 300, 0, 900, 1)
-menu.combo.minq:set("tooltip", "Setting Max Value will use Q only if Marked / Killable.")
-
+menu.combo:slider("minq", " ^- Min. Q Range", 300, 0, 500, 1)
+menu.combo:boolean("markedq", "Q only if Marked / Killable", false)
 menu.combo:boolean("gapq", "Use Q for Gapclose on Minion", true)
 menu.combo:boolean("outofq", " ^-Only if out of Q Range", false)
 menu.combo:boolean("jumparound", "Use Q to Jump-Around Enemy on Minions", false)
@@ -495,6 +520,7 @@ menu.farming.laneclear:slider("mana", "Mana Manager", 30, 0, 100, 1)
 menu.farming.laneclear:boolean("farmq", "Use Q to Farm", true)
 menu.farming.laneclear:boolean("lastq", " ^-Only for Last Hit", true)
 menu.farming.laneclear:boolean("turret", " ^-Don't use Q Under the Turret", true)
+menu.farming.laneclear:boolean("qaa", " ^-Don't use Q in AA Range", true)
 menu.farming.laneclear:boolean("farme", "Use E in Lane Clear", true)
 menu.farming:menu("jungleclear", "Jungle Clear")
 menu.farming.jungleclear:boolean("useq", "Use Q in Jungle Clear", true)
@@ -687,8 +713,13 @@ local function count_enemies_in_range(pos, range)
 end
 
 local last_item_update = 0
-
-
+local hasSheen = false
+local hasTF = false
+local hasBOTRK = false
+local hasTitanic = false
+local hasWitsEnd = false
+local hasRecurve = false
+local hasGuinsoo = false
 function GetQDamage(target)
 	local totalPhysical = 0
 	local totalMagical = 0
@@ -700,17 +731,14 @@ function GetQDamage(target)
 		total = total * 1.7
 	end
 	totalPhysical = total + totalPhysical
-	local hasSheen = false
-	local hasTF = false
-	local hasBOTRK = false
-	local hasTitanic = false
-	local hasWitsEnd = false
-	local hasRecurve = false
-	local hasGuinsoo = false
-	
 	if os.clock() > last_item_update then
-	
-		last_item_update = os.clock() + 10
+		hasSheen = false
+		hasTF = false
+		hasBOTRK = false
+		hasTitanic = false
+		hasWitsEnd = false
+		hasRecurve = false
+		hasGuinsoo = false
 		for i = 0, 5 do
 			if player:itemID(i) == 3078 then
 				hasTF = true
@@ -737,6 +765,7 @@ function GetQDamage(target)
 				hasGuinsoo = true
 			end
 		end
+		last_item_update = os.clock() + 5
 	end
 
 	local onhitPhysical = 0
@@ -937,7 +966,12 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 				for i = 1, #dodgeWs[enemyName] do
 					local spellCheck = dodgeWs[enemyName][i]
 
-					if menu.dodgew[spell.owner.charName .. spellCheck.menuslot]:get() and spell.slot == spellCheck.slot then
+					if
+						menu.dodgew[spell.owner.charName .. spellCheck.menuslot]:get() and spell.slot == spellCheck.slot and
+							spell.owner.charName ~= "Vladimir" and
+							spell.owner.charName ~= "Karthus" and
+							spell.owner.charName ~= "Zed"
+					 then
 						player:castSpell("pos", 1, player.pos)
 					end
 				end
@@ -1398,7 +1432,7 @@ local function Combo()
 		if common.IsValidTarget(target) then
 			if menu.combo.qcombo:get() then
 				if common.IsValidTarget(target) then
-					if target.buff["ireliamark"] then
+					if target.buff["ireliamark"] or target.health <= GetQDamage(target) then
 						player:castSpell("obj", 0, target)
 						meow = os.clock() + 0.5
 					end
@@ -1406,6 +1440,7 @@ local function Combo()
 			end
 		end
 	end
+
 	if menu.combo.jumparound:get() and menu.combo.jumpmana:get() <= (player.mana / player.maxMana) * 100 and (first == 0) then
 		if common.IsValidTarget(target) then
 			if menu.combo.qcombo:get() then
@@ -1561,7 +1596,7 @@ local function Combo()
 	end
 	if (delayyyyyyy < os.clock()) then
 		if common.IsValidTarget(target) then
-			if menu.combo.qcombo:get() then
+			if menu.combo.qcombo:get() and not menu.combo.markedq:get() then
 				if common.IsValidTarget(target) then
 					--[[if not menu.combo.waitq:get() then
 					if (target.pos:dist(player) < spellQ.range) then
@@ -2103,10 +2138,24 @@ local function LaneClear()
 						end
 						if menu.farming.laneclear.lastq:get() and GetQDamage(minion) > minion.health then
 							if menu.farming.laneclear.turret:get() and not common.is_under_tower(vec3(minion.x, minion.y, minion.z)) then
-								player:castSpell("obj", 0, minion)
+								if not menu.farming.laneclear.qaa:get() then
+									player:castSpell("obj", 0, minion)
+								end
+								if menu.farming.laneclear.qaa:get() then
+									if player.pos:dist(minion.pos) > 200 then
+										player:castSpell("obj", 0, minion)
+									end
+								end
 							end
 							if not menu.farming.laneclear.turret:get() then
-								player:castSpell("obj", 0, minion)
+								if not menu.farming.laneclear.qaa:get() then
+									player:castSpell("obj", 0, minion)
+								end
+								if menu.farming.laneclear.qaa:get() then
+									if player.pos:dist(minion.pos) > 200 then
+										player:castSpell("obj", 0, minion)
+									end
+								end
 							end
 						end
 					end
