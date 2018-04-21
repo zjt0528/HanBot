@@ -3,18 +3,18 @@ local evade = module.seek("evade")
 local avada_lib = module.lib("avada_lib")
 if not avada_lib then
 	console.set_color(12)
-	print("You need to have Avada Lib in your community_libs folder to run 'Akali by Kornis'!")
+	print("You need to have Avada Lib in your community_libs folder to run 'Irelia by Kornis'!")
 	print("You can find it here:")
 	console.set_color(11)
-	print("https://gitlab.soontm.net/get_clear_zip.php?fn=avada_lib")
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip")
 	console.set_color(15)
 	return
 elseif avada_lib.version < 1 then
 	console.set_color(12)
-	print("Your need to have Avada Lib updated to run 'Akali by Kornis'!")
+	print("Your need to have Avada Lib updated to run '*Irelia by Kornis'!")
 	print("You can find it here:")
 	console.set_color(11)
-	print("https://gitlab.soontm.net/get_clear_zip.php?fn=avada_lib")
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip")
 	console.set_color(15)
 	return
 end
@@ -313,6 +313,19 @@ local Spells = {
 		cc = false,
 		collision = false
 	},
+	["CassiopeiaR"] = {
+		charName = "Cassiopeia",
+		slot = 3,
+		type = "conic",
+		speed = math.huge,
+		range = 825,
+		delay = 0.5,
+		angle = 80,
+		hitbox = false,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
 	["GravesChargeShotFxMissile"] = {
 		charName = "Graves",
 		slot = 3,
@@ -403,7 +416,7 @@ local Spells = {
 		aoe = true,
 		cc = true,
 		collision = false
-	},
+	}
 }
 local interruptableSpells = {
 	["anivia"] = {
@@ -553,7 +566,7 @@ menu.draws:boolean("drawtoggle", "Draw Farm Toggle", true)
 menu.draws:boolean("drawkill", "Draw Minions Killable with Q", true)
 menu.draws:boolean("drawgapclose", "Draw Gapclose Lines", true)
 menu.draws:boolean("drawdamage", "Draw Damage", true)
-menu.draws:boolean("drawBlades", "Draw Blades", true)
+menu.draws:boolean("mouse", "Draw Flee Range on Cursor", true)
 
 menu:menu("Gap", "Gapcloser Settings")
 menu.Gap:boolean("GapA", "Use E for Anti-Gapclose", true)
@@ -864,8 +877,7 @@ local function GetClosestMobToEnemyForGap()
 	local closestMinionDistance = 9999
 	local enemy = common.GetEnemyHeroes()
 	for i, enemies in ipairs(enemy) do
-		if enemies and common.IsValidTarget(enemies) and not common.HasBuffType(enemies, 17) then
-			local hp = common.GetShieldedHealth("ad", enemies)
+		if enemies and common.IsValidTarget(enemies) then
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if
@@ -993,7 +1005,7 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 							common.DelayAction(
 								function()
 									for _, objsq in pairs(blade) do
-										if objsq and not objsq.isDead and objsq.x and objsq.z and enemy then
+										if objsq and objsq.x and objsq.z and enemy then
 											local pos = preds.linear.get_prediction(spellE, enemy, vec2(objsq.x, objsq.z))
 											if pos and player:spellSlot(2).name == "IreliaE2" then
 												local EPOS =
@@ -1067,7 +1079,7 @@ local function WGapcloser()
 						common.DelayAction(
 							function()
 								for _, objsq in pairs(blade) do
-									if objsq and not objsq.isDead and objsq.x and objsq.z and enemy then
+									if objsq and objsq.x and objsq.z and enemy then
 										local pos = preds.linear.get_prediction(spellE, enemy, vec2(objsq.x, objsq.z))
 										if pos and player:spellSlot(2).name == "IreliaE2" then
 											local EPOS =
@@ -1122,7 +1134,7 @@ local function GetClosestMobKill()
 	for i, minion in pairs(enemyMinions) do
 		if minion and minion.health < GetQDamage(minion) then
 			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 300 then
+			if minionPos:dist(mousePos) < 400 then
 				local minionDistanceToMouse = minionPos:dist(mousePos)
 
 				if minionDistanceToMouse < closestMinionDistance then
@@ -1144,7 +1156,7 @@ local function GetClosestJungleKill()
 	for i, minion in pairs(enemyMinions) do
 		if minion and minion.health < GetQDamage(minion) then
 			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 300 then
+			if minionPos:dist(mousePos) < 400 then
 				local minionDistanceToMouse = minionPos:dist(mousePos)
 
 				if minionDistanceToMouse < closestMinionDistance then
@@ -1165,7 +1177,7 @@ local function GetClosestMobMark()
 	for i, minion in pairs(enemyMinions) do
 		if minion and minion.buff["ireliamark"] then
 			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 300 then
+			if minionPos:dist(mousePos) < 400 then
 				local minionDistanceToMouse = minionPos:dist(mousePos)
 
 				if minionDistanceToMouse < closestMinionDistance then
@@ -1187,7 +1199,7 @@ local function GetClosestJungleMark()
 	for i, minion in pairs(enemyMinions) do
 		if minion and minion.buff["ireliamark"] then
 			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 300 then
+			if minionPos:dist(mousePos) < 400 then
 				local minionDistanceToMouse = minionPos:dist(mousePos)
 
 				if minionDistanceToMouse < closestMinionDistance then
@@ -1200,7 +1212,7 @@ local function GetClosestJungleMark()
 	return closestMinion
 end
 local function GetClosestMob()
-	local enemyMinions = common.GetMinionsInRange(700, TEAM_ENEMY, mousePos)
+	local enemyMinions = common.GetMinionsInRange(900, TEAM_ENEMY, mousePos)
 
 	local closestMinion = nil
 	local closestMinionDistance = 9999
@@ -1208,7 +1220,7 @@ local function GetClosestMob()
 	for i, minion in pairs(enemyMinions) do
 		if minion then
 			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 300 then
+			if minionPos:dist(mousePos) < 400 then
 				local minionDistanceToMouse = minionPos:dist(mousePos)
 
 				if minionDistanceToMouse < closestMinionDistance then
@@ -1222,7 +1234,7 @@ local function GetClosestMob()
 end
 
 local function GetClosestJungle()
-	local enemyMinions = common.GetMinionsInRange(700, TEAM_NEUTRAL, mousePos)
+	local enemyMinions = common.GetMinionsInRange(900, TEAM_NEUTRAL, mousePos)
 
 	local closestMinion = nil
 	local closestMinionDistance = 9999
@@ -1230,7 +1242,7 @@ local function GetClosestJungle()
 	for i, minion in pairs(enemyMinions) do
 		if minion then
 			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 300 then
+			if minionPos:dist(mousePos) < 400 then
 				local minionDistanceToMouse = minionPos:dist(mousePos)
 
 				if minionDistanceToMouse < closestMinionDistance then
@@ -1326,7 +1338,7 @@ local function Flee()
 			if common.IsValidTarget(target) then
 				if (target.pos:dist(player) <= spellE.range) then
 					for _, objsq in pairs(blade) do
-						if objsq and not objsq.isDead and objsq.x and objsq.z and not target.buff["ireliamark"] then
+						if objsq and objsq.x and objsq.z and not target.buff["ireliamark"] then
 							local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
@@ -1434,14 +1446,18 @@ local function Combo()
 				if common.IsValidTarget(target) then
 					if target.buff["ireliamark"] or target.health <= GetQDamage(target) then
 						player:castSpell("obj", 0, target)
-						meow = os.clock() + 0.5
+						meow = os.clock() + 1
 					end
 				end
 			end
 		end
 	end
 
-	if menu.combo.jumparound:get() and menu.combo.jumpmana:get() <= (player.mana / player.maxMana) * 100 and (first == 0) then
+	if
+		menu.combo.jumparound:get() and menu.combo.jumpmana:get() <= (player.mana / player.maxMana) * 100 and
+			(player.health / player.maxHealth) * 100 <= 80 and
+			(first == 0)
+	 then
 		if common.IsValidTarget(target) then
 			if menu.combo.qcombo:get() then
 				if common.IsValidTarget(target) then
@@ -1450,9 +1466,9 @@ local function Combo()
 						if
 							minion and minion.isVisible and not minion.isDead and minion.type == TYPE_MINION and
 								minion.pos:dist(player.pos) < spellQ.range and
-								minion.pos:dist(target.pos) < spellQ.range - 50
+								minion.pos:dist(target.pos) < spellQ.range - 150
 						 then
-							if (GetQDamage(minion) >= minion.health) then
+							if (GetQDamage(minion) >= minion.health) and not common.is_under_tower(vec3(minion.x, minion.y, minion.z)) then
 								player:castSpell("obj", 0, minion)
 							end
 						end
@@ -1479,17 +1495,17 @@ local function Combo()
 							end
 						end
 						if menu.combo.emode:get() == 2 then
+							local pathStartPos = target.path.point[0]
+							local pathEndPos = target.path.point[target.path.count]
+							local pathNorm = (pathEndPos - pathStartPos):norm()
+							local tempPred = common.GetPredictedPos(target, 1.2)
 							-- Thanks to asdf. ♡
 							if not target.path.isActive then
-								if target.pos:dist(player.pos) <= 900 then
+								if target.pos:dist(player.pos) <= 830 then
 									local cast1 = player.pos + (target.pos - player.pos):norm() * 900
 									player:castSpell("pos", 2, cast1)
 								end
 							else
-								local pathStartPos = target.path.point[0]
-								local pathEndPos = target.path.point[target.path.count]
-								local pathNorm = (pathEndPos - pathStartPos):norm()
-								local tempPred = common.GetPredictedPos(target, 1)
 								if tempPred then
 									local dist1 = player.pos:dist(tempPred)
 									if dist1 <= 900 then
@@ -1515,7 +1531,7 @@ local function Combo()
 				local pos = preds.linear.get_prediction(spellR, target)
 				if
 					pos and pos.startPos:dist(pos.endPos) < spellR.range and
-						menu.combo.hitr:get() <= #count_enemies_in_range(target.pos, 300)
+						menu.combo.hitr:get() <= #count_enemies_in_range(target.pos, 400)
 				 then
 					player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
@@ -1541,7 +1557,7 @@ local function Combo()
 			if common.IsValidTarget(target) then
 				if (target.pos:dist(player) <= spellE.range) then
 					for _, objsq in pairs(blade) do
-						if objsq and not objsq.isDead and objsq.x and objsq.z and not target.buff["ireliamark"] then
+						if objsq and objsq.x and objsq.z and not target.buff["ireliamark"] then
 							local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
@@ -1571,7 +1587,7 @@ local function Combo()
 	if menu.combo.gapq:get() and menu.combo.outofq:get() then
 		if common.IsValidTarget(targets) and targets then
 			if (targets.pos:dist(player) > spellQ.range) then
-				local minion = GetClosestMobToEnemyForGap(targets)
+				local minion = GetClosestMobToEnemyForGap()
 				if minion and vec3(minion.x, minion.y, minion.z):dist(player.pos) <= spellQ.range then
 					if player.mana > player.manaCost0 and GetQDamage(minion) >= minion.health then
 						player:castSpell("obj", 0, minion)
@@ -1699,17 +1715,21 @@ function DrawDamagesE(target)
 end
 
 local function JungleClear()
+	--print("crashed Jungle Clear")
+
 	local meow = 0
 	if menu.farming.jungleclear.useq:get() then
+		--print("crashed Jungle Clear -- Q")
+
 		local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
 		for i, minion in pairs(enemyMinionsQ) do
 			if minion and not minion.isDead and common.IsValidTarget(minion) then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				if minionPos:dist(player.pos) <= spellQ.range then
 					if (meow < os.clock()) then
-						if minion.buff["ireliamark"] then
+						if minion.buff["ireliamark"] or minion.health <= GetQDamage(minion) then
 							player:castSpell("obj", 0, minion)
-							meow = os.clock() + 0.5
+							meow = os.clock() + 1
 						end
 					end
 				end
@@ -1718,9 +1738,11 @@ local function JungleClear()
 	end
 
 	if menu.farming.jungleclear.usee:get() then
-		local enemyMinionsQ = common.GetMinionsInRange(spellE.range, TEAM_NEUTRAL)
-		for i, minion in pairs(enemyMinionsQ) do
-			if minion and not minion.isDead and common.IsValidTarget(minion) then
+		--print("crashed Jungle Clear -- E")
+
+		for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
+			local minion = objManager.minions[TEAM_NEUTRAL][i]
+			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				if minionPos:dist(player.pos) <= spellE.range then
 					if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
@@ -1736,7 +1758,7 @@ local function JungleClear()
 								local pathStartPos = minion.path.point[0]
 								local pathEndPos = minion.path.point[minion.path.count]
 								local pathNorm = (pathEndPos - pathStartPos):norm()
-								local tempPred = common.GetPredictedPos(minion, 1)
+								local tempPred = common.GetPredictedPos(minion, 1.2)
 								if tempPred then
 									local dist1 = player.pos:dist(tempPred)
 									if dist1 <= 900 then
@@ -1754,8 +1776,11 @@ local function JungleClear()
 					end
 
 					for _, objsq in pairs(blade) do
-						if objsq and not objsq.isDead and objsq.x and objsq.z and not minion.buff["ireliamark"] then
+						--print("crashed Jungle Clear -- E5")
+						if objsq and objsq.x and objsq.z and not minion.buff["ireliamark"] then
+							print("crashed Jungle Clear -- E4")
 							local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
+							--print("crashed Jungle Clear -- E9999")
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
 									objsq.pos +
@@ -1781,6 +1806,8 @@ local function JungleClear()
 		end
 	end
 	if menu.farming.jungleclear.useq:get() then
+		--print("crashed Jungle Clear -- Q2")
+
 		local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
 		for i, minion in pairs(enemyMinionsQ) do
 			if minion and not minion.isDead and common.IsValidTarget(minion) then
@@ -1790,7 +1817,12 @@ local function JungleClear()
 						if menu.farming.jungleclear.markedq:get() then
 							if minion.buff["ireliamark"] then
 								if (os.clock() > waiting) then
-									player:castSpell("obj", 0, minion)
+									if (meow < os.clock()) then
+										if minion.buff["ireliamark"] or minion.health <= GetQDamage(minion) then
+											player:castSpell("obj", 0, minion)
+											meow = os.clock() + 1
+										end
+									end
 								end
 							end
 						end
@@ -1845,16 +1877,16 @@ local function Harass()
 						end
 						if menu.combo.emode:get() == 2 then
 							-- Thanks to asdf. ♡
+							local pathStartPos = target.path.point[0]
+							local pathEndPos = target.path.point[target.path.count]
+							local pathNorm = (pathEndPos - pathStartPos):norm()
+							local tempPred = common.GetPredictedPos(target, 1.2)
 							if not target.path.isActive then
-								if target.pos:dist(player.pos) <= 900 then
+								if target.pos:dist(player.pos) <= 830 then
 									local cast1 = player.pos + (target.pos - player.pos):norm() * 900
 									player:castSpell("pos", 2, cast1)
 								end
 							else
-								local pathStartPos = target.path.point[0]
-								local pathEndPos = target.path.point[target.path.count]
-								local pathNorm = (pathEndPos - pathStartPos):norm()
-								local tempPred = common.GetPredictedPos(target, 1)
 								if tempPred then
 									local dist1 = player.pos:dist(tempPred)
 									if dist1 <= 900 then
@@ -1880,7 +1912,7 @@ local function Harass()
 			if common.IsValidTarget(target) then
 				if (target.pos:dist(player) <= spellE.range) then
 					for _, objsq in pairs(blade) do
-						if objsq and not objsq.isDead and objsq.x and objsq.z and not target.buff["ireliamark"] then
+						if objsq and objsq.x and objsq.z and not target.buff["ireliamark"] then
 							local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
@@ -1910,7 +1942,7 @@ local function Harass()
 	if menu.harass.gapq:get() and menu.harass.outofq:get() then
 		if common.IsValidTarget(targets) and targets then
 			if (targets.pos:dist(player) > spellQ.range) then
-				local minion = GetClosestMobToEnemyForGap(targets)
+				local minion = GetClosestMobToEnemyForGap()
 				if minion and vec3(minion.x, minion.y, minion.z):dist(player.pos) <= spellQ.range then
 					if player.mana > player.manaCost0 and GetQDamage(minion) >= minion.health then
 						player:castSpell("obj", 0, minion)
@@ -1922,7 +1954,7 @@ local function Harass()
 	if menu.harass.gapq:get() and not menu.harass.outofq:get() then
 		if common.IsValidTarget(targets) and targets then
 			if (targets.pos:dist(player) < spellQ.range * 2) then
-				local minion = GetClosestMobToEnemyForGap(targets)
+				local minion = GetClosestMobToEnemyForGap()
 				if minion and vec3(minion.x, minion.y, minion.z):dist(player.pos) <= spellQ.range then
 					if player.mana > player.manaCost0 and GetQDamage(minion) >= minion.health then
 						if (vec3(minion.x, minion.y, minion.z):dist(targets.pos) < vec3(targets.x, targets.y, targets.z):dist(player.pos)) then
@@ -2061,7 +2093,7 @@ local function KillSteal()
 
 					if (enemies.pos:dist(player) <= spellE.range) then
 						for _, objsq in pairs(blade) do
-							if objsq and not objsq.isDead and objsq.x and objsq.z then
+							if objsq and objsq.x and objsq.z then
 								local pos = preds.linear.get_prediction(spellE, enemies, vec2(objsq.x, objsq.z))
 								if pos and player:spellSlot(2).name == "IreliaE2" then
 									local EPOS =
@@ -2103,12 +2135,12 @@ local function KillSteal()
 						vec3(enemies.x, enemies.y, enemies.z):dist(player) < spellQ.range * 2 - 70 and
 						GetQDamage(enemies) > hp
 				 then
-					local minion = GetClosestMobToEnemyForGap(enemies)
+					local minion = GetClosestMobToEnemyForGap()
 					if minion and minion.health < GetQDamage(minion) then
 						player:castSpell("obj", 0, minion)
 					end
 
-					local minios = GetClosestMobToEnemyForGap(enemies)
+					local minios = GetClosestMobToEnemyForGap()
 					if minios and minion.health < GetQDamage(minion) then
 						player:castSpell("obj", 0, minios)
 					end
@@ -2118,11 +2150,13 @@ local function KillSteal()
 	end
 end
 local function LaneClear()
+--	print("crashed Lane Clear")
 	if uhh then
 		return
 	end
 	if (player.mana / player.maxMana) * 100 >= menu.farming.laneclear.mana:get() then
 		if menu.farming.laneclear.farmq:get() then
+		--	print("crashed Lane Clear -- Q")
 			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 			for i, minion in pairs(enemyMinionsQ) do
 				if minion and not minion.isDead and common.IsValidTarget(minion) then
@@ -2163,45 +2197,51 @@ local function LaneClear()
 			end
 		end
 		if menu.farming.laneclear.farme:get() then
-			local enemyMinionsQ = common.GetMinionsInRange(spellE.range, TEAM_ENEMY)
-			for i, minion in pairs(enemyMinionsQ) do
-				if minion and not minion.isDead and common.IsValidTarget(minion) then
+		--	print("crashed Lane Clear -- E")
+
+			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+				local minion = objManager.minions[TEAM_ENEMY][i]
+				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					if minionPos:dist(player.pos) <= spellE.range then
 						if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
-							if menu.combo.emode:get() == 2 then
-								-- Thanks to asdf. ♡
-								if not minion.path.isActive then
-									if minion.pos:dist(player.pos) <= 900 then
-										local cast1 = player.pos + (minion.pos - player.pos):norm() * 900
+							-- Thanks to asdf. ♡
+							if not minion.path.isActive then
+								if minion.pos:dist(player.pos) <= 900 then
+									local cast1 = player.pos + (minion.pos - player.pos):norm() * 900
 
-										player:castSpell("pos", 2, cast1)
-									end
-								else
-									local pathStartPos = minion.path.point[0]
-									local pathEndPos = minion.path.point[minion.path.count]
-									local pathNorm = (pathEndPos - pathStartPos):norm()
-									local tempPred = common.GetPredictedPos(minion, 1)
-									if tempPred then
-										local dist1 = player.pos:dist(tempPred)
-										if dist1 <= 900 then
-											local dist2 = player.pos:dist(minion.pos)
-											if dist1 < dist2 then
-												pathNorm = pathNorm * -1
-											end
-											local cast2 = RaySetDist(minion.pos, pathNorm, player.pos, 900)
-											player:castSpell("pos", 2, cast2)
+									player:castSpell("pos", 2, cast1)
+								end
+							else
+								local pathStartPos = minion.path.point[0]
+								local pathEndPos = minion.path.point[minion.path.count]
+								local pathNorm = (pathEndPos - pathStartPos):norm()
+								local tempPred = common.GetPredictedPos(minion, 1)
+								--print("crashed Lane Clear -- E1111")
+								if tempPred then
+									local dist1 = player.pos:dist(tempPred)
+									if dist1 <= 900 then
+										local dist2 = player.pos:dist(minion.pos)
+										if dist1 < dist2 then
+											pathNorm = pathNorm * -1
 										end
+										local cast2 = RaySetDist(minion.pos, pathNorm, player.pos, 900)
+										player:castSpell("pos", 2, cast2)
 									end
 								end
-								delayyyyyyy = os.clock() + 0.5
 							end
+							delayyyyyyy = os.clock() + 0.5
 						end
+					--	print("crashed Lane Clear -- E22222")
 
 						for _, objsq in pairs(blade) do
-							if objsq and not objsq.isDead and objsq.x and objsq.z and not minion.buff["ireliamark"] then
+					--		print("crashed Lane Clear -- E5")
+							if objsq and objsq.x and objsq.z and not minion.buff["ireliamark"] then
+								print("crashed Lane Clear -- E4")
 								local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
+							--	print("crashed Lane Clear -- E9999")
 								if pos and player:spellSlot(2).name == "IreliaE2" then
+							--		print("crashed Lane Clear -- E3")
 									local EPOS =
 										objsq.pos +
 										(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
@@ -2264,6 +2304,7 @@ end
 
 local function OnDraw()
 	if player.isOnScreen then
+	--	print("Drawings - 1")
 		if menu.draws.drawq:get() then
 			graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 50)
 		end
@@ -2277,6 +2318,7 @@ local function OnDraw()
 			graphics.draw_circle(player.pos, spellW.range, 2, menu.draws.colorw:get(), 50)
 		end
 		if menu.draws.drawkill:get() and player:spellSlot(0).state == 0 then
+		--	print("Drawings - 2")
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if
@@ -2306,6 +2348,7 @@ local function OnDraw()
 		end
 	end
 	if menu.draws.drawtoggle:get() then
+	--	print("Drawings - 3")
 		local pos = graphics.world_to_screen(vec3(player.x, player.y, player.z))
 
 		if uhh == true then
@@ -2316,57 +2359,57 @@ local function OnDraw()
 	end
 
 	if menu.draws.drawdamage:get() then
-		local enemy = common.GetEnemyHeroes()
-		for i, enemies in ipairs(enemy) do
-			if
-				enemies and common.IsValidTarget(enemies) and player.pos:dist(enemies) < 2000 and enemies.isOnScreen and
-					not common.HasBuffType(enemies, 17)
-			 then
+		--print("Drawings - 4")
+		for i = 0, objManager.enemies_n - 1 do
+			local enemies = objManager.enemies[i]
+			if enemies and not enemies.isDead and enemies.isVisible and enemies.isTargetable and player.pos:dist(enemies) < 2000 then
 				DrawDamagesE(enemies)
 			end
 		end
 	end
-	if menu.draws.drawgapclose:get() then
-		local minion = GetClosestMobToEnemyForGap(targets)
-		local minions = GetClosestJungleEnemyToGap(targets)
-
+	if menu.draws.drawgapclose:get() and player:spellSlot(0).state == 0 then
+		--print("Drawings - 5")
+		local minion = GetClosestMobToEnemyForGap()
 		local targets = GetTargetGap()
-
-		if common.IsValidTarget(targets) and minion then
-			if
-				targets and (targets.pos:dist(player) < spellQ.range + spellQ.range - 50) and
-					(targets.pos:dist(player)) > spellQ.range
-			 then
-				if player.mana > player.manaCost0 and GetQDamage(minion) >= minion.health then
-					graphics.draw_line(player, minion, 4, graphics.argb(255, 218, 34, 34))
-					graphics.draw_line(minion, targets, 4, graphics.argb(255, 218, 34, 34))
+		--print("Drawings - 888")
+		if targets then
+			--print("Drawings - 999")
+			if common.IsValidTarget(targets) and minion then
+				--print("Drawings - 10000")
+				if
+					targets and (targets.pos:dist(player) < spellQ.range + spellQ.range - 50) and
+						(targets.pos:dist(player)) > spellQ.range
+				 then
+					if player.mana > player.manaCost0 and GetQDamage(minion) >= minion.health then
+						--print("Drawings - 6")
+						graphics.draw_line(player, minion, 4, graphics.argb(255, 218, 34, 34))
+						graphics.draw_line(minion, targets, 4, graphics.argb(255, 218, 34, 34))
+					end
 				end
-			end
-			if targets and (targets.pos:dist(player) < spellQ.range + spellQ.range) and (targets.pos:dist(player)) < spellQ.range then
-				if player.mana > player.manaCost0 then
-					if GetQDamage(minion) >= minion.health or minion.buff["ireliamark"] then
-						if (vec3(minion.x, minion.y, minion.z):dist(targets.pos) < vec3(targets.x, targets.y, targets.z):dist(player.pos)) then
-							graphics.draw_line(player, minion, 4, graphics.argb(255, 218, 34, 34))
-							graphics.draw_line(minion, targets, 4, graphics.argb(255, 218, 34, 34))
+
+				if
+					targets and (targets.pos:dist(player) < spellQ.range + spellQ.range) and (targets.pos:dist(player)) < spellQ.range
+				 then
+					if player.mana > player.manaCost0 then
+						if GetQDamage(minion) >= minion.health or minion.buff["ireliamark"] then
+							if
+								(vec3(minion.x, minion.y, minion.z):dist(targets.pos) < vec3(targets.x, targets.y, targets.z):dist(player.pos))
+							 then
+								--print("Drawings - 7")
+								graphics.draw_line(player, minion, 4, graphics.argb(255, 218, 34, 34))
+								graphics.draw_line(minion, targets, 4, graphics.argb(255, 218, 34, 34))
+							end
 						end
 					end
 				end
 			end
 		end
 	end
-	if player.isOnScreen then
-		if menu.draws.drawBlades:get() then
-			for _, objs in pairs(blade) do
-				if objs and not objs.isDead then
-					local pos = graphics.world_to_screen(vec3(objs.x, objs.y, objs.z))
-					graphics.draw_circle(objs.pos, 120, 2, graphics.argb(255, 255, 204, 204), 20)
-					graphics.draw_circle(objs.pos, 100, 2, graphics.argb(155, 255, 204, 204), 20)
-					graphics.draw_circle(objs.pos, 80, 2, graphics.argb(55, 255, 204, 204), 20)
-					graphics.draw_circle(objs.pos, 60, 2, graphics.argb(5, 255, 204, 204), 20)
-				end
-			end
-		end
+
+	if menu.draws.mouse:get() and menu.flee.fleekey:get() then
+		graphics.draw_circle(mousePos, 400, 2, graphics.argb(155, 255, 204, 204), 30)
 	end
+
 	--[[local target = GetTarget()
 	if common.IsValidTarget(target) then
 		if menu.combo.ecombo:get() then
@@ -2410,6 +2453,7 @@ local function OnDraw()
 end
 
 local function OnTick()
+--	print("On Tick")
 	for i = 1, #evade.core.active_spells do
 		local spell = evade.core.active_spells[i]
 
@@ -2473,7 +2517,7 @@ local function OnTick()
 		if common.IsValidTarget(target) then
 			if (target.pos:dist(player) < spellE.range) then
 				for _, objsq in pairs(blade) do
-					if objsq and not objsq.isDead and objsq.x and objsq.z then
+					if objsq and objsq.x and objsq.z then
 						local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 
 						local EPOS =
