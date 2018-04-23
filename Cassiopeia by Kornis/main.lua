@@ -225,7 +225,19 @@ for i = 1, #common.GetEnemyHeroes() do
 end
 local delay = 0
 local hello = 0
-
+function count_enemies_in_something_range(pos, range)
+	local enemies_in_range = {}
+	for i = 0, objManager.enemies_n - 1 do
+		local enemy = objManager.enemies[i]
+		if
+			pos:dist(enemy.pos) < range and common.IsValidTarget(enemy) and player.pos:dist(enemy.pos) < spellR.range and
+				player.pos:dist(enemy.pos) > 370
+		 then
+			enemies_in_range[#enemies_in_range + 1] = enemy
+		end
+	end
+	return enemies_in_range
+end
 -- Thanks to Avada's Cassiopeia. <3
 
 menu:menu("draws", "Draw Settings")
@@ -260,6 +272,16 @@ local TargetSelection = function(res, obj, dist)
 end
 local GetTarget = function()
 	return TS.get_result(TargetSelection).obj
+end
+function count_enemies_in_range(pos, range)
+	local enemies_in_range = {}
+	for i = 0, objManager.enemies_n - 1 do
+		local enemy = objManager.enemies[i]
+		if pos:dist(enemy.pos) < range and common.IsValidTarget(enemy) then
+			enemies_in_range[#enemies_in_range + 1] = enemy
+		end
+	end
+	return enemies_in_range
 end
 
 local uhh = false
@@ -458,7 +480,10 @@ local function LastHit()
 	if menu.lasthit.qlasthit:get() then
 		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 			local minion = objManager.minions[TEAM_ENEMY][i]
-			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
+			if
+				minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+					minion.pos:dist(player.pos) < spellE.range
+			 then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 				delay = menu.misc.lasthittimer:get() / 1000 + player.pos:dist(minion.pos) / 840
@@ -477,7 +502,10 @@ function JungleClear()
 		if menu.laneclear.jungle.useq:get() then
 			for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
 				local minion = objManager.minions[TEAM_NEUTRAL][i]
-				if minion and not minion.isDead and minion.isVisible and minion.type == TYPE_MINION then
+				if
+					minion and not minion.isDead and minion.moveSpeed > 0 and minion.isTargetable and minion.isVisible and
+						minion.type == TYPE_MINION
+				 then
 					if minion.pos:dist(player.pos) <= spellQ.range then
 						local pos = preds.circular.get_prediction(spellQ, minion)
 						if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
@@ -490,7 +518,10 @@ function JungleClear()
 		if menu.laneclear.jungle.usee:get() then
 			for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
 				local minion = objManager.minions[TEAM_NEUTRAL][i]
-				if minion and not minion.isDead and minion.isVisible and minion.type == TYPE_MINION then
+				if
+					minion and not minion.isDead and minion.moveSpeed > 0 and minion.isTargetable and minion.isVisible and
+						minion.type == TYPE_MINION
+				 then
 					if minion.pos:dist(player.pos) <= spellE.range then
 						player:castSpell("obj", 2, minion)
 					end
@@ -566,7 +597,10 @@ local function LaneClear()
 		if menu.laneclear.passive.farme:get() then
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
-				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
+				if
+					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+						minion.pos:dist(player.pos) < spellE.range
+				 then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 					delay = menu.misc.lasthittimer:get() / 1000 + player.pos:dist(minion.pos) / 840
@@ -589,14 +623,15 @@ local function LaneClear()
 				for a = 0, minions.size[TEAM_ENEMY] - 1 do
 					local minion1 = minions[TEAM_ENEMY][a]
 					if
-						minion1 and not minion1.isDead and minion1.isVisible and
+						minion1 and minion1.moveSpeed > 0 and minion1.isTargetable and not minion1.isDead and minion1.isVisible and
 							player.path.serverPos:distSqr(minion1.path.serverPos) <= (spellQ.range * spellQ.range)
 					 then
 						local count = 0
 						for b = 0, minions.size[TEAM_ENEMY] - 1 do
 							local minion2 = minions[TEAM_ENEMY][b]
 							if
-								minion2 and minion2 ~= minion1 and not minion2.isDead and minion2.isVisible and
+								minion2 and minion2.moveSpeed > 0 and minion2.isTargetable and minion2 ~= minion1 and not minion2.isDead and
+									minion2.isVisible and
 									minion2.path.serverPos:distSqr(minion1.path.serverPos) <= (spellQ.radius * spellQ.radius)
 							 then
 								count = count + 1
@@ -615,7 +650,9 @@ local function LaneClear()
 				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 					local minion = objManager.minions[TEAM_ENEMY][i]
 					if
-						minion and minion.pos:dist(player.pos) <= spellQ.range and minion.path.count == 0 and not minion.isDead and
+						minion and minion.moveSpeed > 0 and minion.isTargetable and minion.pos:dist(player.pos) <= spellQ.range and
+							minion.path.count == 0 and
+							not minion.isDead and
 							common.IsValidTarget(minion)
 					 then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
@@ -634,7 +671,10 @@ local function LaneClear()
 			if menu.laneclear.push.farme:get() then
 				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 					local minion = objManager.minions[TEAM_ENEMY][i]
-					if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
+					if
+						minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+							minion.pos:dist(player.pos) < spellE.range
+					 then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 						delay = menu.misc.lasthittimer:get() / 1000 + player.pos:dist(minion.pos) / 840
@@ -648,7 +688,7 @@ local function LaneClear()
 				end
 				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 					local minion = objManager.minions[TEAM_ENEMY][i]
-					if minion and not minion.isDead and common.IsValidTarget(minion) then
+					if minion and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and common.IsValidTarget(minion) then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos:dist(player.pos) <= spellE.range then
 							if (menu.laneclear.push.epoison:get()) then
@@ -667,7 +707,7 @@ local function LaneClear()
 				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 					local minion = objManager.minions[TEAM_ENEMY][i]
 					if
-						minion and
+						minion and minion.moveSpeed > 0 and minion.isTargetable and
 							(minion.buff["poisontrailtarget"] or minion.buff["TwitchDeadlyVenom"] or minion.buff["cassiopeiawpoison"] or
 								minion.buff["cassiopeiaqdebuff"] or
 								minion.buff["ToxicShotParticle"] or
@@ -685,7 +725,7 @@ local function LaneClear()
 				end
 				for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 					local minion = objManager.minions[TEAM_ENEMY][i]
-					if minion and not minion.isDead and common.IsValidTarget(minion) then
+					if minion and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and common.IsValidTarget(minion) then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos:dist(player.pos) <= spellE.range then
 							if not menu.laneclear.push.epoison:get() then
@@ -707,7 +747,7 @@ local GetNumberOfHits = function(res, obj, dist)
 	local aaa = preds.linear.get_prediction(spellR, obj)
 	if menu.combo.rset.facer:get() then
 		if
-			obj and IsFacing(obj) and target.pos:dist(obj.pos) < 350 and
+			obj and IsFacing(obj) and target and target.pos:dist(obj.pos) < 350 and
 				obj.pos:dist(vec3(aaa.endPos.x, mousePos.y, aaa.endPos.y)) < 350 and
 				obj.pos:dist(player.pos) > 350
 		 then
@@ -716,7 +756,8 @@ local GetNumberOfHits = function(res, obj, dist)
 	end
 	if not menu.combo.rset.facer:get() then
 		if
-			obj and target.pos:dist(obj.pos) < 350 and obj.pos:dist(vec3(aaa.endPos.x, mousePos.y, aaa.endPos.y)) < 350 and
+			obj and target and target.pos:dist(obj.pos) < 350 and
+				obj.pos:dist(vec3(aaa.endPos.x, mousePos.y, aaa.endPos.y)) < 350 and
 				obj.pos:dist(player.pos) > 350
 		 then
 			res.num_hits = res.num_hits and res.num_hits + 1 or 1
@@ -1014,31 +1055,6 @@ end
 
 orb.combat.register_f_pre_tick(OnTick)
 
-function count_enemies_in_something_range(pos, range)
-	local enemies_in_range = {}
-	for i = 0, objManager.enemies_n - 1 do
-		local enemy = objManager.enemies[i]
-		if
-			pos:dist(enemy.pos) < range and common.IsValidTarget(enemy) and player.pos:dist(enemy.pos) < spellR.range and
-				player.pos:dist(enemy.pos) > 370
-		 then
-			enemies_in_range[#enemies_in_range + 1] = enemy
-		end
-	end
-	return enemies_in_range
-end
-
-function count_enemies_in_range(pos, range)
-	local enemies_in_range = {}
-	for i = 0, objManager.enemies_n - 1 do
-		local enemy = objManager.enemies[i]
-		if pos:dist(enemy.pos) < range and common.IsValidTarget(enemy) then
-			enemies_in_range[#enemies_in_range + 1] = enemy
-		end
-	end
-	return enemies_in_range
-end
-
 -- Credits to Avada's Kalista. <3
 function DrawDamagesE(target)
 	if target.isVisible and not target.isDead then
@@ -1120,12 +1136,17 @@ local function OnDraw()
 	if menu.draws.drawkill:get() and player:spellSlot(2).state == 0 then
 		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 			local minion = objManager.minions[TEAM_ENEMY][i]
-			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
+			if
+				minion and minion.isVisible and not minion.isDead and minion.moveSpeed > 0 and minion.isTargetable and
+					minion.pos:dist(player.pos) < spellE.range
+			 then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 				delay = (menu.misc.lasthittimer:get() / 1000) + (player.pos:dist(minion.pos) / 840)
 				if (EDamage(minion) >= orb.farm.predict_hp(minion, delay / 2, true)) then
-					graphics.draw_circle(minionPos, 100, 2, graphics.argb(255, 255, 255, 0), 100)
+					if minion.isOnScreen then
+						graphics.draw_circle(minionPos, 100, 2, graphics.argb(255, 255, 255, 0), 100)
+					end
 				end
 			end
 		end
