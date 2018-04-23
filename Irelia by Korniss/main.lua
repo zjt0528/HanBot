@@ -11,7 +11,7 @@ if not avada_lib then
 	return
 elseif avada_lib.version < 1 then
 	console.set_color(12)
-	print("Your need to have Avada Lib updated to run '*Irelia by Kornis'!")
+	print("Your need to have Avada Lib updated to run 'Irelia by Kornis'!")
 	print("You can find it here:")
 	console.set_color(11)
 	print("https://git.soontm.net/avada/avada_lib/archive/master.zip")
@@ -517,6 +517,7 @@ menu.combo:boolean("items", "Use Items", true)
 menu:menu("harass", "Harass")
 menu.harass:boolean("qcombo", "Use Q in Harass", true)
 menu.harass:slider("minq", " ^- Min. Q Range", 220, 0, 400, 1)
+menu.harass:boolean("markedq", "Q only if Marked / Killable", false)
 menu.harass:boolean("gapq", "Use Q for Gapclose on Minion", true)
 menu.harass:boolean("outofq", " ^-Only if out of Q Range", false)
 --menu.combo:boolean("waitq", "Wait for Mark", true)
@@ -881,7 +882,8 @@ local function GetClosestMobToEnemyForGap()
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if
-					minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellQ.range and
+					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+						minion.pos:dist(player.pos) < spellQ.range and
 						minion.type == TYPE_MINION
 				 then
 					if minion.health < GetQDamage(minion) or minion.buff["ireliamark"] then
@@ -1967,7 +1969,7 @@ local function Harass()
 	end
 	if (delayyyyyyy < os.clock()) then
 		if common.IsValidTarget(target) then
-			if menu.harass.qcombo:get() then
+			if menu.harass.qcombo:get() and not menu.harass.markedq:get() then
 				if common.IsValidTarget(target) then
 					--[[if not menu.combo.waitq:get() then
 					if (target.pos:dist(player) < spellQ.range) then
@@ -2150,13 +2152,13 @@ local function KillSteal()
 	end
 end
 local function LaneClear()
---	print("crashed Lane Clear")
+	--	print("crashed Lane Clear")
 	if uhh then
 		return
 	end
 	if (player.mana / player.maxMana) * 100 >= menu.farming.laneclear.mana:get() then
 		if menu.farming.laneclear.farmq:get() then
-		--	print("crashed Lane Clear -- Q")
+			--	print("crashed Lane Clear -- Q")
 			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 			for i, minion in pairs(enemyMinionsQ) do
 				if minion and not minion.isDead and common.IsValidTarget(minion) then
@@ -2197,7 +2199,7 @@ local function LaneClear()
 			end
 		end
 		if menu.farming.laneclear.farme:get() then
-		--	print("crashed Lane Clear -- E")
+			--	print("crashed Lane Clear -- E")
 
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
@@ -2232,16 +2234,16 @@ local function LaneClear()
 							end
 							delayyyyyyy = os.clock() + 0.5
 						end
-					--	print("crashed Lane Clear -- E22222")
+						--	print("crashed Lane Clear -- E22222")
 
 						for _, objsq in pairs(blade) do
-					--		print("crashed Lane Clear -- E5")
+							--		print("crashed Lane Clear -- E5")
 							if objsq and objsq.x and objsq.z and not minion.buff["ireliamark"] then
 								print("crashed Lane Clear -- E4")
 								local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
-							--	print("crashed Lane Clear -- E9999")
+								--	print("crashed Lane Clear -- E9999")
 								if pos and player:spellSlot(2).name == "IreliaE2" then
-							--		print("crashed Lane Clear -- E3")
+									--		print("crashed Lane Clear -- E3")
 									local EPOS =
 										objsq.pos +
 										(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
@@ -2304,7 +2306,7 @@ end
 
 local function OnDraw()
 	if player.isOnScreen then
-	--	print("Drawings - 1")
+		--	print("Drawings - 1")
 		if menu.draws.drawq:get() then
 			graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 50)
 		end
@@ -2318,11 +2320,12 @@ local function OnDraw()
 			graphics.draw_circle(player.pos, spellW.range, 2, menu.draws.colorw:get(), 50)
 		end
 		if menu.draws.drawkill:get() and player:spellSlot(0).state == 0 then
-		--	print("Drawings - 2")
+			--	print("Drawings - 2")
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if
-					minion and minion.isVisible and not minion.isDead and minion.type == TYPE_MINION and
+					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+						minion.type == TYPE_MINION and
 						minion.pos:dist(player.pos) < spellQ.range + 300
 				 then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
@@ -2335,7 +2338,8 @@ local function OnDraw()
 			for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
 				local minion = objManager.minions[TEAM_NEUTRAL][i]
 				if
-					minion and minion.isVisible and not minion.isDead and minion.type == TYPE_MINION and
+					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+						minion.type == TYPE_MINION and
 						minion.pos:dist(player.pos) < spellQ.range + 300
 				 then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
@@ -2348,7 +2352,7 @@ local function OnDraw()
 		end
 	end
 	if menu.draws.drawtoggle:get() then
-	--	print("Drawings - 3")
+		--	print("Drawings - 3")
 		local pos = graphics.world_to_screen(vec3(player.x, player.y, player.z))
 
 		if uhh == true then
@@ -2453,7 +2457,7 @@ local function OnDraw()
 end
 
 local function OnTick()
---	print("On Tick")
+	--	print("On Tick")
 	for i = 1, #evade.core.active_spells do
 		local spell = evade.core.active_spells[i]
 
@@ -2472,7 +2476,7 @@ local function OnTick()
 								player:castSpell("pos", 1, player.pos)
 							end
 						end
-						if k.speed == math.huge then
+						if k.speed == math.huge or spell.data.spell_type == "Circular" then	
 							player:castSpell("pos", 1, player.pos)
 						end
 					end
