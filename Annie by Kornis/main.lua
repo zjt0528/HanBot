@@ -27,7 +27,7 @@ local common = avada_lib.common
 local dmglib = avada_lib.damageLib
 
 local spellQ = {
-	range = 625
+	range = 630
 }
 
 local spellW = {
@@ -172,11 +172,15 @@ menu.draws:boolean("drawflash", "Draw Flash - R Range", true)
 menu.draws:boolean("drawtoggle", "Draw Stack Toggle", true)
 menu.draws:boolean("drawdamage", "Draw Damage", true)
 
-menu:menu("Gap", "Gapcloser Settings")
-menu.Gap:boolean("GapA", "Use Stacked W for Anti-Gapclose", true)
-menu:menu("interrupt", "Interrupt Settings")
-menu.interrupt:boolean("inte", "Use W to Interrupt if Possible", true)
-menu.interrupt:menu("interruptmenu", "Interrupt Settings")
+menu:menu("misc", "Misc.")
+menu.misc:boolean("disable", "Disable Auto Attack in Combo", true)
+menu.misc:slider("level", "Disable AA at X Level", 6, 1, 18, 1)
+
+menu.misc:menu("Gap", "Gapcloser Settings")
+menu.misc.Gap:boolean("GapA", "Use Stacked W for Anti-Gapclose", true)
+menu.misc:menu("interrupt", "Interrupt Settings")
+menu.misc.interrupt:boolean("inte", "Use W to Interrupt if Possible", true)
+menu.misc.interrupt:menu("interruptmenu", "Interrupt Settings")
 for i = 1, #common.GetEnemyHeroes() do
 	local enemy = common.GetEnemyHeroes()[i]
 	local name = string.lower(enemy.charName)
@@ -200,10 +204,11 @@ menu.keys:keybind("lastkey", "Last Hit", "X", nil)
 menu:keybind("stack", "Save Stacks Toggle", "T", nil)
 menu:boolean("stacke", "Auto Stack with E", true)
 menu:slider("stackingw", " ^- Mana Manager", 50, 1, 100, 1)
+menu:keybind("flashr", "Flash - R Key", "G", nil)
 
 TS.load_to_menu(menu)
 local TargetSelection = function(res, obj, dist)
-	if dist < spellQ.range then
+	if dist <= spellQ.range then
 		res.obj = obj
 		return true
 	end
@@ -320,14 +325,14 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 		end
 	end
 	if player.buff["pyromania_particle"] then
-		if menu.interrupt.inte:get() then
+		if menu.misc.interrupt.inte:get() then
 			if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY then
 				local enemyName = string.lower(spell.owner.charName)
 				if interruptableSpells[enemyName] then
 					for i = 1, #interruptableSpells[enemyName] do
 						local spellCheck = interruptableSpells[enemyName][i]
 						if
-							menu.interrupt.interruptmenu[spell.owner.charName .. spellCheck.menuslot]:get() and
+						menu.misc.interrupt.interruptmenu[spell.owner.charName .. spellCheck.menuslot]:get() and
 								string.lower(spell.name) == spellCheck.spellname
 						 then
 							if player.pos2D:dist(spell.owner.pos2D) < spellW.range and common.IsValidTarget(spell.owner) then
@@ -343,7 +348,7 @@ end
 
 local function WGapcloser()
 	if player.buff["pyromania_particle"] then
-		if menu.Gap.GapA:get() then
+		if menu.misc.Gap.GapA:get() then
 			for i = 0, objManager.enemies_n - 1 do
 				local dasher = objManager.enemies[i]
 				if dasher.type == TYPE_HERO and dasher.team == TEAM_ENEMY then
@@ -409,7 +414,7 @@ local function Combo()
 		end
 		if menu.combo.qcombo:get() then
 			if common.IsValidTarget(target) and target then
-				if (target.pos:dist(player) < spellQ.range) then
+				if (target.pos:dist(player) <= spellQ.range) then
 					player:castSpell("obj", 0, target)
 				end
 			end
@@ -468,7 +473,7 @@ local function Combo()
 		end
 		if menu.combo.qcombo:get() then
 			if common.IsValidTarget(target) and target then
-				if (target.pos:dist(player) < spellQ.range) then
+				if (target.pos:dist(player) <= spellQ.range) then
 					player:castSpell("obj", 0, target)
 				end
 			end
@@ -620,8 +625,7 @@ local function Harass()
 			end
 			if menu.harass.qcombo:get() then
 				if common.IsValidTarget(target) and target then
-					print("aa")
-					if (target.pos:dist(player) < spellQ.range) then
+					if (target.pos:dist(player) <= spellQ.range) then
 						player:castSpell("obj", 0, target)
 					end
 				end
@@ -641,7 +645,7 @@ local function Harass()
 			end
 			if menu.harass.qcombo:get() then
 				if common.IsValidTarget(target) and target then
-					if (target.pos:dist(player) < spellQ.range) then
+					if (target.pos:dist(player) <= spellQ.range) then
 						player:castSpell("obj", 0, target)
 					end
 				end
@@ -691,7 +695,7 @@ local function LaneClear()
 							if menu.laneclear.lastq:get() then
 								for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 									local minion = objManager.minions[TEAM_ENEMY][i]
-									if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellQ.range then
+									if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) <= spellQ.range then
 										local minionPos = vec3(minion.x, minion.y, minion.z)
 										--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 										delay = 0.25 + player.pos:dist(minion.pos) / 750
@@ -742,7 +746,7 @@ local function LaneClear()
 							if menu.laneclear.lastq:get() then
 								for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 									local minion = objManager.minions[TEAM_ENEMY][i]
-									if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellQ.range then
+									if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) <= spellQ.range then
 										local minionPos = vec3(minion.x, minion.y, minion.z)
 										--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 										delay = 0.25 + player.pos:dist(minion.pos) / 750
@@ -783,7 +787,10 @@ local function LastHit()
 		if menu.lasthit.useq:get() and player:spellSlot(0).state == 0 then
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
-				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellQ.range then
+				if
+					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+						minion.pos:dist(player.pos) <= spellQ.range
+				 then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 					delay = 0.25 + player.pos:dist(minion.pos) / 750
@@ -801,7 +808,10 @@ local function LastHit()
 		if menu.lasthit.useq:get() and player:spellSlot(0).state == 0 then
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
-				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellQ.range then
+				if
+					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+						minion.pos:dist(player.pos) <= spellQ.range
+				 then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 					delay = 0.25 + player.pos:dist(minion.pos) / 750
@@ -816,16 +826,7 @@ local function LastHit()
 		end
 	end
 end
-local TargetSelectionFR = function(res, obj, dist)
-	if dist < spellR.range + 410 then
-		res.obj = obj
-		return true
-	end
-end
 
-local GetTargetFR = function()
-	return TS.get_result(TargetSelectionFR).obj
-end
 local function OnDraw()
 	if player.isOnScreen then
 		if menu.draws.drawq:get() then
@@ -838,7 +839,7 @@ local function OnDraw()
 			graphics.draw_circle(player.pos, spellW.range, 2, menu.draws.colorw:get(), 50)
 		end
 		if menu.draws.drawflash:get() then
-			graphics.draw_circle(player.pos, spellR.range + 410, 2, menu.draws.colorw:get(), 50)
+			graphics.draw_circle(player.pos, spellR.range + 320, 2, menu.draws.colorw:get(), 50)
 		end
 	end
 	if menu.draws.drawtoggle:get() then
@@ -864,16 +865,63 @@ local function OnDraw()
 	end
 end
 
+local TargetSelectionFR = function(res, obj, dist)
+	if dist < spellR.range + 320 then
+		res.obj = obj
+		return true
+	end
+end
+
+local GetTargetFR = function()
+	return TS.get_result(TargetSelectionFR).obj
+end
 local function OnTick()
 	RFollow()
+	if menu.flashr:get() then
+		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
+		local target = GetTargetFR()
+		if target and target.isVisible then
+			if common.IsValidTarget(target) then
+				if (target.pos:dist(player.pos) <= spellR.range + 320) then
+					if
+						(FlashSlot and player:spellSlot(FlashSlot).state and player:spellSlot(FlashSlot).state == 0 and
+							player:spellSlot(3).state == 0)
+					 then
+						if (target.pos:dist(player.pos) > spellR.range) then
+							local direction = (target.pos - player.pos):norm()
+							local extendedPos = player.pos + direction * 320
+							local seg = preds.circular.get_prediction(spellR, target, vec2(extendedPos.x, extendedPos.z))
+							if seg and seg.startPos:dist(seg.endPos) <= spellR.range + 320 then
+								player:castSpell("pos", 3, vec3(seg.endPos.x, mousePos.y, seg.endPos.y))
 
+								common.DelayAction(
+									function()
+										player:castSpell("pos", FlashSlot, target.pos)
+									end,
+									0.25 + network.latency
+								)
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	if (orb.combat.is_active()) then
+		if (menu.misc.disable:get() and menu.misc.level:get() <= player.levelRef) and player.mana > 100 then
+			orb.core.set_pause_attack(math.huge)
+		end
+	end
+	if orb.combat.is_active() and player.mana < 100 then
+		orb.core.set_pause_attack(0)
+	end
 	if menu.stacke:get() and menu.stackingw:get() <= (player.mana / player.maxMana) * 100 then
 		if not player.buff["pyromania_particle"] and not player.isRecalling then
 			player:castSpell("pos", 2, player.pos)
 		end
 	end
 
-	if menu.Gap.GapA:get() then
+	if menu.misc.Gap.GapA:get() then
 		WGapcloser()
 	end
 	Toggle()
@@ -882,10 +930,8 @@ local function OnTick()
 	end
 	KillSteal()
 	if menu.keys.clearkey:get() then
-	
-			LaneClear()
-			JungleClear()
-	
+		LaneClear()
+		JungleClear()
 	end
 	if menu.keys.harasskey:get() then
 		Harass()
