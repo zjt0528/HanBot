@@ -128,6 +128,9 @@ local dodgeWs = {
 	},
 	["nocturne"] = {
 		{menuslot = "R", slot = 3}
+	},
+	["volibear"] = {
+		{menuslot = "W", slot = 1}
 	}
 }
 local Spells = {
@@ -1725,7 +1728,7 @@ local function JungleClear()
 
 		local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
 		for i, minion in pairs(enemyMinionsQ) do
-			if minion and not minion.isDead and common.IsValidTarget(minion) then
+			if minion and not minion.isDead and minion.moveSpeed > 0 and minion.isTargetable and common.IsValidTarget(minion) then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				if minionPos:dist(player.pos) <= spellQ.range then
 					if (meow < os.clock()) then
@@ -1744,7 +1747,10 @@ local function JungleClear()
 
 		for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
 			local minion = objManager.minions[TEAM_NEUTRAL][i]
-			if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
+			if
+				minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+					minion.pos:dist(player.pos) < spellE.range
+			 then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				if minionPos:dist(player.pos) <= spellE.range then
 					if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
@@ -2203,7 +2209,10 @@ local function LaneClear()
 
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
-				if minion and minion.isVisible and not minion.isDead and minion.pos:dist(player.pos) < spellE.range then
+				if
+					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+						minion.pos:dist(player.pos) < spellE.range
+				 then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					if minionPos:dist(player.pos) <= spellE.range then
 						if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
@@ -2476,7 +2485,7 @@ local function OnTick()
 								player:castSpell("pos", 1, player.pos)
 							end
 						end
-						if k.speed == math.huge or spell.data.spell_type == "Circular" then	
+						if k.speed == math.huge or spell.data.spell_type == "Circular" then
 							player:castSpell("pos", 1, player.pos)
 						end
 					end
