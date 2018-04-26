@@ -187,7 +187,7 @@ for i = 1, #common.GetEnemyHeroes() do
 	if enemy and interruptableSpells[name] then
 		for v = 1, #interruptableSpells[name] do
 			local spell = interruptableSpells[name][v]
-			menu.interrupt.interruptmenu:boolean(
+			menu.misc.interrupt.interruptmenu:boolean(
 				string.format(tostring(enemy.charName) .. tostring(spell.menuslot)),
 				"Interrupt " .. tostring(enemy.charName) .. " " .. tostring(spell.menuslot),
 				true
