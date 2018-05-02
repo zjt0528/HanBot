@@ -324,6 +324,21 @@ end
 local uhh = true
 local something = 0
 
+local QLevelDamage = {50, 95, 140, 185, 230}
+function QDamage(target)
+	local damage = 0
+	if player:spellSlot(0).level > 0 and player:spellSlot(0).level < 5 then
+		damage =
+			common.CalculateMagicDamage(target, (QLevelDamage[player:spellSlot(0).level] + (common.GetTotalAP() * .65)), player)
+	end
+	if player:spellSlot(0).level > 0 and player:spellSlot(0).level == 5 then
+		damage =
+			common.CalculateMagicDamage(target, (QLevelDamage[player:spellSlot(0).level] + (common.GetTotalAP() * .65)), player) +
+			common.CalculateMagicDamage(target, (QLevelDamage[player:spellSlot(0).level] + (common.GetTotalAP() * .65)), player) *
+				0.15
+	end
+	return damage
+end
 local ECasting = 0
 local function Toggle()
 	if menu.combo.rset.rkey:get() then
@@ -383,12 +398,7 @@ local function CreateObj(object)
 
 	if object and object.name == "Seed" and object.owner.charName == "Syndra" then
 		objSomething[object.ptr] = object
-		if (player:spellSlot(0).level < 6) then
-			NoIdeaWhatImDoing[object.ptr] = os.clock() + 7
-		end
-		if (player:spellSlot(0).level == 5) then
-			NoIdeaWhatImDoing[object.ptr] = os.clock() + 9
-		end
+		NoIdeaWhatImDoing[object.ptr] = os.clock() + 7
 	end
 end
 local function AutoInterrupt(spell)
@@ -487,9 +497,12 @@ end
 
 local function LastHit()
 	if menu.laneclear.lane.lastq:get() then
-		local enemyMinionsE = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
-		for i, minion in pairs(enemyMinionsE) do
-			if minion and minion.isVisible and not minion.isDead and common.IsValidTarget(minion) then
+		for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+			local minion = objManager.minions[TEAM_ENEMY][i]
+			if
+				minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+					minion.pos:dist(player.pos) <= spellQ.range
+			 then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 				local delay = 1.2
@@ -518,7 +531,6 @@ function Objects()
 		if objsq and not objsq.isDead then
 			if vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellW.range then
 				local minionPos = vec3(objsq.x, objsq.y, objsq.z)
-
 				local minionDistanceToMouse = minionPos:dist(player.pos)
 
 				if lowest > NoIdeaWhatImDoing[objsq.ptr] then
@@ -612,7 +624,7 @@ local function Killsteal()
 			if menu.killsteal.ksq:get() then
 				if
 					player:spellSlot(0).state == 0 and vec3(enemies.x, enemies.y, enemies.z):dist(player) < spellQ.range and
-						dmglib.GetSpellDamage(0, enemies) > hp
+						QDamage(enemies) > hp
 				 then
 					local pos = preds.circular.get_prediction(spellQ, enemies)
 					if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
@@ -663,9 +675,12 @@ function JungleClear()
 	if uhhfarm == true then
 		if (player.mana / player.maxMana) * 100 >= menu.laneclear.jungle.mana:get() then
 			if menu.laneclear.jungle.farmq:get() then
-				local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
-				for i, minion in pairs(enemyMinionsQ) do
-					if minion and not minion.isDead and common.IsValidTarget(minion) then
+				for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
+					local minion = objManager.minions[TEAM_NEUTRAL][i]
+					if
+						minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+							minion.pos:dist(player.pos) < spellQ.range
+					 then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos:dist(player.pos) <= spellQ.range then
 							local pos = preds.circular.get_prediction(spellQ, minion)
@@ -1053,8 +1068,7 @@ local function Combo()
 								end
 								if menu.combo.rset.engagemode:get() then
 									local damages =
-										RDamage(target) + dmglib.GetSpellDamage(0, target) + dmglib.GetSpellDamage(1, target) +
-										dmglib.GetSpellDamage(2, target)
+										RDamage(target) + QDamage(enemies) + dmglib.GetSpellDamage(1, target) + dmglib.GetSpellDamage(2, target)
 									if (target.health <= damages) then
 										player:castSpell("obj", 3, target)
 									end
@@ -1361,7 +1375,7 @@ local function OnDraw()
 				graphics.draw_text_2D(
 					"Timer: " .. math.floor(NoIdeaWhatImDoing[objs.ptr] - os.clock()),
 					17,
-					pos.x - 40,
+					pos.x + 10,
 					pos.y,
 					graphics.argb(255, 255, 204, 204)
 				)
@@ -1418,14 +1432,9 @@ local function OnTick()
 					if objsq and not objsq.isDead then
 						if (objsq.pos:dist(objsw.pos) < 80 and uhhh ~= objsq.ptr) then
 							uhhh = objsq.ptr
-							if (player:spellSlot(0).level < 6) then
-								NoIdeaWhatImDoing[objsq.ptr] = os.clock() + 7
-								test = os.clock() + 7
-							end
-							if (player:spellSlot(0).level == 5) then
-								NoIdeaWhatImDoing[objsq.ptr] = os.clock() + 9
-								test = os.clock() + 9
-							end
+
+							NoIdeaWhatImDoing[objsq.ptr] = os.clock() + 7
+							test = os.clock() + 7
 						end
 					end
 				end
