@@ -1761,12 +1761,8 @@ function DrawDamagesE(target)
 end
 
 local function JungleClear()
-	--print("crashed Jungle Clear")
-
 	local meow = 0
 	if menu.farming.jungleclear.useq:get() then
-		--print("crashed Jungle Clear -- Q")
-
 		local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
 		for i, minion in pairs(enemyMinionsQ) do
 			if minion and not minion.isDead and minion.moveSpeed > 0 and minion.isTargetable and common.IsValidTarget(minion) then
@@ -1782,10 +1778,7 @@ local function JungleClear()
 			end
 		end
 	end
-
 	if menu.farming.jungleclear.usee:get() then
-		--print("crashed Jungle Clear -- E")
-
 		for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
 			local minion = objManager.minions[TEAM_NEUTRAL][i]
 			if
@@ -1825,11 +1818,9 @@ local function JungleClear()
 					end
 
 					for _, objsq in pairs(blade) do
-						--print("crashed Jungle Clear -- E5")
 						if objsq and objsq.x and objsq.z and not minion.buff["ireliamark"] then
-							print("crashed Jungle Clear -- E4")
 							local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
-							--print("crashed Jungle Clear -- E9999")
+
 							if pos and player:spellSlot(2).name == "IreliaE2" then
 								local EPOS =
 									objsq.pos +
@@ -1855,8 +1846,6 @@ local function JungleClear()
 		end
 	end
 	if menu.farming.jungleclear.useq:get() then
-		--print("crashed Jungle Clear -- Q2")
-
 		local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
 		for i, minion in pairs(enemyMinionsQ) do
 			if minion and not minion.isDead and common.IsValidTarget(minion) then
@@ -2199,13 +2188,11 @@ local function KillSteal()
 	end
 end
 local function LaneClear()
-	--	print("crashed Lane Clear")
 	if uhh then
 		return
 	end
 	if (player.mana / player.maxMana) * 100 >= menu.farming.laneclear.mana:get() then
 		if menu.farming.laneclear.farmq:get() then
-			--	print("crashed Lane Clear -- Q")
 			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 			for i, minion in pairs(enemyMinionsQ) do
 				if minion and not minion.isDead and common.IsValidTarget(minion) then
@@ -2246,8 +2233,6 @@ local function LaneClear()
 			end
 		end
 		if menu.farming.laneclear.farme:get() then
-			--	print("crashed Lane Clear -- E")
-
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if
@@ -2269,7 +2254,7 @@ local function LaneClear()
 								local pathEndPos = minion.path.point[minion.path.count]
 								local pathNorm = (pathEndPos - pathStartPos):norm()
 								local tempPred = common.GetPredictedPos(minion, 1)
-								--print("crashed Lane Clear -- E1111")
+
 								if tempPred then
 									local dist1 = player.pos:dist(tempPred)
 									if dist1 <= 900 then
@@ -2284,16 +2269,12 @@ local function LaneClear()
 							end
 							delayyyyyyy = os.clock() + 0.5
 						end
-						--	print("crashed Lane Clear -- E22222")
 
 						for _, objsq in pairs(blade) do
-							--		print("crashed Lane Clear -- E5")
 							if objsq and objsq.x and objsq.z and not minion.buff["ireliamark"] then
-								print("crashed Lane Clear -- E4")
 								local pos = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
-								--	print("crashed Lane Clear -- E9999")
+
 								if pos and player:spellSlot(2).name == "IreliaE2" then
-									--		print("crashed Lane Clear -- E3")
 									local EPOS =
 										objsq.pos +
 										(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
@@ -2356,7 +2337,6 @@ end
 
 local function OnDraw()
 	if player.isOnScreen then
-		--	print("Drawings - 1")
 		if menu.draws.drawq:get() then
 			graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 50)
 		end
@@ -2370,7 +2350,6 @@ local function OnDraw()
 			graphics.draw_circle(player.pos, spellW.range, 2, menu.draws.colorw:get(), 50)
 		end
 		if menu.draws.drawkill:get() and player:spellSlot(0).state == 0 then
-			--	print("Drawings - 2")
 			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if
@@ -2402,7 +2381,6 @@ local function OnDraw()
 		end
 	end
 	if menu.draws.drawtoggle:get() then
-		--	print("Drawings - 3")
 		local pos = graphics.world_to_screen(vec3(player.x, player.y, player.z))
 
 		if uhh == true then
@@ -2413,7 +2391,6 @@ local function OnDraw()
 	end
 
 	if menu.draws.drawdamage:get() then
-		--print("Drawings - 4")
 		for i = 0, objManager.enemies_n - 1 do
 			local enemies = objManager.enemies[i]
 			if enemies and not enemies.isDead and enemies.isVisible and enemies.isTargetable and player.pos:dist(enemies) < 2000 then
@@ -2422,20 +2399,15 @@ local function OnDraw()
 		end
 	end
 	if menu.draws.drawgapclose:get() and player:spellSlot(0).state == 0 then
-		--print("Drawings - 5")
 		local minion = GetClosestMobToEnemyForGap()
 		local targets = GetTargetGap()
-		--print("Drawings - 888")
 		if targets then
-			--print("Drawings - 999")
 			if common.IsValidTarget(targets) and minion then
-				--print("Drawings - 10000")
 				if
 					targets and (targets.pos:dist(player) < spellQ.range + spellQ.range - 50) and
 						(targets.pos:dist(player)) > spellQ.range
 				 then
 					if player.mana > player.manaCost0 and GetQDamage(minion) >= minion.health then
-						--print("Drawings - 6")
 						graphics.draw_line(player, minion, 4, graphics.argb(255, 218, 34, 34))
 						graphics.draw_line(minion, targets, 4, graphics.argb(255, 218, 34, 34))
 					end
@@ -2449,7 +2421,6 @@ local function OnDraw()
 							if
 								(vec3(minion.x, minion.y, minion.z):dist(targets.pos) < vec3(targets.x, targets.y, targets.z):dist(player.pos))
 							 then
-								--print("Drawings - 7")
 								graphics.draw_line(player, minion, 4, graphics.argb(255, 218, 34, 34))
 								graphics.draw_line(minion, targets, 4, graphics.argb(255, 218, 34, 34))
 							end
@@ -2502,7 +2473,6 @@ local function OnDraw()
 end
 
 local function OnTick()
-	--	print("On Tick")
 	for i = 1, #evade.core.active_spells do
 		local spell = evade.core.active_spells[i]
 
