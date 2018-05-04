@@ -131,6 +131,9 @@ local dodgeWs = {
 	},
 	["volibear"] = {
 		{menuslot = "W", slot = 1}
+	},
+	["singed"] = {
+		{menuslot = "E", slot = 2}
 	}
 }
 local Spells = {
@@ -570,7 +573,6 @@ menu.draws:boolean("drawtoggle", "Draw Farm Toggle", true)
 menu.draws:boolean("drawkill", "Draw Minions Killable with Q", true)
 menu.draws:boolean("drawgapclose", "Draw Gapclose Lines", true)
 menu.draws:boolean("drawdamage", "Draw Damage", true)
-menu.draws:boolean("mouse", "Draw Flee Range on Cursor", true)
 
 menu:menu("Gap", "Gapcloser Settings")
 menu.Gap:boolean("GapA", "Use E for Anti-Gapclose", true)
@@ -1131,101 +1133,133 @@ local function WGapcloser()
 	end
 end
 local function GetClosestMobKill()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY, mousePos)
-
 	local closestMinion = nil
 	local closestMinionDistance = 9999
 
-	for i, minion in pairs(enemyMinions) do
-		if minion and minion.health < GetQDamage(minion) then
-			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 400 then
-				local minionDistanceToMouse = minionPos:dist(mousePos)
+	for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+		local minion = objManager.minions[TEAM_ENEMY][i]
+		if
+			minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+				minion.pos:dist(player.pos) < spellQ.range and
+				minion.pos:dist(mousePos) < player.pos:dist(mousePos) and
+				minion.type == TYPE_MINION
+		 then
+			if minion.health < GetQDamage(minion) then
+				local minionPos = vec3(minion.x, minion.y, minion.z)
+				if minionPos:dist(player.pos) < spellQ.range then
+					local minionDistanceToMouse = minionPos:dist(mousePos)
 
-				if minionDistanceToMouse < closestMinionDistance then
-					closestMinion = minion
-					closestMinionDistance = minionDistanceToMouse
+					if minionDistanceToMouse < closestMinionDistance then
+						closestMinion = minion
+						closestMinionDistance = minionDistanceToMouse
+					end
 				end
 			end
 		end
 	end
+
 	return closestMinion
 end
 
 local function GetClosestJungleKill()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL, mousePos)
-
 	local closestMinion = nil
 	local closestMinionDistance = 9999
 
-	for i, minion in pairs(enemyMinions) do
-		if minion and minion.health < GetQDamage(minion) then
-			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 400 then
-				local minionDistanceToMouse = minionPos:dist(mousePos)
+	for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
+		local minion = objManager.minions[TEAM_NEUTRAL][i]
+		if
+			minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+				minion.pos:dist(player.pos) < spellQ.range and
+				minion.pos:dist(mousePos) < player.pos:dist(mousePos) and
+				minion.type == TYPE_MINION
+		 then
+			if minion.health < GetQDamage(minion) then
+				local minionPos = vec3(minion.x, minion.y, minion.z)
+				if minionPos:dist(player.pos) < spellQ.range then
+					local minionDistanceToMouse = minionPos:dist(mousePos)
 
-				if minionDistanceToMouse < closestMinionDistance then
-					closestMinion = minion
-					closestMinionDistance = minionDistanceToMouse
+					if minionDistanceToMouse < closestMinionDistance then
+						closestMinion = minion
+						closestMinionDistance = minionDistanceToMouse
+					end
 				end
 			end
 		end
 	end
+
 	return closestMinion
 end
 local function GetClosestMobMark()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY, mousePos)
-
 	local closestMinion = nil
 	local closestMinionDistance = 9999
 
-	for i, minion in pairs(enemyMinions) do
-		if minion and minion.buff["ireliamark"] then
-			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 400 then
-				local minionDistanceToMouse = minionPos:dist(mousePos)
+	for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
+		local minion = objManager.minions[TEAM_NEUTRAL][i]
+		if
+			minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+				minion.pos:dist(player.pos) < spellQ.range and
+				minion.pos:dist(mousePos) < player.pos:dist(mousePos) and
+				minion.type == TYPE_MINION
+		 then
+			if minion.buff["ireliamark"] then
+				local minionPos = vec3(minion.x, minion.y, minion.z)
+				if minionPos:dist(player.pos) < spellQ.range then
+					local minionDistanceToMouse = minionPos:dist(mousePos)
 
-				if minionDistanceToMouse < closestMinionDistance then
-					closestMinion = minion
-					closestMinionDistance = minionDistanceToMouse
+					if minionDistanceToMouse < closestMinionDistance then
+						closestMinion = minion
+						closestMinionDistance = minionDistanceToMouse
+					end
 				end
 			end
 		end
 	end
+
 	return closestMinion
 end
 
 local function GetClosestJungleMark()
-	local enemyMinions = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL, mousePos)
-
 	local closestMinion = nil
 	local closestMinionDistance = 9999
 
-	for i, minion in pairs(enemyMinions) do
-		if minion and minion.buff["ireliamark"] then
-			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 400 then
-				local minionDistanceToMouse = minionPos:dist(mousePos)
+	for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
+		local minion = objManager.minions[TEAM_NEUTRAL][i]
+		if
+			minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+				minion.pos:dist(player.pos) < spellQ.range and
+				minion.pos:dist(mousePos) < player.pos:dist(mousePos) and
+				minion.type == TYPE_MINION
+		 then
+			if minion.buff["ireliamark"] then
+				local minionPos = vec3(minion.x, minion.y, minion.z)
+				if minionPos:dist(player.pos) < spellQ.range then
+					local minionDistanceToMouse = minionPos:dist(mousePos)
 
-				if minionDistanceToMouse < closestMinionDistance then
-					closestMinion = minion
-					closestMinionDistance = minionDistanceToMouse
+					if minionDistanceToMouse < closestMinionDistance then
+						closestMinion = minion
+						closestMinionDistance = minionDistanceToMouse
+					end
 				end
 			end
 		end
 	end
+
 	return closestMinion
 end
 local function GetClosestMob()
-	local enemyMinions = common.GetMinionsInRange(900, TEAM_ENEMY, mousePos)
-
 	local closestMinion = nil
 	local closestMinionDistance = 9999
 
-	for i, minion in pairs(enemyMinions) do
-		if minion then
+	for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+		local minion = objManager.minions[TEAM_ENEMY][i]
+		if
+			minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+				minion.pos:dist(player.pos) < spellQ.range and
+				minion.pos:dist(mousePos) < player.pos:dist(mousePos) and
+				minion.type == TYPE_MINION
+		 then
 			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 400 then
+			if minionPos:dist(player.pos) < spellQ.range then
 				local minionDistanceToMouse = minionPos:dist(mousePos)
 
 				if minionDistanceToMouse < closestMinionDistance then
@@ -1235,19 +1269,24 @@ local function GetClosestMob()
 			end
 		end
 	end
+
 	return closestMinion
 end
 
 local function GetClosestJungle()
-	local enemyMinions = common.GetMinionsInRange(900, TEAM_NEUTRAL, mousePos)
-
 	local closestMinion = nil
 	local closestMinionDistance = 9999
 
-	for i, minion in pairs(enemyMinions) do
-		if minion then
+	for i = 0, objManager.minions.size[TEAM_NEUTRAL] - 1 do
+		local minion = objManager.minions[TEAM_NEUTRAL][i]
+		if
+			minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+				minion.pos:dist(player.pos) < spellQ.range and
+				minion.pos:dist(mousePos) < player.pos:dist(mousePos) and
+				minion.type == TYPE_MINION
+		 then
 			local minionPos = vec3(minion.x, minion.y, minion.z)
-			if minionPos:dist(mousePos) < 400 then
+			if minionPos:dist(player.pos) < spellQ.range then
 				local minionDistanceToMouse = minionPos:dist(mousePos)
 
 				if minionDistanceToMouse < closestMinionDistance then
@@ -1257,8 +1296,10 @@ local function GetClosestJungle()
 			end
 		end
 	end
+
 	return closestMinion
 end
+
 local function Flee()
 	if menu.flee.fleekey:get() then
 		local target = GetTarget()
@@ -2418,11 +2459,6 @@ local function OnDraw()
 			end
 		end
 	end
-
-	if menu.draws.mouse:get() and menu.flee.fleekey:get() then
-		graphics.draw_circle(mousePos, 400, 2, graphics.argb(155, 255, 204, 204), 30)
-	end
-
 	--[[local target = GetTarget()
 	if common.IsValidTarget(target) then
 		if menu.combo.ecombo:get() then
