@@ -31,5 +31,3 @@ end
 if player.charName == "Karma" then
 	module.load("SupportAIO" .. player.charName, "Karma")
 end
-
-
