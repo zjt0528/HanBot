@@ -139,7 +139,7 @@ menu.combo:boolean("wcancel", "Cancel W Animation with Q", true)
 menu.combo:boolean("rcombo", "Use R in Combo", true)
 menu.combo:slider("hitr", " ^- If X Near Enemies", 2, 1, 5, 1)
 menu.combo:slider("hpr", " ^- If Enemy HP lower than X", 50, 1, 100, 1)
-menu.combo:boolean("blockaa", "Block Auto Attacks while in W", true)
+menu.combo:boolean("blockaa", "Block Auto Attacks while in R", true)
 
 menu:menu("harass", "Harass")
 menu.harass:boolean("qcombo", "Use Q in Harass", true)
