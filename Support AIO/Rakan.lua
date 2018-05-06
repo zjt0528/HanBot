@@ -263,7 +263,6 @@ local function AutoInterrupt(spell)
 							spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally and
 								not (spell.name:find("BasicAttack") or spell.name:find("crit"))
 						 then
-							print(spell.name)
 							if menu.SpellsMenu.targeteteteteteed:get() then
 								if ally.charName == "Xayah" and ally.pos:dist(player.pos) <= 1000 then
 									player:castSpell("obj", 2, ally)
