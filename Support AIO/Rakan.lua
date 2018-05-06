@@ -210,7 +210,7 @@ menu.SpellsMenu.BasicAttack:slider("minionhp", " ^- HP to Shield", 10, 1, 100, 5
 menu.SpellsMenu.BasicAttack:boolean("turret", "Shield on Turret attack", true)
 menu:keybind("engage", "Engage E - W Combo", "T", nil)
 menu:keybind("wflash", "W - Flash", "Z", nil)
-menu:boolean("wf", " ^- Use R Meanwhile in R", true)
+menu:boolean("wf", " ^- Use R Meanwhile in W", true)
 local objHolder = {}
 local Pix = nil
 local function count_allies_in_range(pos, range)
