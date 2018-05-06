@@ -145,10 +145,10 @@ menu.combo:boolean("minion", " ^- Include Minions for Bounce", true)
 
 menu:menu("harass", "Harass")
 menu.harass:dropdown("harassmode", "Harass Mode", 1, {"E-Q-W", "E-W-Q", "W-E-Q", "W-Q-E"}, 2)
-menu.harass:boolean("qharass", "Use Q in Combo", true)
+menu.harass:boolean("qharass", "Use Q in Harass", true)
 menu.harass:boolean("stunq", " ^- Only if Stuns", true)
-menu.harass:boolean("wharass", "Use W in Combo", true)
-menu.harass:boolean("eharass", "Use E in Combo", true)
+menu.harass:boolean("wharass", "Use W in Harass", true)
+menu.harass:boolean("eharass", "Use E in Harass", true)
 
 menu:menu("laneclear", "Farming")
 menu.laneclear:keybind("toggle", "Farm Toggle", "Z", nil)

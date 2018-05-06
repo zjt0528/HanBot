@@ -319,7 +319,9 @@ local function something()
 				else
 					for i = 1, #collision do
 						local obj = collision[i]
-						if obj and obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 230 then
+						if
+							obj and obj.type and obj.type == TYPE_MINION and obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 230
+						 then
 							countminion[#countminion + 1] = obj
 						end
 					end
@@ -345,7 +347,7 @@ local function Harass()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.path.isActive and
+										obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 											obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 230 - obj.boundingRadius
 									 then
 										player:castSpell("self", 3)
@@ -366,8 +368,9 @@ local function Harass()
 							if (#something() == table.getn(preds.collision.get_prediction(spellQ, pos, target))) then
 								for i = 1, #collision do
 									local obj = collision[i]
+
 									if
-										obj and not obj.path.isActive and
+										obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 											obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 230 - obj.boundingRadius
 									 then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -393,7 +396,7 @@ local function Harass()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.path.isActive and
+										obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 											obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 130 - obj.boundingRadius
 									 then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -414,7 +417,7 @@ local function Harass()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.path.isActive and
+										obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 											obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 230 - obj.boundingRadius
 									 then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -481,7 +484,7 @@ local function Harass()
 									for i = 1, #collision do
 										local obj = collision[i]
 										if
-											obj and not obj.path.isActive and
+											obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 												obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 130 - obj.boundingRadius
 										 then
 											player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -553,7 +556,7 @@ local function Combo()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.path.isActive and
+										obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 											obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 230 - obj.boundingRadius
 									 then
 										player:castSpell("self", 3)
@@ -575,7 +578,7 @@ local function Combo()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.path.isActive and
+										obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 											obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 230 - obj.boundingRadius
 									 then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -601,7 +604,7 @@ local function Combo()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.path.isActive and
+										obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 											obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 130 - obj.boundingRadius
 									 then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -622,7 +625,7 @@ local function Combo()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.path.isActive and
+										obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 											obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 230 - obj.boundingRadius
 									 then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -689,7 +692,7 @@ local function Combo()
 									for i = 1, #collision do
 										local obj = collision[i]
 										if
-											obj and not obj.path.isActive and
+											obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 												obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 130 - obj.boundingRadius
 										 then
 											player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -793,7 +796,7 @@ local function OnTick()
 							for i = 1, #collision do
 								local obj = collision[i]
 								if
-									obj and not obj.path.isActive and
+									obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 										obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 130 - obj.boundingRadius
 								 then
 									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -856,7 +859,7 @@ local function OnTick()
 							for i = 1, #collision do
 								local obj = collision[i]
 								if
-									obj and not obj.path.isActive and
+									obj and obj.type and obj.type == TYPE_MINION and not obj.path.isActive and
 										obj.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) < 130 - obj.boundingRadius
 								 then
 									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))

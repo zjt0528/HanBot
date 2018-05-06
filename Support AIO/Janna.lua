@@ -332,12 +332,125 @@ for _, i in pairs(ShildSpellsDB) do
 		end
 	end
 end
+menu.boost:menu("wset", "E on Auto Attack")
+menu.boost.wset:boolean("enablee", "Enable E on Auto Attack", false)
+menu.boost.wset:header("uhhh", "0 - Disabled, 1 - Biggest Priority, 5 - Lowest Priority")
+local enemy = common.GetAllyHeroes()
+for i, allies in ipairs(enemy) do
+	if
+		allies.charName ~= "Janna" and allies.charName ~= "Twitch" and allies.charName ~= "KogMaw" and
+			allies.charName ~= "Tristana" and
+			allies.charName ~= "Ashe" and
+			allies.charName ~= "Vayne" and
+			allies.charName ~= "Varus" and
+			allies.charName ~= "Xayah" and
+			allies.charName ~= "Lucian" and
+			allies.charName ~= "Sivir" and
+			allies.charName ~= "Draven" and
+			allies.charName ~= "Kalista" and
+			allies.charName ~= "Caitlyn" and
+			allies.charName ~= "Jinx" and
+			allies.charName ~= "Ezreal"
+	 then
+		menu.boost.wset:slider(allies.charName, "Priority: " .. allies.charName, 0, 0, 5, 1)
+	end
+	if
+		allies.charName == "Twitch" or allies.charName == "KogMaw" or allies.charName == "Tristana" or
+			allies.charName == "Ashe" or
+			allies.charName == "Vayne" or
+			allies.charName == "Varus" or
+			allies.charName == "Xayah" or
+			allies.charName == "Lucian" or
+			allies.charName == "Sivir" or
+			allies.charName == "Draven" or
+			allies.charName == "Kalista" or
+			allies.charName == "Caitlyn" or
+			allies.charName == "Jinx" or
+			allies.charName == "Ezreal"
+	 then
+		menu.boost.wset:slider(allies.charName, "Priority: " .. allies.charName, 1, 0, 5, 1)
+	end
+	if allies.charName == "Janna" then
+		menu.boost.wset:slider(allies.charName, "Priority: " .. allies.charName, 0, 0, 5, 1)
+	end
+end
+
 local function Spellsssss(slot, vec3, vec3, networkID, isInjected)
 	if (slot == 0 and isInjected == true) then
 		player:castSpell("self", 0)
 	end
 end
+local function PrioritizedAllyW()
+	local heroTarget = nil
+	for i = 0, objManager.allies_n - 1 do
+		local hero = objManager.allies[i]
+		if not player.isRecalling then
+			if
+				hero.team == TEAM_ALLY and not hero.isDead and menu.boost.wset[hero.charName]:get() > 0 and
+					hero.pos:dist(player.pos) <= spellE.range
+			 then
+				if heroTarget == nil then
+					heroTarget = hero
+				elseif menu.boost.wset[hero.charName]:get() < menu.boost.wset[heroTarget.charName]:get() then
+					heroTarget = hero
+				end
+			end
+		end
+	end
+
+	return heroTarget
+end
+local PSpells = {
+	"CaitlynHeadshotMissile",
+	"RumbleOverheatAttack",
+	"JarvanIVMartialCadenceAttack",
+	"ShenKiAttack",
+	"MasterYiDoubleStrike",
+	"sonahymnofvalorattackupgrade",
+	"sonaariaofperseveranceupgrade",
+	"sonasongofdiscordattackupgrade",
+	"NocturneUmbraBladesAttack",
+	"NautilusRavageStrikeAttack",
+	"ZiggsPassiveAttack",
+	"QuinnWEnhanced",
+	"LucianPassiveAttack",
+	"SkarnerPassiveAttack",
+	"KarthusDeathDefiedBuff"
+}
 local function AutoInterrupt(spell)
+	if menu.boost.wset.enablee:get() then
+		local heroTarget = nil
+		if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY and spell.target.type == TYPE_HERO then
+			for i = 1, #PSpells do
+				if
+					spell.name:find(PSpells[i]) and spell.owner.pos:dist(player.pos) <= spellE.range and
+						menu.boost.wset[spell.owner.charName]:get() > 0
+				 then
+					if heroTarget == nil then
+						heroTarget = spell.owner
+					elseif menu.boost.wset[hero.charName]:get() < menu.boost.wset[heroTarget.charName]:get() then
+						heroTarget = spell.owner
+					end
+					if (heroTarget) then
+						player:castSpell("obj", 2, heroTarget)
+					end
+				end
+			end
+			if
+				spell.name:find("BasicAttack") and spell.owner.pos:dist(player.pos) <= spellE.range and
+					menu.boost.wset[spell.owner.charName]:get() > 0
+			 then
+				if heroTarget == nil then
+					heroTarget = spell.owner
+				elseif menu.boost.wset[hero.charName]:get() < menu.boost.wset[heroTarget.charName]:get() then
+					heroTarget = spell.owner
+				end
+				if (heroTarget) then
+					player:castSpell("obj", 2, heroTarget)
+				end
+			end
+		end
+	end
 	if menu.SpellsMenu.targeteteteteteed:get() then
 		local allies = common.GetAllyHeroes()
 		for z, ally in ipairs(allies) do
@@ -492,6 +605,7 @@ local function AutoInterrupt(spell)
 		end
 	end
 end
+
 local function WGapcloser()
 	if player:spellSlot(0).state == 0 and menu.misc.GapA:get() then
 		for i = 0, objManager.enemies_n - 1 do
@@ -660,7 +774,7 @@ local function OnTick()
 			local allies = common.GetAllyHeroes()
 			for z, ally in ipairs(allies) do
 				if ally then
-					if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+					if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
 						if
 							(ally.buff[5] or ally.buff[8] or ally.buff[24] or ally.buff[23] or ally.buff[11] or ally.buff[22] or ally.buff[8] or
 								ally.buff[21])
