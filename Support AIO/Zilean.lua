@@ -79,10 +79,10 @@ for i = 0, objManager.allies_n - 1 do
 end
 
 menu:menu("harass", "Harass")
-menu.harass:boolean("qcombo", "Use Q in Combo", true)
+menu.harass:boolean("qcombo", "Use Q in Harass", true)
 menu.harass:boolean("wcombo", "Use W for Q Reset", true)
 menu.harass:boolean("whit", " ^- Only if Q Hits", false)
-menu.harass:boolean("ecombo", "Use E in Combo", true)
+menu.harass:boolean("ecombo", "Use E in Harass", true)
 
 menu:menu("we", "W Boost Settings")
 menu.we:keybind("wekey", "W Boost Ally", "Z", nil)
