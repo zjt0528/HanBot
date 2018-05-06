@@ -121,7 +121,8 @@ menu:menu("combo", "Combo")
 
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:boolean("useeq", "Use E > Q Extended", false)
-menu.combo:boolean("wcombo", "Auto W", true)
+menu.combo:boolean("wcomboenemy", "Use W in Combo on Enemy", false)
+menu.combo:boolean("wcombo", "Auto W on Ally", true)
 menu.combo:menu("wset", "W Priority")
 menu.combo.wset:boolean("enablee", "Auto E together with W", false)
 menu.combo.wset:header("uhhh", "0 - Disabled, 1 - Biggest Priority, 5 - Lowest Priority")
@@ -807,6 +808,14 @@ local function Harass()
 end
 
 local function Combo()
+	if menu.combo.wcomboenemy:get() then
+		local target = GetTargetQ()
+		if target and target.isVisible then
+			if common.IsValidTarget(target) and target.pos:dist(player.pos) <= spellW.range then
+				player:castSpell("obj", 1, target)
+			end
+		end
+	end
 	if menu.combo.qcombo:get() then
 		local target = GetTargetQ()
 		if target and target.isVisible then
