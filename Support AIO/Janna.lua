@@ -204,6 +204,11 @@ menu:menu("combo", "Combo")
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:boolean("wcombo", "Use W in Combo", true)
 
+menu:menu("harass", "Harass")
+
+menu.harass:boolean("qcombo", "Use Q in Harass", true)
+menu.harass:boolean("wcombo", "Use W in Harass", true)
+
 menu:menu("draws", "Draw Settings")
 menu.draws:boolean("drawq", "Draw Q Range", true)
 menu.draws:color("colorq", "  ^- Color", 255, 255, 255, 255)
@@ -264,6 +269,7 @@ menu.keys:keybind("clearkey", "Lane Clear Key", "V", nil)
 menu.keys:keybind("lastkey", "Last Hit", "X", nil)
 menu:menu("SpellsMenu", "Shielding")
 menu.SpellsMenu:boolean("enable", "Enable Shielding", true)
+menu.SpellsMenu:boolean("blockr", "Don't Cancel R to Shield", false)
 menu.SpellsMenu:boolean("priority", "Priority Ally", true)
 menu.SpellsMenu:menu("blacklist", "Ally Shield Blacklist")
 local enemy = common.GetAllyHeroes()
@@ -451,15 +457,125 @@ local function AutoInterrupt(spell)
 			end
 		end
 	end
-	if menu.SpellsMenu.targeteteteteteed:get() then
-		local allies = common.GetAllyHeroes()
-		for z, ally in ipairs(allies) do
-			if ally then
-				if not menu.SpellsMenu.blacklist[ally.charName]:get() then
-					if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
-						if not spell.name:find("crit") then
-							if not spell.name:find("BasicAttack") then
-								if menu.SpellsMenu.targeteteteteteed:get() then
+	if menu.SpellsMenu.blockr:get() then
+		if not player.buff["reapthewhirlwind"] then
+			if menu.SpellsMenu.targeteteteteteed:get() then
+				local allies = common.GetAllyHeroes()
+				for z, ally in ipairs(allies) do
+					if ally then
+						if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+							if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+								if not spell.name:find("crit") then
+									if not spell.name:find("BasicAttack") then
+										if menu.SpellsMenu.targeteteteteteed:get() then
+											if ally.pos:dist(player.pos) <= spellE.range then
+												player:castSpell("obj", 2, ally)
+											end
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+			if menu.SpellsMenu.BasicAttack.aa:get() then
+				local allies = common.GetAllyHeroes()
+				for z, ally in ipairs(allies) do
+					if ally and ally.pos:dist(player.pos) <= spellE.range then
+						if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+							if spell.name:find("BasicAttack") then
+								if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+									if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+										if ally.pos:dist(player.pos) <= spellE.range then
+											player:castSpell("obj", 2, ally)
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+			if menu.SpellsMenu.BasicAttack.critaa:get() then
+				local allies = common.GetAllyHeroes()
+				for z, ally in ipairs(allies) do
+					if ally and ally.pos:dist(player.pos) <= spellE.range then
+						if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+							if spell.name:find("crit") then
+								if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.crithp:get() then
+									if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+										if ally.pos:dist(player.pos) <= spellE.range then
+											player:castSpell("obj", 2, ally)
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+			if menu.SpellsMenu.BasicAttack.minionaa:get() then
+				local allies = common.GetAllyHeroes()
+				for z, ally in ipairs(allies) do
+					if ally and ally.pos:dist(player.pos) <= spellE.range then
+						if spell.owner.type == TYPE_MINION and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+							if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.minionhp:get() then
+								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+									if ally.pos:dist(player.pos) <= spellE.range then
+										player:castSpell("obj", 2, ally)
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+			if menu.SpellsMenu.BasicAttack.turret:get() then
+				local allies = common.GetAllyHeroes()
+				for z, ally in ipairs(allies) do
+					if ally and ally.pos:dist(player.pos) <= spellE.range then
+						if spell.owner.type == TYPE_TURRET and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+							if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+								if ally.pos:dist(player.pos) <= spellE.range then
+									player:castSpell("obj", 2, ally)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	if not menu.SpellsMenu.blockr:get() then
+		if menu.SpellsMenu.targeteteteteteed:get() then
+			local allies = common.GetAllyHeroes()
+			for z, ally in ipairs(allies) do
+				if ally then
+					if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+						if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+							if not spell.name:find("crit") then
+								if not spell.name:find("BasicAttack") then
+									if menu.SpellsMenu.targeteteteteteed:get() then
+										if ally.pos:dist(player.pos) <= spellE.range then
+											player:castSpell("obj", 2, ally)
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+		if menu.SpellsMenu.BasicAttack.aa:get() then
+			local allies = common.GetAllyHeroes()
+			for z, ally in ipairs(allies) do
+				if ally and ally.pos:dist(player.pos) <= spellE.range then
+					if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+						if spell.name:find("BasicAttack") then
+							if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
 									if ally.pos:dist(player.pos) <= spellE.range then
 										player:castSpell("obj", 2, ally)
 									end
@@ -470,14 +586,30 @@ local function AutoInterrupt(spell)
 				end
 			end
 		end
-	end
-	if menu.SpellsMenu.BasicAttack.aa:get() then
-		local allies = common.GetAllyHeroes()
-		for z, ally in ipairs(allies) do
-			if ally and ally.pos:dist(player.pos) <= spellE.range then
-				if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
-					if spell.name:find("BasicAttack") then
-						if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+		if menu.SpellsMenu.BasicAttack.critaa:get() then
+			local allies = common.GetAllyHeroes()
+			for z, ally in ipairs(allies) do
+				if ally and ally.pos:dist(player.pos) <= spellE.range then
+					if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+						if spell.name:find("crit") then
+							if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.crithp:get() then
+								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+									if ally.pos:dist(player.pos) <= spellE.range then
+										player:castSpell("obj", 2, ally)
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+		if menu.SpellsMenu.BasicAttack.minionaa:get() then
+			local allies = common.GetAllyHeroes()
+			for z, ally in ipairs(allies) do
+				if ally and ally.pos:dist(player.pos) <= spellE.range then
+					if spell.owner.type == TYPE_MINION and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+						if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.minionhp:get() then
 							if not menu.SpellsMenu.blacklist[ally.charName]:get() then
 								if ally.pos:dist(player.pos) <= spellE.range then
 									player:castSpell("obj", 2, ally)
@@ -488,31 +620,11 @@ local function AutoInterrupt(spell)
 				end
 			end
 		end
-	end
-	if menu.SpellsMenu.BasicAttack.critaa:get() then
-		local allies = common.GetAllyHeroes()
-		for z, ally in ipairs(allies) do
-			if ally and ally.pos:dist(player.pos) <= spellE.range then
-				if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
-					if spell.name:find("crit") then
-						if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.crithp:get() then
-							if not menu.SpellsMenu.blacklist[ally.charName]:get() then
-								if ally.pos:dist(player.pos) <= spellE.range then
-									player:castSpell("obj", 2, ally)
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	if menu.SpellsMenu.BasicAttack.minionaa:get() then
-		local allies = common.GetAllyHeroes()
-		for z, ally in ipairs(allies) do
-			if ally and ally.pos:dist(player.pos) <= spellE.range then
-				if spell.owner.type == TYPE_MINION and spell.owner.team == TEAM_ENEMY and spell.target == ally then
-					if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.minionhp:get() then
+		if menu.SpellsMenu.BasicAttack.turret:get() then
+			local allies = common.GetAllyHeroes()
+			for z, ally in ipairs(allies) do
+				if ally and ally.pos:dist(player.pos) <= spellE.range then
+					if spell.owner.type == TYPE_TURRET and spell.owner.team == TEAM_ENEMY and spell.target == ally then
 						if not menu.SpellsMenu.blacklist[ally.charName]:get() then
 							if ally.pos:dist(player.pos) <= spellE.range then
 								player:castSpell("obj", 2, ally)
@@ -523,21 +635,6 @@ local function AutoInterrupt(spell)
 			end
 		end
 	end
-	if menu.SpellsMenu.BasicAttack.turret:get() then
-		local allies = common.GetAllyHeroes()
-		for z, ally in ipairs(allies) do
-			if ally and ally.pos:dist(player.pos) <= spellE.range then
-				if spell.owner.type == TYPE_TURRET and spell.owner.team == TEAM_ENEMY and spell.target == ally then
-					if not menu.SpellsMenu.blacklist[ally.charName]:get() then
-						if ally.pos:dist(player.pos) <= spellE.range then
-							player:castSpell("obj", 2, ally)
-						end
-					end
-				end
-			end
-		end
-	end
-
 	if menu.misc.interrupt.inte:get() then
 		if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY then
 			local enemyName = string.lower(spell.owner.charName)
@@ -694,6 +791,31 @@ local function count_allies_in_range(pos, range)
 	return enemies_in_range
 end
 
+local function Harass()
+	if not player.buff["reapthewhirlwind"] then
+		if menu.harass.qcombo:get() then
+			local target = GetTargetQ()
+			if target and target.isVisible then
+				if common.IsValidTarget(target) then
+					local pos = preds.linear.get_prediction(spellQ, target)
+					if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
+						player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+					end
+				end
+			end
+		end
+		if menu.harass.wcombo:get() then
+			local target = GetTargetW()
+			if target and target.isVisible then
+				if common.IsValidTarget(target) then
+					if target.pos:dist(player.pos) <= spellW.range then
+						player:castSpell("obj", 1, target)
+					end
+				end
+			end
+		end
+	end
+end
 local function Combo()
 	if not player.buff["reapthewhirlwind"] then
 		if menu.combo.qcombo:get() then
@@ -748,6 +870,7 @@ local function Insec()
 	end
 end
 local allow = true
+
 local function OnTick()
 	if player.buff["reapthewhirlwind"] then
 		orb.core.set_pause_move(math.huge)
@@ -766,63 +889,171 @@ local function OnTick()
 	if menu.keys.combokey:get() then
 		Combo()
 	end
+	if menu.keys.harasskey:get() then
+		Harass()
+	end
 	if menu.insec:get() then
 		Insec()
 	end
 	if not player.isRecalling then
-		if menu.SpellsMenu.cc:get() then
-			local allies = common.GetAllyHeroes()
-			for z, ally in ipairs(allies) do
-				if ally then
-					if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
-						if
-							(ally.buff[5] or ally.buff[8] or ally.buff[24] or ally.buff[23] or ally.buff[11] or ally.buff[22] or ally.buff[8] or
-								ally.buff[21])
-						 then
-							if ally.pos:dist(player.pos) <= spellE.range then
-								player:castSpell("obj", 2, ally)
+		if menu.SpellsMenu.blockr:get() then
+			if not player.buff["reapthewhirlwind"] then
+				if menu.SpellsMenu.cc:get() then
+					local allies = common.GetAllyHeroes()
+					for z, ally in ipairs(allies) do
+						if ally then
+							if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
+								if
+									(ally.buff[5] or ally.buff[8] or ally.buff[24] or ally.buff[23] or ally.buff[11] or ally.buff[22] or
+										ally.buff[8] or
+										ally.buff[21])
+								 then
+									if ally.pos:dist(player.pos) <= spellE.range then
+										player:castSpell("obj", 2, ally)
+									end
+								end
 							end
 						end
 					end
 				end
-			end
-		end
-		if menu.SpellsMenu.enable:get() then
-			for i = 1, #evade.core.active_spells do
-				local spell = evade.core.active_spells[i]
-				if menu.SpellsMenu.priority:get() then
-					local allies = common.GetAllyHeroes()
-					for z, ally in ipairs(allies) do
-						if ally and ally.pos:dist(player.pos) <= spellE.range and ally ~= player then
-							if not menu.SpellsMenu.blacklist[ally.charName]:get() then
-								if (spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0) then
-									allow = false
-								else
-									allow = true
-								end
+				if menu.SpellsMenu.enable:get() then
+					for i = 1, #evade.core.active_spells do
+						local spell = evade.core.active_spells[i]
+						if menu.SpellsMenu.priority:get() then
+							local allies = common.GetAllyHeroes()
+							for z, ally in ipairs(allies) do
+								if ally and ally.pos:dist(player.pos) <= spellE.range and ally ~= player then
+									if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+										if (spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0) then
+											allow = false
+										else
+											allow = true
+										end
 
-								if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
-									if not spell.name:find("crit") then
-										if not spell.name:find("basicattack") then
-											if menu.SpellsMenu.targeteteteteteed:get() then
-												if ally.pos:dist(player.pos) <= spellE.range then
-													player:castSpell("obj", 2, ally)
+										if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
+											if not spell.name:find("crit") then
+												if not spell.name:find("basicattack") then
+													if menu.SpellsMenu.targeteteteteteed:get() then
+														if ally.pos:dist(player.pos) <= spellE.range then
+															player:castSpell("obj", 2, ally)
+														end
+													end
+												end
+											end
+										elseif
+											spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0 and
+												(not spell.data.collision or #spell.data.collision == 0)
+										 then
+											for _, k in pairs(database) do
+												if menu.SpellsMenu[k.charName] then
+													if
+														spell.name:find(_:lower()) and menu.SpellsMenu[k.charName] and menu.SpellsMenu[k.charName][_].Dodge:get() and
+															menu.SpellsMenu[k.charName][_].hp:get() >= (ally.health / ally.maxHealth) * 100
+													 then
+														if ally.pos:dist(player.pos) <= spellE.range then
+															if ally ~= player then
+																if spell.missile then
+																	if (ally.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+																		if ally.pos:dist(player.pos) <= spellE.range then
+																			player:castSpell("obj", 2, ally)
+																		end
+																	end
+																end
+																if spell.name:find(_:lower()) then
+																	if k.speeds == math.huge or spell.data.spell_type == "Circular" then
+																		if ally.pos:dist(player.pos) <= spellE.range then
+																			player:castSpell("obj", 2, ally)
+																		end
+																	end
+																end
+																if spell.data.speed == math.huge or spell.data.spell_type == "Circular" then
+																	if ally.pos:dist(player.pos) <= spellE.range then
+																		player:castSpell("obj", 2, ally)
+																	end
+																end
+															end
+														end
+													end
 												end
 											end
 										end
 									end
-								elseif
-									spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0 and
-										(not spell.data.collision or #spell.data.collision == 0)
-								 then
-									for _, k in pairs(database) do
-										if menu.SpellsMenu[k.charName] then
-											if
-												spell.name:find(_:lower()) and menu.SpellsMenu[k.charName] and menu.SpellsMenu[k.charName][_].Dodge:get() and
-													menu.SpellsMenu[k.charName][_].hp:get() >= (ally.health / ally.maxHealth) * 100
-											 then
-												if ally.pos:dist(player.pos) <= spellE.range then
-													if ally ~= player then
+								end
+							end
+							for z, ally in ipairs(allies) do
+								if ally and ally == player and allow then
+									if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+										if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
+											if not spell.name:find("crit") then
+												if not spell.name:find("basicattack") then
+													if menu.SpellsMenu.targeteteteteteed:get() then
+														if ally.pos:dist(player.pos) <= spellE.range then
+															player:castSpell("obj", 2, ally)
+														end
+													end
+												end
+											end
+										elseif
+											spell.polygon and spell.polygon:Contains(player.path.serverPos) ~= 0 and
+												(not spell.data.collision or #spell.data.collision == 0)
+										 then
+											for _, k in pairs(database) do
+												if ally == player then
+													if menu.SpellsMenu[k.charName] then
+														if
+															spell.name:find(_:lower()) and menu.SpellsMenu[k.charName] and menu.SpellsMenu[k.charName][_].Dodge:get() and
+																menu.SpellsMenu[k.charName][_].hp:get() >= (ally.health / ally.maxHealth) * 100
+														 then
+															if player.pos:dist(player.pos) <= spellE.range then
+																if spell.missile then
+																	if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+																		player:castSpell("obj", 2, player)
+																	end
+																end
+																if spell.name:find(_:lower()) then
+																	if k.speeds == math.huge or spell.data.spell_type == "Circular" then
+																		player:castSpell("obj", 2, player)
+																	end
+																end
+																if spell.data.speed == math.huge or spell.data.spell_type == "Circular" then
+																	player:castSpell("obj", 2, player)
+																end
+															end
+														end
+													end
+												end
+											end
+										end
+									end
+								end
+							end
+						end
+
+						if not menu.SpellsMenu.priority:get() then
+							local allies = common.GetAllyHeroes()
+							for z, ally in ipairs(allies) do
+								if ally then
+									if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+										if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
+											if not spell.name:find("crit") then
+												if not spell.name:find("basicattack") then
+													if menu.SpellsMenu.targeteteteteteed:get() then
+														if ally.pos:dist(player.pos) <= spellE.range then
+															player:castSpell("obj", 2, ally)
+														end
+													end
+												end
+											end
+										elseif
+											spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0 and
+												(not spell.data.collision or #spell.data.collision == 0)
+										 then
+											for _, k in pairs(database) do
+												if
+													spell.name:find(_:lower()) and menu.SpellsMenu[k.charName] and menu.SpellsMenu[k.charName][_].Dodge:get() and
+														menu.SpellsMenu[k.charName][_].hp:get() >= (ally.health / ally.maxHealth) * 100
+												 then
+													if ally.pos:dist(player.pos) <= spellE.range then
 														if spell.missile then
 															if (ally.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
 																if ally.pos:dist(player.pos) <= spellE.range then
@@ -851,43 +1082,130 @@ local function OnTick()
 							end
 						end
 					end
-					for z, ally in ipairs(allies) do
-						if ally and ally == player and allow then
-							if not menu.SpellsMenu.blacklist[ally.charName]:get() then
-								if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
-									if not spell.name:find("crit") then
-										if not spell.name:find("basicattack") then
-											if menu.SpellsMenu.targeteteteteteed:get() then
-												if ally.pos:dist(player.pos) <= spellE.range then
-													player:castSpell("obj", 2, ally)
+				end
+			end
+		end
+		if not menu.SpellsMenu.blockr:get() then
+			if menu.SpellsMenu.cc:get() then
+				local allies = common.GetAllyHeroes()
+				for z, ally in ipairs(allies) do
+					if ally then
+						if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
+							if
+								(ally.buff[5] or ally.buff[8] or ally.buff[24] or ally.buff[23] or ally.buff[11] or ally.buff[22] or
+									ally.buff[8] or
+									ally.buff[21])
+							 then
+								if ally.pos:dist(player.pos) <= spellE.range then
+									player:castSpell("obj", 2, ally)
+								end
+							end
+						end
+					end
+				end
+			end
+			if menu.SpellsMenu.enable:get() then
+				for i = 1, #evade.core.active_spells do
+					local spell = evade.core.active_spells[i]
+					if menu.SpellsMenu.priority:get() then
+						local allies = common.GetAllyHeroes()
+						for z, ally in ipairs(allies) do
+							if ally and ally.pos:dist(player.pos) <= spellE.range and ally ~= player then
+								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+									if (spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0) then
+										allow = false
+									else
+										allow = true
+									end
+
+									if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
+										if not spell.name:find("crit") then
+											if not spell.name:find("basicattack") then
+												if menu.SpellsMenu.targeteteteteteed:get() then
+													if ally.pos:dist(player.pos) <= spellE.range then
+														player:castSpell("obj", 2, ally)
+													end
 												end
 											end
 										end
-									end
-								elseif
-									spell.polygon and spell.polygon:Contains(player.path.serverPos) ~= 0 and
-										(not spell.data.collision or #spell.data.collision == 0)
-								 then
-									for _, k in pairs(database) do
-										if ally == player then
+									elseif
+										spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0 and
+											(not spell.data.collision or #spell.data.collision == 0)
+									 then
+										for _, k in pairs(database) do
 											if menu.SpellsMenu[k.charName] then
 												if
 													spell.name:find(_:lower()) and menu.SpellsMenu[k.charName] and menu.SpellsMenu[k.charName][_].Dodge:get() and
 														menu.SpellsMenu[k.charName][_].hp:get() >= (ally.health / ally.maxHealth) * 100
 												 then
-													if player.pos:dist(player.pos) <= spellE.range then
-														if spell.missile then
-															if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
-																player:castSpell("obj", 2, player)
+													if ally.pos:dist(player.pos) <= spellE.range then
+														if ally ~= player then
+															if spell.missile then
+																if (ally.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+																	if ally.pos:dist(player.pos) <= spellE.range then
+																		player:castSpell("obj", 2, ally)
+																	end
+																end
+															end
+															if spell.name:find(_:lower()) then
+																if k.speeds == math.huge or spell.data.spell_type == "Circular" then
+																	if ally.pos:dist(player.pos) <= spellE.range then
+																		player:castSpell("obj", 2, ally)
+																	end
+																end
+															end
+															if spell.data.speed == math.huge or spell.data.spell_type == "Circular" then
+																if ally.pos:dist(player.pos) <= spellE.range then
+																	player:castSpell("obj", 2, ally)
+																end
 															end
 														end
-														if spell.name:find(_:lower()) then
-															if k.speeds == math.huge or spell.data.spell_type == "Circular" then
+													end
+												end
+											end
+										end
+									end
+								end
+							end
+						end
+						for z, ally in ipairs(allies) do
+							if ally and ally == player and allow then
+								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+									if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
+										if not spell.name:find("crit") then
+											if not spell.name:find("basicattack") then
+												if menu.SpellsMenu.targeteteteteteed:get() then
+													if ally.pos:dist(player.pos) <= spellE.range then
+														player:castSpell("obj", 2, ally)
+													end
+												end
+											end
+										end
+									elseif
+										spell.polygon and spell.polygon:Contains(player.path.serverPos) ~= 0 and
+											(not spell.data.collision or #spell.data.collision == 0)
+									 then
+										for _, k in pairs(database) do
+											if ally == player then
+												if menu.SpellsMenu[k.charName] then
+													if
+														spell.name:find(_:lower()) and menu.SpellsMenu[k.charName] and menu.SpellsMenu[k.charName][_].Dodge:get() and
+															menu.SpellsMenu[k.charName][_].hp:get() >= (ally.health / ally.maxHealth) * 100
+													 then
+														if player.pos:dist(player.pos) <= spellE.range then
+															if spell.missile then
+																if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+																	player:castSpell("obj", 2, player)
+																end
+															end
+															if spell.name:find(_:lower()) then
+																if k.speeds == math.huge or spell.data.spell_type == "Circular" then
+																	player:castSpell("obj", 2, player)
+																end
+															end
+															if spell.data.speed == math.huge or spell.data.spell_type == "Circular" then
 																player:castSpell("obj", 2, player)
 															end
-														end
-														if spell.data.speed == math.huge or spell.data.spell_type == "Circular" then
-															player:castSpell("obj", 2, player)
 														end
 													end
 												end
@@ -898,50 +1216,50 @@ local function OnTick()
 							end
 						end
 					end
-				end
 
-				if not menu.SpellsMenu.priority:get() then
-					local allies = common.GetAllyHeroes()
-					for z, ally in ipairs(allies) do
-						if ally then
-							if not menu.SpellsMenu.blacklist[ally.charName]:get() then
-								if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
-									if not spell.name:find("crit") then
-										if not spell.name:find("basicattack") then
-											if menu.SpellsMenu.targeteteteteteed:get() then
-												if ally.pos:dist(player.pos) <= spellE.range then
-													player:castSpell("obj", 2, ally)
+					if not menu.SpellsMenu.priority:get() then
+						local allies = common.GetAllyHeroes()
+						for z, ally in ipairs(allies) do
+							if ally then
+								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+									if spell.data.spell_type == "Target" and spell.target == ally and spell.owner.type == TYPE_HERO then
+										if not spell.name:find("crit") then
+											if not spell.name:find("basicattack") then
+												if menu.SpellsMenu.targeteteteteteed:get() then
+													if ally.pos:dist(player.pos) <= spellE.range then
+														player:castSpell("obj", 2, ally)
+													end
 												end
 											end
 										end
-									end
-								elseif
-									spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0 and
-										(not spell.data.collision or #spell.data.collision == 0)
-								 then
-									for _, k in pairs(database) do
-										if
-											spell.name:find(_:lower()) and menu.SpellsMenu[k.charName] and menu.SpellsMenu[k.charName][_].Dodge:get() and
-												menu.SpellsMenu[k.charName][_].hp:get() >= (ally.health / ally.maxHealth) * 100
-										 then
-											if ally.pos:dist(player.pos) <= spellE.range then
-												if spell.missile then
-													if (ally.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+									elseif
+										spell.polygon and spell.polygon:Contains(ally.path.serverPos) ~= 0 and
+											(not spell.data.collision or #spell.data.collision == 0)
+									 then
+										for _, k in pairs(database) do
+											if
+												spell.name:find(_:lower()) and menu.SpellsMenu[k.charName] and menu.SpellsMenu[k.charName][_].Dodge:get() and
+													menu.SpellsMenu[k.charName][_].hp:get() >= (ally.health / ally.maxHealth) * 100
+											 then
+												if ally.pos:dist(player.pos) <= spellE.range then
+													if spell.missile then
+														if (ally.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+															if ally.pos:dist(player.pos) <= spellE.range then
+																player:castSpell("obj", 2, ally)
+															end
+														end
+													end
+													if spell.name:find(_:lower()) then
+														if k.speeds == math.huge or spell.data.spell_type == "Circular" then
+															if ally.pos:dist(player.pos) <= spellE.range then
+																player:castSpell("obj", 2, ally)
+															end
+														end
+													end
+													if spell.data.speed == math.huge or spell.data.spell_type == "Circular" then
 														if ally.pos:dist(player.pos) <= spellE.range then
 															player:castSpell("obj", 2, ally)
 														end
-													end
-												end
-												if spell.name:find(_:lower()) then
-													if k.speeds == math.huge or spell.data.spell_type == "Circular" then
-														if ally.pos:dist(player.pos) <= spellE.range then
-															player:castSpell("obj", 2, ally)
-														end
-													end
-												end
-												if spell.data.speed == math.huge or spell.data.spell_type == "Circular" then
-													if ally.pos:dist(player.pos) <= spellE.range then
-														player:castSpell("obj", 2, ally)
 													end
 												end
 											end
