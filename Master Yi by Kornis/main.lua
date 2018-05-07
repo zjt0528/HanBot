@@ -345,6 +345,58 @@ local Spells = {
 		cc = false,
 		collision = false
 	},
+	["LuxLightBinding"] = {
+		charName = "Lux",
+		slot = 0,
+		type = "linear",
+		speeds = 1200,
+		range = 1175,
+		delay = 0.25,
+		radius = 60,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = true
+	},
+	["NautilusAnchorDrag"] = {
+		charName = "Nautilus",
+		slot = 0,
+		type = "linear",
+		speeds = 2000,
+		range = 1100,
+		delay = 0.25,
+		radius = 75,
+		hitbox = true,
+		aoe = false,
+		cc = true,
+		collision = true
+	},
+	["GnarBigW"] = {
+		charName = "Gnar",
+		slot = 1,
+		type = "linear",
+		speeds = math.huge,
+		range = 550,
+		delay = 0.6,
+		radius = 100,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["CamilleE"] = {
+		charName = "Camille",
+		slot = 2,
+		type = "linear",
+		speeds = 1350,
+		range = 800,
+		delay = 0.25,
+		radius = 45,
+		hitbox = true,
+		aoe = false,
+		cc = true,
+		collision = false
+	},
 	["SonaR"] = {
 		charName = "Sona",
 		slot = 3,
@@ -1152,7 +1204,40 @@ local function OnTick()
 								end
 							end
 						end
-						if k.speed == math.huge or spell.data.spell_type == "Circular" then
+						if spell.name:find(_:lower()) then
+							if k.speeds == math.huge or spell.data.spell_type == "Circular" then
+								for i = 0, objManager.enemies_n - 1 do
+									local enemies = objManager.enemies[i]
+									if
+										enemies and not enemies.isDead and enemies.isVisible and enemies.isTargetable and
+											player.pos:dist(enemies) < spellQ.range
+									 then
+										if menu.dodgew.enableq:get() then
+											player:castSpell("obj", 0, enemies)
+										end
+									end
+								end
+								if #count_enemies_in_range(player.pos, spellQ.range) == 0 then
+									for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+										local minion = objManager.minions[TEAM_ENEMY][i]
+										if
+											minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+												minion.pos:dist(player.pos) < spellQ.range
+										 then
+											if menu.dodgew.enableq:get() then
+												player:castSpell("obj", 0, enemies)
+											end
+										end
+									end
+								end
+								if #count_enemies_in_range(player.pos, spellQ.range) == 0 or player:spellSlot(0).state ~= 0 then
+									if menu.dodgew.enablew:get() then
+										player:castSpell("self", 1)
+									end
+								end
+							end
+						end
+						if spell.data.speed == math.huge or spell.data.spell_type == "Circular" then
 							for i = 0, objManager.enemies_n - 1 do
 								local enemies = objManager.enemies[i]
 								if
