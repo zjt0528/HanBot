@@ -122,8 +122,14 @@ menu:menu("combo", "Combo")
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:boolean("useeq", "Use E > Q Extended", false)
 menu.combo:boolean("wcomboenemy", "Use W in Combo on Enemy", false)
+menu.combo:menu("wblacklist", "W Blacklist for Enemy")
+local enemy = common.GetEnemyHeroes()
+for i, allies in ipairs(enemy) do
+	menu.combo.wblacklist:boolean(allies.charName, "Block: " .. allies.charName, false)
+end
 menu.combo:boolean("wcombo", "Auto W on Ally", true)
 menu.combo:menu("wset", "W Priority")
+menu.combo.wset:boolean("enablew", "Enable W usage", true)
 menu.combo.wset:boolean("enablee", "Auto E together with W", false)
 menu.combo.wset:header("uhhh", "0 - Disabled, 1 - Biggest Priority, 5 - Lowest Priority")
 local enemy = common.GetAllyHeroes()
@@ -433,7 +439,9 @@ local function AutoInterrupt(spell)
 						heroTarget = spell.owner
 					end
 					if (heroTarget) then
-						player:castSpell("obj", 1, heroTarget)
+						if menu.combo.wset.enablew:get() then
+							player:castSpell("obj", 1, heroTarget)
+						end
 						if menu.combo.wset.enablee:get() then
 							player:castSpell("obj", 2, heroTarget)
 						end
@@ -450,7 +458,9 @@ local function AutoInterrupt(spell)
 					heroTarget = spell.owner
 				end
 				if (heroTarget) then
-					player:castSpell("obj", 1, heroTarget)
+					if menu.combo.wset.enablew:get() then
+						player:castSpell("obj", 1, heroTarget)
+					end
 					if menu.combo.wset.enablee:get() then
 						player:castSpell("obj", 2, heroTarget)
 					end
@@ -812,7 +822,9 @@ local function Combo()
 		local target = GetTargetQ()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) and target.pos:dist(player.pos) <= spellW.range then
-				player:castSpell("obj", 1, target)
+				if menu.combo.wblacklist[target.charName] and not menu.combo.wblacklist[target.charName]:get() then
+					player:castSpell("obj", 1, target)
+				end
 			end
 		end
 	end
