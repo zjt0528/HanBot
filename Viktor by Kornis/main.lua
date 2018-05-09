@@ -175,6 +175,8 @@ menu.killsteal:boolean("ksq", "Killsteal with Q", true)
 menu.killsteal:boolean("kse", "Killsteal with E", true)
 
 menu:menu("misc", "Misc.")
+menu.misc:boolean("disable", "Disable Auto Attack", false)
+menu.misc:slider("level", "Disable AA at X Level", 6, 1, 18, 1)
 menu.misc:boolean("GapA", "Use W for Anti-Gapclose", true)
 menu.misc:slider("health", " ^-Only if my Health Percent < X", 50, 1, 100, 1)
 menu.misc:menu("interrupt", "Interrupt Settings")
@@ -279,7 +281,8 @@ local function AutoInterrupt(spell)
 			orb.core.set_pause_attack(0.2)
 			player:move(mousePos)
 			if (orb.core.can_attack()) then
-			orb.core.reset()
+				orb.core.set_pause_attack(0)
+				orb.core.reset()
 			end
 		end
 	end
@@ -666,7 +669,7 @@ local function JungleClear()
 			if menu.laneclear.jungle.useq:get() then
 				local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
 				for i, minion in pairs(enemyMinionsQ) do
-					if minion and not minion.isDead and common.IsValidTarget(minion) then
+					if minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead then
 						local minionPos = vec3(minion.x, minion.y, minion.z)
 						if minionPos:dist(player.pos) <= spellQ.range then
 							player:castSpell("obj", 0, minion)
@@ -680,7 +683,7 @@ local function JungleClear()
 				for i = 0, minions.size[TEAM_NEUTRAL] - 1 do
 					local minion = minions[TEAM_NEUTRAL][i]
 					if
-						minion and not minion.isDead and minion.isVisible and
+						minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
 							player.path.serverPos:distSqr(minion.path.serverPos) <= (spellE.range * spellE.range)
 					 then
 						valid[#valid + 1] = minion
@@ -689,12 +692,11 @@ local function JungleClear()
 				local max_count, cast_pos = 0, nil
 				for i = 1, #valid do
 					local minion_a = valid[i]
-					local current_pos,
-						hit_count =
+					local current_pos, hit_count =
 						player.path.serverPos +
-						((minion_a.path.serverPos - player.path.serverPos):norm() *
-							(minion_a.path.serverPos:dist(player.path.serverPos) + 400)),
-					1
+							((minion_a.path.serverPos - player.path.serverPos):norm() *
+								(minion_a.path.serverPos:dist(player.path.serverPos) + 400)),
+						1
 					for j = 1, #valid do
 						if j ~= i then
 							local minion_b = valid[j]
@@ -738,7 +740,10 @@ local function LastHit()
 	if menu.laneclear.push.lastq:get() then
 		local enemyMinionsE = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 		for i, minion in pairs(enemyMinionsE) do
-			if minion and not minion.isDead then
+			if
+				minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+					minion.pos:dist(player.pos) < spellQ.range
+			 then
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 				local delay = player.path.serverPos2D:dist(minion.path.serverPos2D) / 2000 + 0.25 - network.latency
@@ -775,7 +780,7 @@ local function LaneClear()
 		if menu.laneclear.push.farmq:get() then
 			local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_ENEMY)
 			for i, minion in pairs(enemyMinionsQ) do
-				if minion and not minion.isDead and common.IsValidTarget(minion) then
+				if minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead then
 					local minionPos = vec3(minion.x, minion.y, minion.z)
 					if minionPos:dist(player.pos) <= spellQ.range then
 						player:castSpell("obj", 0, minion)
@@ -790,7 +795,7 @@ local function LaneClear()
 				for i = 0, minions.size[TEAM_ENEMY] - 1 do
 					local minion = minions[TEAM_ENEMY][i]
 					if
-						minion and not minion.isDead and minion.isVisible and
+						minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
 							player.path.serverPos:distSqr(minion.path.serverPos) <= (spellE.range * spellE.range)
 					 then
 						valid[#valid + 1] = minion
@@ -799,12 +804,11 @@ local function LaneClear()
 				local max_count, cast_pos = 0, nil
 				for i = 1, #valid do
 					local minion_a = valid[i]
-					local current_pos,
-						hit_count =
+					local current_pos, hit_count =
 						player.path.serverPos +
-						((minion_a.path.serverPos - player.path.serverPos):norm() *
-							(minion_a.path.serverPos:dist(player.path.serverPos) + 300)),
-					1
+							((minion_a.path.serverPos - player.path.serverPos):norm() *
+								(minion_a.path.serverPos:dist(player.path.serverPos) + 300)),
+						1
 					for j = 1, #valid do
 						if j ~= i then
 							local minion_b = valid[j]
@@ -854,6 +858,14 @@ local function Flee()
 end
 
 local function OnTick()
+	if (orb.combat.is_active() and not player.buff["viktorpowertransferreturn"]) then
+		if (menu.misc.disable:get() and menu.misc.level:get() <= player.levelRef) and player.mana > 100 then
+			orb.core.set_pause_attack(math.huge)
+		end
+	end
+	if orb.combat.is_active() and player.mana < 100 or player.buff["viktorpowertransferreturn"] then
+		orb.core.set_pause_attack(0)
+	end
 	spellW.delay = 1
 	KillSteal()
 	RFollow()
@@ -918,6 +930,7 @@ local function OnDraw()
 		end
 	end
 end
+
 orb.combat.register_f_pre_tick(OnTick)
 --cb.add(cb.tick, OnTick)
 cb.add(cb.spell, AutoInterrupt)
