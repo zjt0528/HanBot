@@ -748,6 +748,15 @@ end
 
 local allow = true
 local function OnTick()
+	if not evade then
+		print(" ")
+		console.set_color(79)
+		print("-----------Support AIO--------------")
+		print("You need to have enabled 'Premium Evade' for Shielding Champions.")
+		print("If you don't want Evade to dodge, disable dodging but keep Module enabled. :>")
+		print("------------------------------------")
+		console.set_color(12)
+	end
 	if menu.combo.survivecombo:get() then
 		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
 		local target = GetTargetW()

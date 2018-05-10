@@ -872,6 +872,15 @@ end
 local allow = true
 
 local function OnTick()
+	if not evade then
+		print(" ")
+		console.set_color(79)
+		print("-----------Support AIO--------------")
+		print("You need to have enabled 'Premium Evade' for Shielding Champions.")
+		print("If you don't want Evade to dodge, disable dodging but keep Module enabled. :>")
+		print("------------------------------------")
+		console.set_color(12)
+	end
 	if player.buff["reapthewhirlwind"] then
 		orb.core.set_pause_move(math.huge)
 		orb.core.set_pause_attack(math.huge)

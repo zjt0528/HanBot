@@ -693,6 +693,15 @@ end
 local allow = true
 local timer = 0
 local function OnTick()
+	if not evade then
+		print(" ")
+		console.set_color(79)
+		print("-----------Support AIO--------------")
+		print("You need to have enabled 'Premium Evade' for Shielding Champions.")
+		print("If you don't want Evade to dodge, disable dodging but keep Module enabled. :>")
+		print("------------------------------------")
+		console.set_color(12)
+	end
 	if menu.combo.blockaa:get() then
 		if player.buff["rakanr"] then
 			orb.core.set_pause_attack(math.huge)

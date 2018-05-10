@@ -517,6 +517,15 @@ local allow = true
 local timer = 0
 local meowsomethinggggg
 local function OnTick()
+	if not evade then
+		print(" ")
+		console.set_color(79)
+		print("-----------Support AIO--------------")
+		print("You need to have enabled 'Premium Evade' for R Usage.")
+		print("If you don't want Evade to dodge, disable dodging but keep Module enabled. :>")
+		print("------------------------------------")
+		console.set_color(12)
+	end
 	if menu.combo.qwq:get() then
 		if player.pos:dist(mousePos) < spellQ.range then
 			player:castSpell("pos", 0, mousePos)
