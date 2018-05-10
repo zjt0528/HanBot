@@ -367,10 +367,10 @@ local function Combo()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
 				if menu.combo.qcombo:get() then
-					if target.pos:dist(player.pos) < spellQ.range then
+					if target.pos:dist(player.pos) < spellQ.range-50 then
 						if not menu.combo.slowedq:get() then
 							local pos = preds.circular.get_prediction(spellQ, target)
-							if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
+							if pos and pos.startPos:dist(pos.endPos) < spellQ.range-50 then
 								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 							end
 						end
@@ -381,7 +381,7 @@ local function Combo()
 									target.buff[21])
 							 then
 								local pos = preds.circular.get_prediction(spellQ, target)
-								if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
+								if pos and pos.startPos:dist(pos.endPos) < spellQ.range-50 then
 									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 								end
 							end

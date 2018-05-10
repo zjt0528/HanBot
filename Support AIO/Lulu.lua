@@ -773,7 +773,9 @@ local function Harass()
 					(#count_allies_in_range(player.pos, spellE.range + 200) == 1 or
 						((target.health / target.maxHealth) * 100 < 5 and (player.health / player.maxHealth) * 100 > 20))
 				 then
-					player:castSpell("obj", 2, target)
+					if target.pos:dist(player.pos) < spellE.range then
+						player:castSpell("obj", 2, target)
+					end
 				end
 			end
 		end
@@ -849,7 +851,7 @@ local function Combo()
 	end
 	local target = GetTargetQ()
 	if target and target.isVisible then
-		if common.IsValidTarget(target) then
+		if common.IsValidTarget(target) and target.pos:dist(player.pos) <= spellE.range then
 			if menu.combo.eusage:get() == 1 then
 				player:castSpell("obj", 2, target)
 			end
@@ -944,7 +946,6 @@ local function OnTick()
 		print("If you don't want Evade to dodge, disable dodging but keep Module enabled. :>")
 		print("------------------------------------")
 		console.set_color(12)
-
 	end
 	if menu.combo.rset.whitelist.autor:get() then
 		local allies = common.GetAllyHeroes()
