@@ -758,7 +758,9 @@ local function OnTick()
 		console.set_color(12)
 	end
 	if menu.combo.survivecombo:get() then
-		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
+		if not orb.combat.is_active() then
+			player:move(mousePos)
+		end
 		local target = GetTargetW()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
@@ -818,7 +820,9 @@ local function OnTick()
 		end
 	end
 	if menu.combo.chasingcombo:get() then
-		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
+		if not orb.combat.is_active() then
+			player:move(mousePos)
+		end
 		local target = GetTargetE()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
