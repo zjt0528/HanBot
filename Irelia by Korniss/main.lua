@@ -521,6 +521,7 @@ menu.combo:keybind("semir", "Semi-R", "T", nil)
 menu.combo:boolean("items", "Use Items", true)
 
 menu:menu("harass", "Harass")
+menu.harass:boolean("turretq", "Don't use Q under-turret", true)
 menu.harass:boolean("qcombo", "Use Q in Harass", true)
 menu.harass:slider("minq", " ^- Min. Q Range", 220, 0, 400, 1)
 menu.harass:boolean("markedq", "Q only if Marked / Killable", false)
@@ -593,30 +594,34 @@ for i = 1, #common.GetEnemyHeroes() do
 		end
 	end
 end
-
 menu:menu("dodgew", "W Dodge")
 menu.dodgew:header("hello", " -- Enemy Skillshots -- ")
-for _, i in pairs(Spells) do
-	for l, k in pairs(common.GetEnemyHeroes()) do
-		-- k = myHero
-		if not Spells[_] then
-			return
-		end
-		if i.charName == k.charName then
-			if i.displayname == "" then
-				i.displayname = _
+if not evade then
+	menu.dodgew:header("uhh", "Enable 'Premium Evade' to block Skillshots")
+end
+if evade then
+	for _, i in pairs(Spells) do
+		for l, k in pairs(common.GetEnemyHeroes()) do
+			-- k = myHero
+			if not Spells[_] then
+				return
 			end
-			if i.danger == 0 then
-				i.danger = 1
-			end
-			if (menu.dodgew[i.charName] == nil) then
-				menu.dodgew:menu(i.charName, i.charName)
-			end
-			menu.dodgew[i.charName]:menu(_, "" .. i.charName .. " | " .. (str[i.slot] or "?") .. " " .. _)
+			if i.charName == k.charName then
+				if i.displayname == "" then
+					i.displayname = _
+				end
+				if i.danger == 0 then
+					i.danger = 1
+				end
+				if (menu.dodgew[i.charName] == nil) then
+					menu.dodgew:menu(i.charName, i.charName)
+				end
+				menu.dodgew[i.charName]:menu(_, "" .. i.charName .. " | " .. (str[i.slot] or "?") .. " " .. _)
 
-			menu.dodgew[i.charName][_]:boolean("Dodge", "Enable Block", true)
+				menu.dodgew[i.charName][_]:boolean("Dodge", "Enable Block", true)
 
-			menu.dodgew[i.charName][_]:slider("hp", "HP to Dodge", 100, 1, 100, 5)
+				menu.dodgew[i.charName][_]:slider("hp", "HP to Dodge", 100, 1, 100, 5)
+			end
 		end
 	end
 end
@@ -940,6 +945,28 @@ local function GetClosestJungleEnemy()
 
 	return closestMinion
 end
+
+local trace_filter = function(input, segment, target)
+	if preds.trace.linear.hardlock(input, segment, target) then
+		return true
+	end
+	if preds.trace.linear.hardlockmove(input, segment, target) then
+		return true
+	end
+	if
+		target and common.IsValidTarget(target) and
+			(player.pos:dist(target) <= (player.attackRange + player.boundingRadius + target.boundingRadius) or
+				(player:spellSlot(0).state == 0 and segment.startPos:dist(segment.endPos) <= 625))
+	 then
+		return true
+	end
+	if segment.startPos:dist(segment.endPos) <= 625 and preds.trace.newpath(target, 0.033, 0.55) then
+		return true
+	end
+	if preds.trace.newpath(target, 0.033, 0.95) then
+		return true
+	end
+end
 local function GetClosestJungleEnemyToGap()
 	local closestMinion = nil
 	local closestMinionDistance = 9999
@@ -1018,7 +1045,7 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 												local EPOS =
 													objsq.pos +
 													(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
-														(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 300)
+														(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 420)
 												if (enemy.pos:dist(objsq.pos) > 300) then
 													spellE.speed = EPOS:dist(objsq.pos)
 												end
@@ -1028,7 +1055,7 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 													local EPOS2 =
 														objsq.pos +
 														(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-															(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 300)
+															(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 420)
 													player:castSpell("pos", 2, EPOS2)
 
 													enemy = nil
@@ -1092,7 +1119,7 @@ local function WGapcloser()
 											local EPOS =
 												objsq.pos +
 												(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
-													(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 300)
+													(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 420)
 											if (enemy.pos:dist(objsq.pos) > 300) then
 												spellE.speed = EPOS:dist(objsq.pos)
 											end
@@ -1102,7 +1129,7 @@ local function WGapcloser()
 												local EPOS2 =
 													objsq.pos +
 													(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-														(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 300)
+														(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) +420)
 												player:castSpell("pos", 2, EPOS2)
 
 												enemy = nil
@@ -1390,17 +1417,20 @@ local function Flee()
 								local EPOS =
 									objsq.pos +
 									(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
-										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 320)
+										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 420)
 								if (target.pos:dist(objsq.pos) > 300) then
 									spellE.speed = EPOS:dist(objsq.pos)
 								end
 
 								local pos2 = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
-								if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
+								if
+									pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 and
+										trace_filter(spellE, pos, target)
+								 then
 									local EPOS2 =
 										objsq.pos +
 										(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 320)
+											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 420)
 									player:castSpell("pos", 2, EPOS2)
 								end
 							end
@@ -1526,7 +1556,7 @@ local function Combo()
 	if common.IsValidTarget(target) then
 		if menu.combo.ecombo:get() then
 			if common.IsValidTarget(target) then
-				if (target.pos:dist(player) <= spellE.range) then
+				if (target.pos:dist(player) <= spellE.range - 50) then
 					if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
 						if menu.combo.emode:get() == 1 then
 							local pos2 = preds.linear.get_prediction(spellEA, target)
@@ -1609,17 +1639,20 @@ local function Combo()
 								local EPOS =
 									objsq.pos +
 									(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
-										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 320)
+										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 420)
 								if (target.pos:dist(objsq.pos) > 300) then
 									spellE.speed = EPOS:dist(objsq.pos)
 								end
 
 								local pos2 = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
-								if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
+								if
+									pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 and
+										trace_filter(spellE, pos, target)
+								 then
 									local EPOS2 =
 										objsq.pos +
 										(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 320)
+											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 420)
 									player:castSpell("pos", 2, EPOS2)
 								end
 							end
@@ -1825,7 +1858,7 @@ local function JungleClear()
 								local EPOS =
 									objsq.pos +
 									(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
-										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 300)
+										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 420)
 								if (minion.pos:dist(objsq.pos) > 300) then
 									spellE.speed = EPOS:dist(objsq.pos)
 								end
@@ -1835,7 +1868,7 @@ local function JungleClear()
 									local EPOS2 =
 										objsq.pos +
 										(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 300)
+											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 420)
 									player:castSpell("pos", 2, EPOS2)
 								end
 							end
@@ -1888,8 +1921,16 @@ local function Harass()
 			if menu.harass.qcombo:get() then
 				if common.IsValidTarget(target) then
 					if target.buff["ireliamark"] then
-						player:castSpell("obj", 0, target)
-						meow = os.clock() + 0.5
+						if menu.harass.turretq:get() then
+							if not common.is_under_tower(vec3(target.x, target.y, target.z)) then
+								player:castSpell("obj", 0, target)
+								meow = os.clock() + 0.5
+							end
+						end
+						if not menu.harass.turretq:get() then
+							player:castSpell("obj", 0, target)
+							meow = os.clock() + 0.5
+						end
 					end
 				end
 			end
@@ -1956,17 +1997,20 @@ local function Harass()
 								local EPOS =
 									objsq.pos +
 									(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
-										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 300)
+										(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 420)
 								if (target.pos:dist(objsq.pos) > 300) then
 									spellE.speed = EPOS:dist(objsq.pos)
 								end
 
 								local pos2 = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
-								if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
+								if
+									pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 and
+										trace_filter(spellE, pos, target)
+								 then
 									local EPOS2 =
 										objsq.pos +
 										(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 300)
+											(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 420)
 									player:castSpell("pos", 2, EPOS2)
 								end
 							end
@@ -1983,7 +2027,14 @@ local function Harass()
 				local minion = GetClosestMobToEnemyForGap()
 				if minion and vec3(minion.x, minion.y, minion.z):dist(player.pos) <= spellQ.range then
 					if player.mana > player.manaCost0 and GetQDamage(minion) >= minion.health then
-						player:castSpell("obj", 0, minion)
+						if menu.harass.turretq:get() then
+							if not common.is_under_tower(vec3(minion.x, minion.y, minion.z)) then
+								player:castSpell("obj", 0, minion)
+							end
+						end
+						if not menu.harass.turretq:get() then
+							player:castSpell("obj", 0, minion)
+						end
 					end
 				end
 			end
@@ -1996,7 +2047,14 @@ local function Harass()
 				if minion and vec3(minion.x, minion.y, minion.z):dist(player.pos) <= spellQ.range then
 					if player.mana > player.manaCost0 and GetQDamage(minion) >= minion.health then
 						if (vec3(minion.x, minion.y, minion.z):dist(targets.pos) < vec3(targets.x, targets.y, targets.z):dist(player.pos)) then
-							player:castSpell("obj", 0, minion)
+							if menu.harass.turretq:get() then
+								if not common.is_under_tower(vec3(minion.x, minion.y, minion.z)) then
+									player:castSpell("obj", 0, minion)
+								end
+							end
+							if not menu.harass.turretq:get() then
+								player:castSpell("obj", 0, minion)
+							end
 						end
 					end
 				end
@@ -2021,7 +2079,14 @@ local function Harass()
 						if (os.clock() > waiting) then
 							if (target.pos:dist(player) < spellQ.range) then
 								if (target.pos:dist(player)) > menu.harass.minq:get() then
-									player:castSpell("obj", 0, target)
+									if menu.harass.turretq:get() then
+										if not common.is_under_tower(vec3(target.x, target.y, target.z)) then
+											player:castSpell("obj", 0, target)
+										end
+									end
+									if not menu.harass.turretq:get() then
+										player:castSpell("obj", 0, target)
+									end
 								end
 							end
 						end
@@ -2137,7 +2202,7 @@ local function KillSteal()
 									local EPOS =
 										objsq.pos +
 										(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
-											(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 300)
+											(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 420)
 									if (enemies.pos:dist(objsq.pos) > 300) then
 										spellE.speed = EPOS:dist(objsq.pos)
 									end
@@ -2147,7 +2212,7 @@ local function KillSteal()
 										local EPOS2 =
 											objsq.pos +
 											(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-												(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 300)
+												(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 420)
 										player:castSpell("pos", 2, EPOS2)
 									end
 								end
@@ -2278,17 +2343,19 @@ local function LaneClear()
 									local EPOS =
 										objsq.pos +
 										(vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - objsq.pos):norm() *
-											(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 300)
+											(objsq.pos:dist(vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) + 420)
 									if (minion.pos:dist(objsq.pos) > 300) then
 										spellE.speed = EPOS:dist(objsq.pos)
 									end
 
 									local pos2 = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
-									if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
+									if
+										pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930
+									 then
 										local EPOS2 =
 											objsq.pos +
 											(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-												(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 300)
+												(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 420)
 										player:castSpell("pos", 2, EPOS2)
 									end
 								end
@@ -2473,26 +2540,28 @@ local function OnDraw()
 end
 
 local function OnTick()
-	for i = 1, #evade.core.active_spells do
-		local spell = evade.core.active_spells[i]
+	if evade then
+		for i = 1, #evade.core.active_spells do
+			local spell = evade.core.active_spells[i]
 
-		if
-			spell.polygon and spell.polygon:Contains(player.path.serverPos) ~= 0 and
-				(not spell.data.collision or #spell.data.collision == 0)
-		 then
-			for _, k in pairs(Spells) do
-				if menu.dodgew[k.charName] then
-					if
-						spell.name:find(_:lower()) and menu.dodgew[k.charName][_].Dodge:get() and
-							menu.dodgew[k.charName][_].hp:get() >= (player.health / player.maxHealth) * 100
-					 then
-						if spell.missile then
-							if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+			if
+				spell.polygon and spell.polygon:Contains(player.path.serverPos) ~= 0 and
+					(not spell.data.collision or #spell.data.collision == 0)
+			 then
+				for _, k in pairs(Spells) do
+					if menu.dodgew[k.charName] then
+						if
+							spell.name:find(_:lower()) and menu.dodgew[k.charName][_].Dodge:get() and
+								menu.dodgew[k.charName][_].hp:get() >= (player.health / player.maxHealth) * 100
+						 then
+							if spell.missile then
+								if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+									player:castSpell("pos", 1, player.pos)
+								end
+							end
+							if k.speed == math.huge or spell.data.spell_type == "Circular" then
 								player:castSpell("pos", 1, player.pos)
 							end
-						end
-						if k.speed == math.huge or spell.data.spell_type == "Circular" then
-							player:castSpell("pos", 1, player.pos)
 						end
 					end
 				end
