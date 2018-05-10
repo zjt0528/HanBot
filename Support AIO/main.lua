@@ -31,3 +31,9 @@ end
 if player.charName == "Karma" then
 	module.load("SupportAIO" .. player.charName, "Karma")
 end
+if player.charName == "Nautilus" then
+	module.load("SupportAIO" .. player.charName, "Nautilus")
+end
+if player.charName == "Bard" then
+	module.load("SupportAIO" .. player.charName, "Bard")
+end

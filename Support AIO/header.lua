@@ -9,7 +9,9 @@ local myAIOchampions = {
   Lulu = true,
   Rakan = true,
   Zilean = true,
-  Karma = true
+  Karma = true,
+  Nautilus = true,
+  Bard = true
 }
 
 return {

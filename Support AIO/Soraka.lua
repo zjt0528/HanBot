@@ -350,10 +350,10 @@ end
 
 local function OnTick()
 	if menu.wpriority.enabler:get() and not menu.wpriority.semir:get() then
+		local enemy = common.GetAllyHeroes()
 		for i, enemies in ipairs(enemy) do
 			if
 				enemies and not enemies.isDead and menu.wpriority.rhealth:get() >= (enemies.health / enemies.maxHealth) * 100 and
-					menu.wpriority.semir:get() and
 					not enemies.isRecalling and
 					not menu.wpriority.rblack[enemies.charName]:get() and
 					#count_enemies_in_range(enemies.pos, 3000) > 0
