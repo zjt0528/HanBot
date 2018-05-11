@@ -745,7 +745,7 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 											minion.pos:dist(player.pos) < spellQ.range
 									 then
 										if menu.dodgew.enableq:get() then
-											player:castSpell("obj", 0, enemies)
+											player:castSpell("obj", 0, minion)
 										end
 									end
 								end
@@ -796,7 +796,7 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 										minion.pos:dist(player.pos) < spellQ.range
 								 then
 									if menu.dodgew.enableq:get() then
-										player:castSpell("obj", 0, enemies)
+										player:castSpell("obj", 0, minion)
 									end
 								end
 							end
@@ -1192,7 +1192,7 @@ local function OnTick()
 												minion.pos:dist(player.pos) < spellQ.range
 										 then
 											if menu.dodgew.enableq:get() then
-												player:castSpell("obj", 0, enemies)
+												player:castSpell("obj", 0, minion)
 											end
 										end
 									end
@@ -1225,7 +1225,7 @@ local function OnTick()
 												minion.pos:dist(player.pos) < spellQ.range
 										 then
 											if menu.dodgew.enableq:get() then
-												player:castSpell("obj", 0, enemies)
+												player:castSpell("obj", 0, minion)
 											end
 										end
 									end
@@ -1257,7 +1257,7 @@ local function OnTick()
 											minion.pos:dist(player.pos) < spellQ.range
 									 then
 										if menu.dodgew.enableq:get() then
-											player:castSpell("obj", 0, enemies)
+											player:castSpell("obj", 0, minion)
 										end
 									end
 								end
@@ -1332,7 +1332,7 @@ local function OnTick()
 							minion.pos:dist(player.pos) < spellQ.range
 					 then
 						if menu.dodgew.enableq:get() then
-							player:castSpell("obj", 0, enemies)
+							player:castSpell("obj", 0, minion)
 						end
 					end
 				end
@@ -1366,7 +1366,7 @@ local function OnTick()
 							minion.pos:dist(player.pos) < spellQ.range
 					 then
 						if menu.dodgew.enableq:get() then
-							player:castSpell("obj", 0, enemies)
+							player:castSpell("obj", 0, minion)
 						end
 					end
 				end
@@ -1400,7 +1400,7 @@ local function OnTick()
 							minion.pos:dist(player.pos) < spellQ.range
 					 then
 						if menu.dodgew.enableq:get() then
-							player:castSpell("obj", 0, enemies)
+							player:castSpell("obj", 0, minion)
 						end
 					end
 				end
@@ -1435,7 +1435,7 @@ local function OnTick()
 							minion.pos:dist(player.pos) < spellQ.range
 					 then
 						if menu.dodgew.enableq:get() then
-							player:castSpell("obj", 0, enemies)
+							player:castSpell("obj", 0, minion)
 						end
 					end
 				end
