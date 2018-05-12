@@ -309,6 +309,19 @@ local Spells = {
 		cc = true,
 		collision = false
 	},
+	["LeblancW"] = {
+		charName = "Leblanc",
+		slot = 1,
+		type = "circular",
+		speeds = 1600,
+		range = 600,
+		delay = 0.25,
+		radius = 260,
+		hitbox = true,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
 	["RivenIzunaBlade"] = {
 		charName = "Riven",
 		slot = 3,

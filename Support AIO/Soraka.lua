@@ -126,6 +126,12 @@ menu:menu("combo", "Combo")
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:boolean("ecombo", "Use E in Combo", true)
 
+menu:menu("harass", "Harass")
+
+menu.harass:boolean("qcombo", "Use Q in Harass", true)
+menu.harass:boolean("ecombo", "Use E in Harass", true)
+
+
 menu:menu("wpriority", "Healing")
 menu.wpriority:header("something", " -- W Settings -- ")
 menu.wpriority:boolean("enable", "Enable Auto W", true)
@@ -348,6 +354,37 @@ local function Combo()
 	end
 end
 
+local function Harass()
+	if menu.harass.ecombo:get() then
+		local target = GetTargetE()
+		if target and target.isVisible then
+			if common.IsValidTarget(target) then
+				if target.pos:dist(player.pos) < spellE.range then
+					local pos = preds.circular.get_prediction(spellE, target)
+					if pos and pos.startPos:dist(pos.endPos) < spellE.range then
+						player:castSpell("pos", 2, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+					end
+				end
+			end
+		end
+	end
+	if menu.harass.qcombo:get() then
+		local target = GetTargetQ()
+		if target and target.isVisible then
+			if common.IsValidTarget(target) then
+				if menu.harass.qcombo:get() then
+					if target.pos:dist(player.pos) < spellQ.range then
+						local pos = preds.circular.get_prediction(spellQ, target)
+						if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
+							player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 local function OnTick()
 	if menu.wpriority.enabler:get() and not menu.wpriority.semir:get() then
 		local enemy = common.GetAllyHeroes()
@@ -384,6 +421,9 @@ local function OnTick()
 	WGapcloser()
 	if menu.keys.combokey:get() then
 		Combo()
+	end
+	if menu.keys.harasskey:get() then
+		Harass()
 	end
 end
 
