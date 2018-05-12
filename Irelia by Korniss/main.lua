@@ -257,6 +257,19 @@ local Spells = {
 		cc = false,
 		collision = false
 	},
+	["EvelynnQ"] = {
+		charName = "Evelynn",
+		slot = 0,
+		type = "linear",
+		speeds = 2200,
+		range = 800,
+		delay = 0.25,
+		radius = 35,
+		hitbox = true,
+		aoe = false,
+		cc = false,
+		collision = true
+	},
 	["GnarR"] = {
 		charName = "Gnar",
 		slot = 3,
@@ -2558,17 +2571,33 @@ local function OnTick()
 			 then
 				for _, k in pairs(Spells) do
 					if menu.dodgew[k.charName] then
-						if
-							spell.name:find(_:lower()) and menu.dodgew[k.charName][_].Dodge:get() and
-								menu.dodgew[k.charName][_].hp:get() >= (player.health / player.maxHealth) * 100
-						 then
-							if spell.missile then
-								if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+						if k.charName == "Evelynn" and player.buff["EvelynnW"] then
+							if
+								spell.name:find(_:lower()) and menu.dodgew[k.charName][_].Dodge:get() and
+									menu.dodgew[k.charName][_].hp:get() >= (player.health / player.maxHealth) * 100
+							 then
+								if spell.missile then
+									if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+										player:castSpell("pos", 1, player.pos)
+									end
+								end
+								if k.speed == math.huge or spell.data.spell_type == "Circular" then
 									player:castSpell("pos", 1, player.pos)
 								end
 							end
-							if k.speed == math.huge or spell.data.spell_type == "Circular" then
-								player:castSpell("pos", 1, player.pos)
+						else
+							if
+								spell.name:find(_:lower()) and menu.dodgew[k.charName][_].Dodge:get() and
+									menu.dodgew[k.charName][_].hp:get() >= (player.health / player.maxHealth) * 100
+							 then
+								if spell.missile then
+									if (player.pos:dist(spell.missile.pos) / spell.data.speed < network.latency + 0.35) then
+										player:castSpell("pos", 1, player.pos)
+									end
+								end
+								if k.speed == math.huge or spell.data.spell_type == "Circular" then
+									player:castSpell("pos", 1, player.pos)
+								end
 							end
 						end
 					end
