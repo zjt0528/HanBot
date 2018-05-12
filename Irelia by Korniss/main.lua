@@ -166,6 +166,19 @@ local Spells = {
 		cc = false,
 		collision = false
 	},
+	["KledEDash"] = {
+		charName = "Kled",
+		slot = 2,
+		type = "linear",
+		speeds = 1100,
+		range = 550,
+		delay = 0,
+		radius = 90,
+		hitbox = true,
+		aoe = true,
+		cc = false,
+		collision = false
+	},
 	["EkkoR"] = {
 		charName = "Ekko",
 		slot = 3,
