@@ -425,6 +425,7 @@ local PSpells = {
 }
 local function AutoInterrupt(spell)
 	--	print("int")
+
 	if menu.combo.wcombo:get() then
 		local heroTarget = nil
 		if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY and spell.target.type == TYPE_HERO then
@@ -450,6 +451,26 @@ local function AutoInterrupt(spell)
 			end
 			if
 				spell.name:find("BasicAttack") and spell.owner.pos:dist(player.pos) <= spellW.range and
+					menu.combo.wset[spell.owner.charName]:get() > 0
+			 then
+				if heroTarget == nil then
+					heroTarget = spell.owner
+				elseif menu.combo.wset[hero.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
+					heroTarget = spell.owner
+				end
+				if (heroTarget) then
+					if menu.combo.wset.enablew:get() then
+						player:castSpell("obj", 1, heroTarget)
+					end
+					if menu.combo.wset.enablee:get() then
+						player:castSpell("obj", 2, heroTarget)
+					end
+				end
+			end
+		end
+		if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY then
+			if
+				spell.name:find("KogMawBioArcaneBarrage") and spell.owner.pos:dist(player.pos) <= spellW.range and
 					menu.combo.wset[spell.owner.charName]:get() > 0
 			 then
 				if heroTarget == nil then
