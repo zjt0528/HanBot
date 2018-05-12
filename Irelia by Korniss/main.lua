@@ -134,6 +134,9 @@ local dodgeWs = {
 	},
 	["singed"] = {
 		{menuslot = "E", slot = 2}
+	},
+	["renekton"] = {
+		{menuslot = "W", slot = 1}
 	}
 }
 local Spells = {
@@ -1018,7 +1021,14 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 							spell.owner.charName ~= "Karthus" and
 							spell.owner.charName ~= "Zed"
 					 then
-						player:castSpell("pos", 1, player.pos)
+						if not spell.owner.charName == "Renekton" then
+							player:castSpell("pos", 1, player.pos)
+						end
+					end
+					if menu.dodgew[spell.owner.charName .. spellCheck.menuslot]:get() and spell.owner.charName == "Renekton" then
+						if spell.name == "RenektonExecute" then
+							player:castSpell("pos", 1, player.pos)
+						end
 					end
 				end
 			end
@@ -1129,7 +1139,7 @@ local function WGapcloser()
 												local EPOS2 =
 													objsq.pos +
 													(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
-														(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) +420)
+														(objsq.pos:dist(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y)) + 420)
 												player:castSpell("pos", 2, EPOS2)
 
 												enemy = nil
@@ -2349,9 +2359,7 @@ local function LaneClear()
 									end
 
 									local pos2 = preds.linear.get_prediction(spellE, minion, vec2(objsq.x, objsq.z))
-									if
-										pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930
-									 then
+									if pos2 and vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y):dist(player.pos) < 930 then
 										local EPOS2 =
 											objsq.pos +
 											(vec3(pos2.endPos.x, mousePos.y, pos2.endPos.y) - objsq.pos):norm() *
