@@ -201,7 +201,7 @@ menu.killsteal:slider("saver", "Don't waste R if Enemy Health < X", 100, 0, 500,
 
 menu:menu("misc", "Misc.")
 menu.misc:slider("qpred", "Q Radius: ", 170, 130, 200, 1)
-menu.misc.qpred:set("tooltip", "Lower - Will try to cast more behind enemy, Higher - Will try to cast more further of target.")
+menu.misc.qpred:set("tooltip", "Lower - Will try to cast more further of target, Higher - Will try to cast more behind target.")
 menu.misc:slider("lasthittimer", "Last Hit E Delay", 125, 50, 200, 1)
 menu.misc.lasthittimer:set("tooltip", "Lower - Casts later, Higher - Casts earlier // Default is 125")
 menu.misc:boolean("disable", "Disable Auto Attack", true)
