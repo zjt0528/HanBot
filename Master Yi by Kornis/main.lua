@@ -293,6 +293,19 @@ local Spells = {
 		cc = true,
 		collision = false
 	},
+	["GalioE"] = {
+		charName = "Galio",
+		slot = 2,
+		type = "linear",
+		speeds = 1400,
+		range = 650,
+		delay = 0.45,
+		radius = 160,
+		hitbox = true,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
 	["EvelynnR"] = {
 		charName = "Evelynn",
 		slot = 3,
@@ -304,6 +317,32 @@ local Spells = {
 		hitbox = false,
 		aoe = true,
 		cc = false,
+		collision = false
+	},
+	["ZacE"] = {
+		charName = "Zac",
+		slot = 2,
+		type = "circular",
+		speeds = 1330,
+		range = 1800,
+		delay = 0,
+		radius = 300,
+		hitbox = false,
+		aoe = true,
+		cc = true,
+		collision = false
+	},
+	["ZacR"] = {
+		charName = "Zac",
+		slot = 3,
+		type = "circular",
+		speeds = math.huge,
+		range = 1000,
+		delay = 0,
+		radius = 300,
+		hitbox = false,
+		aoe = true,
+		cc = true,
 		collision = false
 	},
 	["GnarR"] = {
