@@ -138,6 +138,12 @@ menu.combo:slider("mine", " ^- Min. Enemies", 2, 1, 5, 1)
 menu.combo:slider("mina", " ^- Min. Allies", 1, 1, 4, 1)
 menu.combo:keybind("semir", "Semi-R Key", "T", nil)
 menu.combo.semir:set("tooltip", "It Ignores how many Enemies it can hit.")
+menu:menu("harass", "Harass")
+
+menu.harass:boolean("qcombo", "Use Q in Harass", true)
+menu.harass:boolean("slowedq", " ^- Only if Slowed / CC", false)
+menu.harass:dropdown("wusage", "W Usage", 1, {"From Target to Ally", "From Ally to Target", "Never"})
+menu.harass:boolean("ecombo", "Use E in Harass", true)
 
 menu:menu("wpriority", "W Healing")
 menu.wpriority:boolean("enable", "Enable Auto W", true)
@@ -361,6 +367,59 @@ local function count_allies_in_range(pos, range)
 	return enemies_in_range
 end
 
+
+local function Harass()
+	if menu.harass.qcombo:get() then
+		local target = GetTargetQ()
+		if target and target.isVisible then
+			if common.IsValidTarget(target) then
+				if menu.harass.qcombo:get() then
+					if target.pos:dist(player.pos) < spellQ.range-50 then
+						if not menu.harass.slowedq:get() then
+							local pos = preds.circular.get_prediction(spellQ, target)
+							if pos and pos.startPos:dist(pos.endPos) < spellQ.range-50 then
+								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+							end
+						end
+						if menu.harass.slowedq:get() then
+							if
+								(target.buff[5] or target.buff[8] or target.buff[24] or target.buff[10] or target.buff[11] or target.buff[22] or
+									target.buff[8] or
+									target.buff[21])
+							 then
+								local pos = preds.circular.get_prediction(spellQ, target)
+								if pos and pos.startPos:dist(pos.endPos) < spellQ.range-50 then
+									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	local target = GetTargetW()
+	if target and target.isVisible then
+		if common.IsValidTarget(target) then
+			if menu.harass.wusage:get() == 1 then
+				if (#count_allies_in_range(target.pos, 690) > 0) then
+					player:castSpell("obj", 1, target)
+				end
+			end
+		end
+	end
+	if menu.harass.wusage:get() == 2 then
+		local enemy = common.GetAllyHeroes()
+		for i, enemies in ipairs(enemy) do
+			if enemies and enemies.pos:dist(player.pos) < spellW.range and not enemies.isDead then
+				if (#count_enemies_in_range(enemies.pos, 690) > 0) then
+					player:castSpell("obj", 1, enemies)
+				end
+			end
+		end
+	end
+end
+
 local function Combo()
 	if menu.combo.qcombo:get() then
 		local target = GetTargetQ()
@@ -468,6 +527,9 @@ local function OnTick()
 	WGapcloser()
 	if menu.keys.combokey:get() then
 		Combo()
+	end
+	if menu.keys.harasskey:get() then
+		Harass()
 	end
 end
 

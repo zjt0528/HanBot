@@ -756,21 +756,18 @@ local function Harass()
 		local target = GetTargetQ()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
-				if Pix and not player.isDead and Pix.team == TEAM_ALLY then
-					local pos = preds.linear.get_prediction(spellQ, target)
-					if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
-						player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-					end
+				local pos = preds.linear.get_prediction(spellQ, target)
+				if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
+					player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
-				if not Pix then
-					local pos = preds.linear.get_prediction(spellQ, target)
-					if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
-						player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-					end
+
+				local pos = preds.linear.get_prediction(spellQ, target)
+				if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
+					player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
 			end
 		end
-		if Pix and not player.isDead and Pix.team == TEAM_ALLY then
+		if Pix and not player.isDead then
 			for i = 0, objManager.enemies_n - 1 do
 				local hero = objManager.enemies[i]
 
@@ -855,17 +852,14 @@ local function Combo()
 		local target = GetTargetQ()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
-				if Pix and not player.isDead and Pix.team == TEAM_ALLY then
-					local pos = preds.linear.get_prediction(spellQ, target)
-					if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
-						player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-					end
+				local pos = preds.linear.get_prediction(spellQ, target)
+				if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
+					player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
-				if not Pix then
-					local pos = preds.linear.get_prediction(spellQ, target)
-					if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
-						player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-					end
+
+				local pos = preds.linear.get_prediction(spellQ, target)
+				if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
+					player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
 			end
 		end
@@ -901,7 +895,7 @@ local function Combo()
 			end
 		end
 	end
-	if Pix and not player.isDead and Pix.team == TEAM_ALLY then
+	if Pix and not player.isDead then
 		for i = 0, objManager.enemies_n - 1 do
 			local hero = objManager.enemies[i]
 
@@ -1002,7 +996,7 @@ local function OnTick()
 	if os.clock() > timer then
 		objManager.loop(
 			function(obj)
-				if obj and obj.name == "RobotBuddy" then
+				if obj and obj.name == "RobotBuddy" and obj.team == TEAM_ALLY and obj.owner == player then
 					Pix = obj
 					timer = os.clock() + 10
 				end
@@ -1366,12 +1360,12 @@ local function OnDraw()
 		end
 	end
 	if menu.draws.drawpix:get() then
-		if Pix and not player.isDead and Pix.isOnScreen and Pix.team == TEAM_ALLY then
+		if Pix and not player.isDead and Pix.isOnScreen then
 			graphics.draw_circle(Pix.pos, 50, 2, graphics.argb(255, 255, 105, 180), 100)
 		end
 	end
 	if menu.draws.drawrangespix:get() then
-		if Pix and not player.isDead and Pix.isOnScreen and Pix.team == TEAM_ALLY then
+		if Pix and not player.isDead and Pix.isOnScreen then
 			for i = 0, objManager.allies_n - 1 do
 				local hero = objManager.allies[i]
 
