@@ -263,9 +263,9 @@ local function AutoInterrupt(spell)
 									local collision = preds.collision.get_prediction(spellQ, pos, spell.owner)
 									for i = 1, #collision do
 										local obj = collision[i]
+
 										if
-											obj and not obj.isDead and obj.type and (obj.type == TYPE_MINION or obj.type == TYPE_HERO) and
-												obj.pos:dist(player.pos) > 150 and
+											obj and obj.type and (obj.type == TYPE_MINION or obj.type == TYPE_HERO) and obj.pos:dist(player.pos) > 150 and
 												obj.pos:dist(target.pos) < menu.combo.maxstun:get()
 										 then
 											player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -415,7 +415,7 @@ local function Combo()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.isDead and obj.type and obj.type == TYPE_HERO and obj.pos:dist(player.pos) > 150 and
+										obj and obj.type and obj.type == TYPE_HERO and obj.pos:dist(player.pos) > 150 and
 											obj.pos:dist(target.pos) < menu.combo.maxstun:get()
 									 then
 										for i = 0, objManager.enemies_n - 1 do
@@ -439,8 +439,7 @@ local function Combo()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.isDead and obj.type and (obj.type == TYPE_MINION or obj.type == TYPE_HERO) and
-											obj.pos:dist(player.pos) > 150 and
+										obj and obj.type and (obj.type == TYPE_MINION or obj.type == TYPE_HERO) and obj.pos:dist(player.pos) > 150 and
 											obj.pos:dist(target.pos) < menu.combo.maxstun:get()
 									 then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
@@ -526,7 +525,7 @@ local function Harass()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.isDead and obj.type and obj.type == TYPE_HERO and obj.pos:dist(player.pos) > 150 and
+										obj and obj.type and obj.type == TYPE_HERO and obj.pos:dist(player.pos) > 150 and
 											obj.pos:dist(target.pos) < menu.combo.maxstun:get()
 									 then
 										for i = 0, objManager.enemies_n - 1 do
@@ -550,8 +549,7 @@ local function Harass()
 								for i = 1, #collision do
 									local obj = collision[i]
 									if
-										obj and not obj.isDead and obj.type and (obj.type == TYPE_MINION or obj.type == TYPE_HERO) and
-											obj.pos:dist(player.pos) > 150 and
+										obj and obj.type and (obj.type == TYPE_MINION or obj.type == TYPE_HERO) and obj.pos:dist(player.pos) > 150 and
 											obj.pos:dist(target.pos) < menu.combo.maxstun:get()
 									 then
 										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
