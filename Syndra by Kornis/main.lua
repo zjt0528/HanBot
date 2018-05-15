@@ -145,6 +145,7 @@ menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:boolean("autoq", "Use Auto Q on Dash", true)
 menu.combo:boolean("qecombo", "Use QE in Combo.", true)
 menu.combo:slider("qerange", " ^- QE Range", 1100, 800, 1150, 1)
+menu.combo:boolean("slowpred", "Use Slow Predictions for QE", true)
 menu.combo:boolean("wcombo", "Use W in Combo", true)
 menu.combo:boolean("ecombo", "Use E in Combo", true)
 menu.combo:menu("rset", "R Settings")
@@ -854,6 +855,17 @@ local function LaneClear()
 		end
 	end
 end
+local function QEFilter(seg, obj)
+	if preds.trace.linear.hardlock(spellQE2, seg, obj) then
+		return true
+	end
+	if preds.trace.linear.hardlockmove(spellQE2, seg, obj) then
+		return true
+	end
+	if preds.trace.newpath(obj, 0.033, 0.5) then
+		return true
+	end
+end
 local function Combo()
 	if menu.combo.items:get() then
 		for i = 6, 11 do
@@ -926,7 +938,7 @@ local function Combo()
 									if vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellQE.range then
 										if
 											(vec3(objsq.x, objsq.y, objsq.z):dist(player.pos) <= spellE.range) and
-												player.pos:dist(vec3(objsq.x, objsq.y, objsq.z)) >= 130 and
+												player.pos:dist(vec3(objsq.x, objsq.y, objsq.z)) >= 100 and
 												target.pos:dist(player.pos) <= 1100
 										 then
 											local pos = preds.linear.get_prediction(spellQE, target)
@@ -1013,30 +1025,66 @@ local function Combo()
 		end
 	end]]
 	if menu.combo.qecombo:get() then
-		local target = GetTargetQE()
-		if target and target.isVisible then
-			if common.IsValidTarget(target) and player.mana > player.manaCost0 + player.manaCost2 then
-				if (target.pos:dist(player.pos) <= spellQE.range) then
-					if target.pos:dist(player.pos) > 1000 then
-						spellQE2.delay = 0.24
+		if not menu.combo.slowpred:get() then
+			local target = GetTargetQE()
+			if target and target.isVisible then
+				if common.IsValidTarget(target) and player.mana > player.manaCost0 + player.manaCost2 then
+					if (target.pos:dist(player.pos) <= spellQE.range) then
+						if target.pos:dist(player.pos) > 1000 then
+							spellQE2.delay = 0.24
+						end
+						if target.pos:dist(player.pos) < 1000 and target.pos:dist(player.pos) > 900 then
+							spellQE2.delay = 0.16
+						end
+						if target.pos:dist(player.pos) < 900 then
+							spellQE2.delay = 0.25
+						end
+						if
+							(target.path.count > 0) or
+								(target.buff[5] or target.buff[8] or target.buff[24] or target.buff[11] or target.buff[22] or target.buff[8] or
+									target.buff[21])
+						 then
+							local pos = preds.linear.get_prediction(spellQE2, target)
+							if pos and pos.startPos:dist(pos.endPos) <= spellQE.range then
+								local pos = player.pos + 700 * (vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - player.pos):norm()
+								if (target.pos:dist(player.pos) > spellE.range) and player:spellSlot(2).state == 0 then
+									player:castSpell("pos", 0, pos)
+
+									MaybeItHelps = os.clock()
+								end
+							end
+						end
 					end
-					if target.pos:dist(player.pos) < 1000 and target.pos:dist(player.pos) > 900 then
-						spellQE2.delay = 0.16
-					end
-					if target.pos:dist(player.pos) < 900 then
-						spellQE2.delay = 0.25
-					end
-					if
-						(target.path.count > 0) or
-							(target.buff[5] or target.buff[8] or target.buff[24] or target.buff[11] or target.buff[22] or target.buff[8] or
-								target.buff[21])
-					 then
-						local pos = preds.linear.get_prediction(spellQE2, target)
-						if pos and pos.startPos:dist(pos.endPos) <= spellQE.range then
-							local pos = player.pos + 700 * (vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - player.pos):norm()
-							if (target.pos:dist(player.pos) > spellE.range) and player:spellSlot(2).state == 0 then
-								player:castSpell("pos", 0, pos)
-								MaybeItHelps = os.clock()
+				end
+			end
+		end
+		if menu.combo.slowpred:get() then
+			local target = GetTargetQE()
+			if target and target.isVisible then
+				if common.IsValidTarget(target) and player.mana > player.manaCost0 + player.manaCost2 then
+					if (target.pos:dist(player.pos) <= spellQE.range) then
+						if target.pos:dist(player.pos) > 1000 then
+							spellQE2.delay = 0.24
+						end
+						if target.pos:dist(player.pos) < 1000 and target.pos:dist(player.pos) > 900 then
+							spellQE2.delay = 0.16
+						end
+						if target.pos:dist(player.pos) < 900 then
+							spellQE2.delay = 0.25
+						end
+						if
+							(target.path.count > 0) or
+								(target.buff[5] or target.buff[8] or target.buff[24] or target.buff[11] or target.buff[22] or target.buff[8] or
+									target.buff[21])
+						 then
+							local pos = preds.linear.get_prediction(spellQE2, target)
+							if pos and QEFilter(pos, target) and pos.startPos:dist(pos.endPos) <= spellQE.range then
+								local pos = player.pos + 700 * (vec3(pos.endPos.x, mousePos.y, pos.endPos.y) - player.pos):norm()
+								if (target.pos:dist(player.pos) > spellE.range) and player:spellSlot(2).state == 0 then
+									player:castSpell("pos", 0, pos)
+
+									MaybeItHelps = os.clock()
+								end
 							end
 						end
 					end
@@ -1054,14 +1102,14 @@ local function Combo()
 						(target.health / target.maxHealth) * 100 >= menu.combo.rset.waster:get()
 				 then
 					if (mode == 2) then
-						if not menu.blacklist[target.charName]:get() then
+						if menu.blacklist[target.charName] and not menu.blacklist[target.charName]:get() then
 							if (RDamage(target) > target.health) then
 								player:castSpell("obj", 3, target)
 							end
 						end
 					end
 					if (mode == 1) then
-						if not menu.blacklist[target.charName]:get() then
+						if menu.blacklist[target.charName] and not menu.blacklist[target.charName]:get() then
 							if player:spellSlot(3).stacks >= menu.combo.rset.orb:get() then
 								if not menu.combo.rset.engagemode:get() then
 									player:castSpell("obj", 3, target)
