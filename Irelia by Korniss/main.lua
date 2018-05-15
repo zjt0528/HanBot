@@ -559,6 +559,7 @@ menu.combo:dropdown("rusage", "R Usage", 2, {"Always", "Only if Killable", "Neve
 menu.combo:slider("hitr", " ^- If Hits X Enemies", 2, 1, 5, 1)
 menu.combo.hitr:set("tooltip", "Only if Usage is 'Always'")
 menu.combo:slider("saver", "Don't waste R if Enemy Health Percent <=", 10, 1, 100, 1)
+menu.combo:boolean("dontr", "Don't use R if Q is on Cooldown", false)
 menu.combo:keybind("semir", "Semi-R", "T", nil)
 menu.combo:boolean("items", "Use Items", true)
 
@@ -1651,26 +1652,54 @@ local function Combo()
 		end
 	end
 	if common.IsValidTarget(target) and target then
-		if mode == 1 then
-			if (target.pos:dist(player) < spellR.range) then
-				local pos = preds.linear.get_prediction(spellR, target)
-				if
-					pos and pos.startPos:dist(pos.endPos) < spellR.range and
-						menu.combo.hitr:get() <= #count_enemies_in_range(target.pos, 400)
-				 then
-					player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
-				end
-			end
-		end
-		if mode == 2 then
-			if (GetQDamage(target) + RDamage(target) * 2 + EDamage(target) >= target.health) then
+		if not menu.combo.dontr:get() then
+			if mode == 1 then
 				if (target.pos:dist(player) < spellR.range) then
 					local pos = preds.linear.get_prediction(spellR, target)
 					if
 						pos and pos.startPos:dist(pos.endPos) < spellR.range and
-							(target.health / target.maxHealth) * 100 >= menu.combo.saver:get()
+							menu.combo.hitr:get() <= #count_enemies_in_range(target.pos, 400)
 					 then
 						player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+					end
+				end
+			end
+			if mode == 2 then
+				if (GetQDamage(target) + RDamage(target) * 2 + EDamage(target) >= target.health) then
+					if (target.pos:dist(player) < spellR.range) then
+						local pos = preds.linear.get_prediction(spellR, target)
+						if
+							pos and pos.startPos:dist(pos.endPos) < spellR.range and
+								(target.health / target.maxHealth) * 100 >= menu.combo.saver:get()
+						 then
+							player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+						end
+					end
+				end
+			end
+		end
+		if menu.combo.dontr:get() and player:spellSlot(0).state == 0 then
+			if mode == 1 then
+				if (target.pos:dist(player) < spellR.range) then
+					local pos = preds.linear.get_prediction(spellR, target)
+					if
+						pos and pos.startPos:dist(pos.endPos) < spellR.range and
+							menu.combo.hitr:get() <= #count_enemies_in_range(target.pos, 400)
+					 then
+						player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+					end
+				end
+			end
+			if mode == 2 then
+				if (GetQDamage(target) + RDamage(target) * 2 + EDamage(target) >= target.health) then
+					if (target.pos:dist(player) < spellR.range) then
+						local pos = preds.linear.get_prediction(spellR, target)
+						if
+							pos and pos.startPos:dist(pos.endPos) < spellR.range and
+								(target.health / target.maxHealth) * 100 >= menu.combo.saver:get()
+						 then
+							player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+						end
 					end
 				end
 			end
