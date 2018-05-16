@@ -179,6 +179,9 @@ menu.draws:color("colorr", "  ^- Color", 255, 0x66, 0x33, 0x00)
 menu.draws:boolean("drawflash", "Draw Burst Range", true)
 menu.draws:boolean("drawtoggle", "Draw Toggle", true)
 menu.draws:boolean("drawdamage", "Draw Damage", true)
+menu:menu("flee", "Flee")
+menu.flee:boolean("fleer", "Use R to Flee", true)
+menu.flee:keybind("fleekey", "Flee Key:", "A", nil)
 menu:menu("misc", "Misc.")
 menu.misc:menu("Gap", "Gapcloser Settings")
 menu.misc.Gap:boolean("GapA", "Use E for Anti-Gapclose", true)
@@ -839,7 +842,16 @@ end
 local GetTargetFR = function()
 	return TS.get_result(TargetSelectionFR).obj
 end
+local function Flee()
+	if menu.flee.fleekey:get() then
+		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
+		if menu.flee.fleer:get() then
+			player:castSpell("pos", 3, mousePos)
+		end
+	end
+end
 local function OnTick()
+	Flee()
 	if menu.burst.burstkley:get() then
 		player:move(vec3(mousePos.x, mousePos.y, mousePos.z))
 		local target = GetTargetFR()
@@ -894,6 +906,11 @@ local function OnTick()
 						end
 					end
 				end
+				if common.IsValidTarget(target) and target then
+					if (target.pos:dist(player) <= spellQ.range) then
+						player:castSpell("obj", 0, target)
+					end
+				end
 				if player:spellSlot(1).state == 0 then
 					if common.IsValidTarget(target) and target then
 						if (target.pos:dist(player) < 250) then
@@ -908,11 +925,6 @@ local function OnTick()
 						if seg and seg.startPos:dist(seg.endPos) <= spellE.range then
 							player:castSpell("pos", 2, vec3(seg.endPos.x, target.y, seg.endPos.y))
 						end
-					end
-				end
-				if common.IsValidTarget(target) and target then
-					if (target.pos:dist(player) <= spellQ.range) then
-						player:castSpell("obj", 0, target)
 					end
 				end
 				if common.IsValidTarget(target) and target then
