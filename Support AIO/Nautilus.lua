@@ -141,6 +141,12 @@ for i, allies in ipairs(enemy) do
 	menu.combo.blacklist:boolean(allies.charName, "Block: " .. allies.charName, false)
 end
 
+menu:menu("blacklist", "Q Blacklist")
+local enemy = common.GetEnemyHeroes()
+for i, allies in ipairs(enemy) do
+	menu.blacklist:boolean(allies.charName, "Block: " .. allies.charName, false)
+end
+
 menu:menu("harass", "Harass")
 menu.harass:boolean("qcombo", "Use Q in Harass", true)
 menu.harass:boolean("wcombo", "Use W for Auto Attack Reset", true)
@@ -461,7 +467,9 @@ local function Harass()
 				if pos and pos.startPos:dist(pos.endPos) <= spellQ.range then
 					if not preds.collision.get_prediction(spellQ, pos, target) then
 						if not meowmeowcheck(player.pos, vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) then
-							player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+							if menu.blacklist[target.charName] and not menu.blacklist[target.charName]:get() then
+								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+							end
 						end
 					end
 				end
@@ -488,7 +496,9 @@ local function Combo()
 				if pos and pos.startPos:dist(pos.endPos) <= spellQ.range then
 					if not preds.collision.get_prediction(spellQ, pos, target) then
 						if not meowmeowcheck(player.pos, vec3(pos.endPos.x, mousePos.y, pos.endPos.y)) then
-							player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+							if menu.blacklist[target.charName] and not menu.blacklist[target.charName]:get() then
+								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+							end
 						end
 					end
 				end
@@ -618,7 +628,6 @@ local function OnDraw()
 			graphics.draw_circle(player.pos, spellR.range, 2, menu.draws.colorr:get(), 100)
 		end
 	end
-	
 end
 TS.load_to_menu(menu)
 --cb.add(cb.spell, SpellCasting)
