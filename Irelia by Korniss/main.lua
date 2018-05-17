@@ -539,7 +539,7 @@ menu:menu("combo", "Combo")
 menu.combo:header("uhhh", "-- Q Settings --")
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:slider("minq", " ^- Min. Q Range", 300, 0, 500, 1)
-menu.combo:boolean("markedq", "Q only if Marked / Killable", false)
+menu.combo:keybind("qmarked", "Only if Marked Toggle", "A", nil)
 menu.combo:boolean("gapq", "Use Q for Gapclose on Minion", true)
 menu.combo:boolean("outofq", " ^-Only if out of Q Range", false)
 menu.combo:boolean("jumparound", "Use Q to Jump-Around Enemy on Minions", false)
@@ -567,7 +567,6 @@ menu:menu("harass", "Harass")
 menu.harass:boolean("turretq", "Don't use Q under-turret", true)
 menu.harass:boolean("qcombo", "Use Q in Harass", true)
 menu.harass:slider("minq", " ^- Min. Q Range", 220, 0, 400, 1)
-menu.harass:boolean("markedq", "Q only if Marked / Killable", false)
 menu.harass:boolean("gapq", "Use Q for Gapclose on Minion", true)
 menu.harass:boolean("outofq", " ^-Only if out of Q Range", false)
 --menu.combo:boolean("waitq", "Wait for Mark", true)
@@ -758,6 +757,20 @@ local function Toggle()
 		if (uhh == true and os.clock() > something) then
 			uhh = false
 			something = os.clock() + 0.3
+		end
+	end
+end
+local uhh5 = false
+local something2 = 0
+local function Toggle2()
+	if menu.combo.qmarked:get() then
+		if (uhh5 == false and os.clock() > something2) then
+			uhh5 = true
+			something2 = os.clock() + 0.3
+		end
+		if (uhh5 == true and os.clock() > something2) then
+			uhh5 = false
+			something2 = os.clock() + 0.3
 		end
 	end
 end
@@ -1769,7 +1782,7 @@ local function Combo()
 	end
 	if (delayyyyyyy < os.clock()) then
 		if common.IsValidTarget(target) then
-			if menu.combo.qcombo:get() and not menu.combo.markedq:get() then
+			if menu.combo.qcombo:get() and uhh5 then
 				if common.IsValidTarget(target) then
 					--[[if not menu.combo.waitq:get() then
 					if (target.pos:dist(player) < spellQ.range) then
@@ -2141,7 +2154,7 @@ local function Harass()
 	end
 	if (delayyyyyyy < os.clock()) then
 		if common.IsValidTarget(target) then
-			if menu.harass.qcombo:get() and not menu.harass.markedq:get() then
+			if menu.harass.qcombo:get() and uhh5 then
 				if common.IsValidTarget(target) then
 					--[[if not menu.combo.waitq:get() then
 					if (target.pos:dist(player) < spellQ.range) then
@@ -2531,6 +2544,11 @@ local function OnDraw()
 		else
 			graphics.draw_text_2D("Farm: ON", 18, pos.x - 20, pos.y + 40, graphics.argb(255, 128, 255, 0))
 		end
+		if uhh5 == true then
+			graphics.draw_text_2D("Only Marked: OFF", 18, pos.x - 20, pos.y + 20, graphics.argb(255, 218, 34, 34))
+		else
+			graphics.draw_text_2D("Only Marked: ON", 18, pos.x - 20, pos.y + 20, graphics.argb(255, 128, 255, 0))
+		end
 	end
 
 	if menu.draws.drawdamage:get() then
@@ -2722,6 +2740,7 @@ local function OnTick()
 		WGapcloser()
 	end
 	Toggle()
+	Toggle2()
 	if menu.keys.lastkey:get() then
 		LastHit()
 	end
