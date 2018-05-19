@@ -421,7 +421,59 @@ local PSpells = {
 	"QuinnWEnhanced",
 	"LucianPassiveAttack",
 	"SkarnerPassiveAttack",
-	"KarthusDeathDefiedBuff"
+	"KarthusDeathDefiedBuff",
+	"GarenQAttack",
+	"KennenMegaProc",
+	"MordekaiserQAttack",
+	"MordekaiserQAttack2",
+	"BlueCardPreAttack",
+	"RedCardPreAttack",
+	"GoldCardPreAttack",
+	"XenZhaoThrust",
+	"XenZhaoThrust2",
+	"XenZhaoThrust3",
+	"ViktorQBuff",
+	"TrundleQ",
+	"RenektonSuperExecute",
+	"RenektonExecute",
+	"GarenSlash2",
+	"frostarrow",
+	"SivirWAttack",
+	"rengarnewpassivebuffdash",
+	"YorickQAttack",
+	"ViEAttack",
+	"SejuaniBasicAttackW",
+	"ShyvanaDoubleAttackHit",
+	"ShenQAttack",
+	"SonaEAttackUpgrade",
+	"SonaWAttackUpgrade",
+	"SonaQAttackUpgrade",
+	"PoppyPassiveAttack",
+	"NidaleeTakedownAttack",
+	"NasusQAttack",
+	"KindredBasicAttackOverrideLightbombFinal",
+	"LeonaShieldOfDaybreakAttack",
+	"KassadinBasicAttack3",
+	"JhinPassiveAttack",
+	"JayceHyperChargeRangedAttack",
+	"JaycePassiveRangedAttack",
+	"JaycePassiveMeleeAttack",
+	"illaoiwattack",
+	"hecarimrampattack",
+	"DrunkenRage",
+	"GalioPassiveAttack",
+	"FizzWBasicAttack",
+	"FioraEAttack",
+	"EkkoEAttack",
+	"ekkobasicattackp3",
+	"MasochismAttack",
+	"DravenSpinningAttack",
+	"DianaBasicAttack3",
+	"DariusNoxianTacticsONHAttack",
+	"CamilleQAttackEmpowered",
+	"CamilleQAttack",
+	"PowerFistAttack",
+	"AsheQAttack"
 }
 local function AutoInterrupt(spell)
 	--	print("int")
@@ -431,7 +483,7 @@ local function AutoInterrupt(spell)
 		if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY and spell.target.type == TYPE_HERO then
 			for i = 1, #PSpells do
 				if
-					spell.name:find(PSpells[i]) and spell.owner.pos:dist(player.pos) <= spellW.range and
+					spell.name:lower():find(PSpells[i]:lower()) and spell.owner.pos:dist(player.pos) <= spellW.range and
 						menu.combo.wset[spell.owner.charName]:get() > 0
 				 then
 					if heroTarget == nil then
@@ -528,7 +580,28 @@ local function AutoInterrupt(spell)
 		local allies = common.GetAllyHeroes()
 		for z, ally in ipairs(allies) do
 			if ally and ally.pos:dist(player.pos) <= spellE.range then
+			if ally and ally.pos:dist(player.pos) <= spellE.range then
 				if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+					for i = 1, #PSpells do
+						if spell.name:lower():find(PSpells[i]:lower()) then
+							if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+									if ally.pos:dist(player.pos) <= spellE.range then
+										player:castSpell("obj", 2, ally)
+									end
+									if menu.combo.rset.whitelist.autor:get() then
+										if
+											menu.blacklist[ally.charName] and not menu.blacklist[ally.charName]:get() and
+												ally.pos:dist(player.pos) <= spellR.range and
+												menu.combo.rset.whitelist[ally.charName]:get() >= (ally.health / ally.maxHealth) * 100
+										 then
+											player:castSpell("obj", 3, ally)
+										end
+									end
+								end
+							end
+						end
+					end
 					if spell.name:find("BasicAttack") then
 						if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
 							if not menu.SpellsMenu.blacklist[ally.charName]:get() then

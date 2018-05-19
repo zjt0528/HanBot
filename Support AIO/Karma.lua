@@ -144,6 +144,76 @@ menu.SpellsMenu.BasicAttack:slider("minionhp", " ^- HP to Shield", 10, 1, 100, 5
 menu.SpellsMenu.BasicAttack:boolean("turret", "Shield on Turret attack", true)
 menu:keybind("rq", "R-Q to Mouse", "G", nil)
 
+local PSpells = {
+	"CaitlynHeadshotMissile",
+	"RumbleOverheatAttack",
+	"JarvanIVMartialCadenceAttack",
+	"ShenKiAttack",
+	"MasterYiDoubleStrike",
+	"sonahymnofvalorattackupgrade",
+	"sonaariaofperseveranceupgrade",
+	"sonasongofdiscordattackupgrade",
+	"NocturneUmbraBladesAttack",
+	"NautilusRavageStrikeAttack",
+	"ZiggsPassiveAttack",
+	"QuinnWEnhanced",
+	"LucianPassiveAttack",
+	"SkarnerPassiveAttack",
+	"KarthusDeathDefiedBuff",
+	"GarenQAttack",
+	"KennenMegaProc",
+	"MordekaiserQAttack",
+	"MordekaiserQAttack2",
+	"BlueCardPreAttack",
+	"RedCardPreAttack",
+	"GoldCardPreAttack",
+	"XenZhaoThrust",
+	"XenZhaoThrust2",
+	"XenZhaoThrust3",
+	"ViktorQBuff",
+	"TrundleQ",
+	"RenektonSuperExecute",
+	"RenektonExecute",
+	"GarenSlash2",
+	"frostarrow",
+	"SivirWAttack",
+	"rengarnewpassivebuffdash",
+	"YorickQAttack",
+	"ViEAttack",
+	"SejuaniBasicAttackW",
+	"ShyvanaDoubleAttackHit",
+	"ShenQAttack",
+	"SonaEAttackUpgrade",
+	"SonaWAttackUpgrade",
+	"SonaQAttackUpgrade",
+	"PoppyPassiveAttack",
+	"NidaleeTakedownAttack",
+	"NasusQAttack",
+	"KindredBasicAttackOverrideLightbombFinal",
+	"LeonaShieldOfDaybreakAttack",
+	"KassadinBasicAttack3",
+	"JhinPassiveAttack",
+	"JayceHyperChargeRangedAttack",
+	"JaycePassiveRangedAttack",
+	"JaycePassiveMeleeAttack",
+	"illaoiwattack",
+	"hecarimrampattack",
+	"DrunkenRage",
+	"GalioPassiveAttack",
+	"FizzWBasicAttack",
+	"FioraEAttack",
+	"EkkoEAttack",
+	"ekkobasicattackp3",
+	"MasochismAttack",
+	"DravenSpinningAttack",
+	"DianaBasicAttack3",
+	"DariusNoxianTacticsONHAttack",
+	"CamilleQAttackEmpowered",
+	"CamilleQAttack",
+	"PowerFistAttack",
+	"AsheQAttack"
+}
+
 local function AutoInterrupt(spell)
 	if menu.rq:get() then
 		if spell and spell.owner.type == TYPE_HERO and spell.owner == player then
@@ -177,6 +247,17 @@ local function AutoInterrupt(spell)
 		for z, ally in ipairs(allies) do
 			if ally and ally.pos:dist(player.pos) <= spellE.range then
 				if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+					for i = 1, #PSpells do
+						if spell.name:lower():find(PSpells[i]:lower()) then
+							if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+									if ally.pos:dist(player.pos) <= spellE.range then
+										player:castSpell("obj", 2, ally)
+									end
+								end
+							end
+						end
+					end
 					if spell.name:find("BasicAttack") then
 						if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
 							if not menu.SpellsMenu.blacklist[ally.charName]:get() then

@@ -283,6 +283,20 @@ local function AutoInterrupt(spell)
 				for z, ally in ipairs(allies) do
 					if ally then
 						if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+							for i = 1, #PSpells do
+								if spell.name:lower():find(PSpells[i]:lower()) then
+									if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+										if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
+											if ally.charName == "Xayah" and ally.pos:dist(player.pos) <= 1000 then
+												player:castSpell("obj", 2, ally)
+											end
+											if ally.pos:dist(player.pos) <= spellE.range then
+												player:castSpell("obj", 2, ally)
+											end
+										end
+									end
+								end
+							end
 							if spell.name:find("BasicAttack") then
 								if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
 									if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
@@ -387,6 +401,20 @@ local function AutoInterrupt(spell)
 				for z, ally in ipairs(allies) do
 					if ally then
 						if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+							for i = 1, #PSpells do
+								if spell.name:lower():find(PSpells[i]:lower()) then
+									if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+										if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
+											if ally.charName == "Xayah" and ally.pos:dist(player.pos) <= 1000 then
+												player:castSpell("obj", 2, ally)
+											end
+											if ally.pos:dist(player.pos) <= spellE.range then
+												player:castSpell("obj", 2, ally)
+											end
+										end
+									end
+								end
+							end
 							if spell.name:find("BasicAttack") then
 								if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
 									if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
@@ -491,6 +519,20 @@ local function AutoInterrupt(spell)
 				for z, ally in ipairs(allies) do
 					if ally then
 						if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+							for i = 1, #PSpells do
+								if spell.name:lower():find(PSpells[i]:lower()) then
+									if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+										if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
+											if ally.charName == "Xayah" and ally.pos:dist(player.pos) <= 1000 then
+												player:castSpell("obj", 2, ally)
+											end
+											if ally.pos:dist(player.pos) <= spellE.range then
+												player:castSpell("obj", 2, ally)
+											end
+										end
+									end
+								end
+							end
 							if spell.name:find("BasicAttack") then
 								if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
 									if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then

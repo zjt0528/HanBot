@@ -245,7 +245,59 @@ local PSpells = {
 	"QuinnWEnhanced",
 	"LucianPassiveAttack",
 	"SkarnerPassiveAttack",
-	"KarthusDeathDefiedBuff"
+	"KarthusDeathDefiedBuff",
+	"GarenQAttack",
+	"KennenMegaProc",
+	"MordekaiserQAttack",
+	"MordekaiserQAttack2",
+	"BlueCardPreAttack",
+	"RedCardPreAttack",
+	"GoldCardPreAttack",
+	"XenZhaoThrust",
+	"XenZhaoThrust2",
+	"XenZhaoThrust3",
+	"ViktorQBuff",
+	"TrundleQ",
+	"RenektonSuperExecute",
+	"RenektonExecute",
+	"GarenSlash2",
+	"frostarrow",
+	"SivirWAttack",
+	"rengarnewpassivebuffdash",
+	"YorickQAttack",
+	"ViEAttack",
+	"SejuaniBasicAttackW",
+	"ShyvanaDoubleAttackHit",
+	"ShenQAttack",
+	"SonaEAttackUpgrade",
+	"SonaWAttackUpgrade",
+	"SonaQAttackUpgrade",
+	"PoppyPassiveAttack",
+	"NidaleeTakedownAttack",
+	"NasusQAttack",
+	"KindredBasicAttackOverrideLightbombFinal",
+	"LeonaShieldOfDaybreakAttack",
+	"KassadinBasicAttack3",
+	"JhinPassiveAttack",
+	"JayceHyperChargeRangedAttack",
+	"JaycePassiveRangedAttack",
+	"JaycePassiveMeleeAttack",
+	"illaoiwattack",
+	"hecarimrampattack",
+	"DrunkenRage",
+	"GalioPassiveAttack",
+	"FizzWBasicAttack",
+	"FioraEAttack",
+	"EkkoEAttack",
+	"ekkobasicattackp3",
+	"MasochismAttack",
+	"DravenSpinningAttack",
+	"DianaBasicAttack3",
+	"DariusNoxianTacticsONHAttack",
+	"CamilleQAttackEmpowered",
+	"CamilleQAttack",
+	"PowerFistAttack",
+	"AsheQAttack"
 }
 local function AutoInterrupt(spell)
 	if menu.combo.ecombo:get() then
@@ -258,7 +310,7 @@ local function AutoInterrupt(spell)
 				player:castSpell("obj", 2, spell.owner)
 			end
 			for i = 1, #PSpells do
-				if spell.name:find(PSpells[i]) and spell.owner.pos:dist(player.pos) <= spellE.range then
+				if spell.name:lower():find(PSpells[i]:lower()) and spell.owner.pos:dist(player.pos) <= spellE.range then
 					player:castSpell("obj", 2, spell.owner)
 				end
 			end
@@ -367,17 +419,16 @@ local function count_allies_in_range(pos, range)
 	return enemies_in_range
 end
 
-
 local function Harass()
 	if menu.harass.qcombo:get() then
 		local target = GetTargetQ()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
 				if menu.harass.qcombo:get() then
-					if target.pos:dist(player.pos) < spellQ.range-50 then
+					if target.pos:dist(player.pos) < spellQ.range - 50 then
 						if not menu.harass.slowedq:get() then
 							local pos = preds.circular.get_prediction(spellQ, target)
-							if pos and pos.startPos:dist(pos.endPos) < spellQ.range-50 then
+							if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
 								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 							end
 						end
@@ -388,7 +439,7 @@ local function Harass()
 									target.buff[21])
 							 then
 								local pos = preds.circular.get_prediction(spellQ, target)
-								if pos and pos.startPos:dist(pos.endPos) < spellQ.range-50 then
+								if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
 									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 								end
 							end
@@ -426,10 +477,10 @@ local function Combo()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
 				if menu.combo.qcombo:get() then
-					if target.pos:dist(player.pos) < spellQ.range-50 then
+					if target.pos:dist(player.pos) < spellQ.range - 50 then
 						if not menu.combo.slowedq:get() then
 							local pos = preds.circular.get_prediction(spellQ, target)
-							if pos and pos.startPos:dist(pos.endPos) < spellQ.range-50 then
+							if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
 								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 							end
 						end
@@ -440,7 +491,7 @@ local function Combo()
 									target.buff[21])
 							 then
 								local pos = preds.circular.get_prediction(spellQ, target)
-								if pos and pos.startPos:dist(pos.endPos) < spellQ.range-50 then
+								if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
 									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 								end
 							end
