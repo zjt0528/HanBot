@@ -580,10 +580,29 @@ local function AutoInterrupt(spell)
 		local allies = common.GetAllyHeroes()
 		for z, ally in ipairs(allies) do
 			if ally and ally.pos:dist(player.pos) <= spellE.range then
-			if ally and ally.pos:dist(player.pos) <= spellE.range then
-				if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
-					for i = 1, #PSpells do
-						if spell.name:lower():find(PSpells[i]:lower()) then
+				if ally and ally.pos:dist(player.pos) <= spellE.range then
+					if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+						for i = 1, #PSpells do
+							if spell.name:lower():find(PSpells[i]:lower()) then
+								if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
+									if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+										if ally.pos:dist(player.pos) <= spellE.range then
+											player:castSpell("obj", 2, ally)
+										end
+										if menu.combo.rset.whitelist.autor:get() then
+											if
+												menu.blacklist[ally.charName] and not menu.blacklist[ally.charName]:get() and
+													ally.pos:dist(player.pos) <= spellR.range and
+													menu.combo.rset.whitelist[ally.charName]:get() >= (ally.health / ally.maxHealth) * 100
+											 then
+												player:castSpell("obj", 3, ally)
+											end
+										end
+									end
+								end
+							end
+						end
+						if spell.name:find("BasicAttack") then
 							if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
 								if not menu.SpellsMenu.blacklist[ally.charName]:get() then
 									if ally.pos:dist(player.pos) <= spellE.range then
@@ -597,24 +616,6 @@ local function AutoInterrupt(spell)
 										 then
 											player:castSpell("obj", 3, ally)
 										end
-									end
-								end
-							end
-						end
-					end
-					if spell.name:find("BasicAttack") then
-						if (ally.health / ally.maxHealth) * 100 <= menu.SpellsMenu.BasicAttack.aahp:get() then
-							if not menu.SpellsMenu.blacklist[ally.charName]:get() then
-								if ally.pos:dist(player.pos) <= spellE.range then
-									player:castSpell("obj", 2, ally)
-								end
-								if menu.combo.rset.whitelist.autor:get() then
-									if
-										menu.blacklist[ally.charName] and not menu.blacklist[ally.charName]:get() and
-											ally.pos:dist(player.pos) <= spellR.range and
-											menu.combo.rset.whitelist[ally.charName]:get() >= (ally.health / ally.maxHealth) * 100
-									 then
-										player:castSpell("obj", 3, ally)
 									end
 								end
 							end
