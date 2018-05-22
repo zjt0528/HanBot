@@ -222,7 +222,7 @@ local TargetSelectionGap = function(res, obj, dist)
 		return true
 	end
 end
-
+local meowmeow = 0
 local GetTarget = function()
 	return TS.get_result(TargetSelection).obj
 end
@@ -470,11 +470,12 @@ local function Combo()
 			end
 		end
 	end
-	if menu.combo.wcombo:get() and not menu.harass.waa:get() and player:spellSlot(1).state == 0 then
+	if menu.combo.wcombo:get() and not menu.combo.waa:get() and player:spellSlot(1).state == 0 then
 		if common.IsValidTarget(target) and target then
-			if (target.pos:dist(player) < 250) then
+			if (target.pos:dist(player) < 300) and os.clock() > meowmeow then
 				player:castSpell("self", 1)
 				player:attack(target)
+				meowmeow = os.clock() + 0.1
 			end
 		end
 	end
@@ -579,10 +580,12 @@ local function JungleClear()
 			local minion = objManager.minions[TEAM_NEUTRAL][i]
 			if
 				minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
-					minion.pos:dist(player.pos) < 250
+					os.clock() > meowmeow and
+					minion.pos:dist(player.pos) < 300
 			 then
 				player:castSpell("self", 1)
 				player:attack(minion)
+				meowmeow = os.clock() + 0.3
 			end
 		end
 	end
@@ -613,9 +616,10 @@ local function Harass()
 	end
 	if menu.harass.wcombo:get() and not menu.harass.waa:get() and player:spellSlot(1).state == 0 then
 		if common.IsValidTarget(target) and target then
-			if (target.pos:dist(player) < 250) then
+			if (target.pos:dist(player) < 300) and os.clock() > meowmeow then
 				player:castSpell("self", 1)
 				player:attack(target)
+				meowmeow = os.clock() + 0.1
 			end
 		end
 	end
@@ -677,6 +681,7 @@ local function KillSteal()
 		end
 	end
 end
+
 local function LaneClear()
 	if not mhh then
 		if menu.farming.laneclear.farmq:get() and player:spellSlot(0).state == 0 then
@@ -702,7 +707,7 @@ local function LaneClear()
 									--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 									delay = 0.25 + player.pos:dist(minion.pos) / 1600
 									if (QDamage(minion) >= orb.farm.predict_hp(minion, delay, true)) then
-										if menu.farming.laneclear.qaa:get() and 250 < minion.pos:dist(player.pos) then
+										if menu.farming.laneclear.qaa:get() and 300 < minion.pos:dist(player.pos) then
 											player:castSpell("obj", 0, minion)
 										end
 										if not menu.farming.laneclear.qaa:get() then
@@ -722,11 +727,12 @@ local function LaneClear()
 				local minion = objManager.minions[TEAM_ENEMY][i]
 				if
 					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
-						minion.pos:dist(player.pos) <= 250
+						minion.pos:dist(player.pos) <= 300
 				 then
-					if minion.health <= WDamage(minion) then
+					if minion.health <= WDamage(minion) and os.clock() > meowmeow then
 						player:castSpell("self", 1)
 						player:attack(minion)
+						meowmeow = os.clock() + 0.3
 					end
 				end
 			end
@@ -763,7 +769,7 @@ local function LastHit()
 				--delay = player.pos:dist(minion.pos) / 3500 + 0.2
 				delay = 0.25 + player.pos:dist(minion.pos) / 1600
 				if (QDamage(minion) >= orb.farm.predict_hp(minion, delay, true)) then
-					if menu.lasthit.qaa:get() and 250 < minion.pos:dist(player.pos) then
+					if menu.lasthit.qaa:get() and 300 < minion.pos:dist(player.pos) then
 						player:castSpell("obj", 0, minion)
 					end
 					if not menu.lasthit.qaa:get() then
@@ -778,11 +784,12 @@ local function LastHit()
 			local minion = objManager.minions[TEAM_ENEMY][i]
 			if
 				minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
-					minion.pos:dist(player.pos) <= 250
+					minion.pos:dist(player.pos) <= 300
 			 then
-				if minion.health <= WDamage(minion) then
+				if minion.health <= WDamage(minion) and os.clock() > meowmeow then
 					player:castSpell("self", 1)
 					player:attack(minion)
+					meowmeow = os.clock() + 0.3
 				end
 			end
 		end
@@ -913,9 +920,10 @@ local function OnTick()
 				end
 				if player:spellSlot(1).state == 0 then
 					if common.IsValidTarget(target) and target then
-						if (target.pos:dist(player) < 250) then
+						if (target.pos:dist(player) < 300) and os.clock() > meowmeow then
 							player:castSpell("self", 1)
 							player:attack(target)
+							meowmeow = os.clock() + 0.3
 						end
 					end
 				end
