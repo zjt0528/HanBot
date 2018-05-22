@@ -982,7 +982,8 @@ local function Combo()
 				if (player.health / player.maxHealth) * 100 <= 30 then
 					player:castSpell("obj", 0, target)
 				end
-				if QDamage(target) > target.health then
+
+				if QDamage(target) > target.health and not common.HasBuffType(target, 17) then
 					player:castSpell("obj", 0, target)
 				end
 				if target.pos:dist(player.pos) > 400 then
