@@ -2,20 +2,34 @@ local version = "1.0"
 
 local avada_lib = module.lib("avada_lib")
 if not avada_lib then
+	print("")
+	console.set_color(79)
+	print("                                                                                   ")
+	print("----------- Cassiopeia by Kornis -------------                                     ")
+	print("You need to have Avada Lib in your community_libs folder to run this script!       ")
+	print("You can find it here:                                                              ")
+	console.set_color(78)
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip                          ")
+	console.set_color(79)
+	print("                                                                                   ")
 	console.set_color(12)
-	print("You need to have Avada Lib in your community_libs folder to run 'Akali by Kornis'!")
-	print("You can find it here:")
-	console.set_color(11)
-	print("https://gitlab.soontm.net/get_clear_zip.php?fn=avada_lib")
-	console.set_color(15)
+	local menuerror = menu("CassiopeiabyKornis", "Cassiopeia By Kornis")
+	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
 	return
 elseif avada_lib.version < 1 then
+	print("")
+	console.set_color(79)
+	print("                                                                                   ")
+	print("----------- Cassiopeia by Kornis -------------                                     ")
+	print("You need to have Avada Lib in your community_libs folder to run this script!       ")
+	print("You can find it here:                                                              ")
+	console.set_color(78)
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip                          ")
+	console.set_color(79)
+	print("                                                                                   ")
 	console.set_color(12)
-	print("Your need to have Avada Lib updated to run 'Akali by Kornis'!")
-	print("You can find it here:")
-	console.set_color(11)
-	print("https://gitlab.soontm.net/get_clear_zip.php?fn=avada_lib")
-	console.set_color(15)
+	local menuerror = menu("CassiopeiabyKornis", "Cassiopeia By Kornis")
+	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
 	return
 end
 local interruptableSpells = {
@@ -201,7 +215,10 @@ menu.killsteal:slider("saver", "Don't waste R if Enemy Health < X", 100, 0, 500,
 
 menu:menu("misc", "Misc.")
 menu.misc:slider("qpred", "Q Radius: ", 170, 130, 200, 1)
-menu.misc.qpred:set("tooltip", "Lower - Will try to cast more further of target, Higher - Will try to cast more behind target.")
+menu.misc.qpred:set(
+	"tooltip",
+	"Lower - Will try to cast more behind enemy, Higher - Will try to cast more further of target."
+)
 menu.misc:slider("lasthittimer", "Last Hit E Delay", 125, 50, 200, 1)
 menu.misc.lasthittimer:set("tooltip", "Lower - Casts later, Higher - Casts earlier // Default is 125")
 menu.misc:boolean("disable", "Disable Auto Attack", true)
@@ -933,7 +950,7 @@ local function Combo()
 			if menu.combo.qset.qcombo:get() then
 				if (target.pos:dist(player) < spellQ.range) then
 					local pos = preds.circular.get_prediction(spellQ, target)
-					if pos and pos.startPos:dist(pos.endPos) < spellQ.range  then
+					if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
 						if not menu.combo.qset.qpoison:get() then
 							player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 						end

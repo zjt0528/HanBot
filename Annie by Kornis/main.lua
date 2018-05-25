@@ -2,20 +2,34 @@ local version = "1.0"
 
 local avada_lib = module.lib("avada_lib")
 if not avada_lib then
+	print("")
+	console.set_color(79)
+	print("                                                                                   ")
+	print("----------- Annie by Kornis -------------                                          ")
+	print("You need to have Avada Lib in your community_libs folder to run this script!       ")
+	print("You can find it here:                                                              ")
+	console.set_color(78)
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip                          ")
+	console.set_color(79)
+	print("                                                                                   ")
 	console.set_color(12)
-	print("You need to have Avada Lib in your community_libs folder to run 'Annie by Kornis'!")
-	print("You can find it here:")
-	console.set_color(11)
-	print("https://gitlab.soontm.net/get_clear_zip.php?fn=avada_lib")
-	console.set_color(15)
+	local menuerror = menu("AnnieaKornis", "Annie By Kornis")
+	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
 	return
 elseif avada_lib.version < 1 then
+	print("")
+	console.set_color(79)
+	print("                                                                                   ")
+	print("----------- Annie by Kornis -------------                                          ")
+	print("You need to have Avada Lib in your community_libs folder to run this script!       ")
+	print("You can find it here:                                                              ")
+	console.set_color(78)
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip                          ")
+	console.set_color(79)
+	print("                                                                                   ")
 	console.set_color(12)
-	print("Your need to have Avada Lib updated to run 'Annie by Kornis'!")
-	print("You can find it here:")
-	console.set_color(11)
-	print("https://gitlab.soontm.net/get_clear_zip.php?fn=avada_lib")
-	console.set_color(15)
+	local menuerror = menu("AnnieaKornis", "Annie By Kornis")
+	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
 	return
 end
 
@@ -174,6 +188,7 @@ menu.draws:boolean("drawdamage", "Draw Damage", true)
 
 menu:menu("misc", "Misc.")
 menu.misc:boolean("disable", "Disable Auto Attack in Combo", true)
+menu.misc:boolean("disableq", " ^- Only if Q is up", true)
 menu.misc:slider("level", "Disable AA at X Level", 6, 1, 18, 1)
 
 menu.misc:menu("Gap", "Gapcloser Settings")
@@ -332,7 +347,7 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 					for i = 1, #interruptableSpells[enemyName] do
 						local spellCheck = interruptableSpells[enemyName][i]
 						if
-						menu.misc.interrupt.interruptmenu[spell.owner.charName .. spellCheck.menuslot]:get() and
+							menu.misc.interrupt.interruptmenu[spell.owner.charName .. spellCheck.menuslot]:get() and
 								string.lower(spell.name) == spellCheck.spellname
 						 then
 							if player.pos2D:dist(spell.owner.pos2D) < spellW.range and common.IsValidTarget(spell.owner) then
@@ -908,19 +923,37 @@ local function OnTick()
 		end
 	end
 	if (orb.combat.is_active()) then
-		if (menu.misc.disable:get() and menu.misc.level:get() <= player.levelRef) and player.mana > 100 then
-			orb.core.set_pause_attack(math.huge)
+		if menu.misc.disableq:get() then
+			if
+				(menu.misc.disable:get() and menu.misc.level:get() <= player.levelRef and player:spellSlot(0).state == 0) and
+					player.mana > 100
+			 then
+				orb.core.set_pause_attack(math.huge)
+			end
+		end
+		if not menu.misc.disableq:get() then
+			if (menu.misc.disable:get() and menu.misc.level:get() <= player.levelRef) and player.mana > 100 then
+				orb.core.set_pause_attack(math.huge)
+			end
 		end
 	end
-	if orb.combat.is_active() and player.mana < 100 then
-		orb.core.set_pause_attack(0)
-	end
-	if menu.stacke:get() and menu.stackingw:get() <= (player.mana / player.maxMana) * 100 then
-		if not player.buff["pyromania_particle"] and not player.isRecalling then
-			player:castSpell("pos", 2, player.pos)
+	
+		if menu.misc.disableq:get() then
+			if orb.combat.is_active() and (player.mana < 100 or player:spellSlot(0).state ~= 0 or menu.misc.level:get() > player.levelRef) then
+				orb.core.set_pause_attack(0)
+			end
 		end
-	end
-
+		if not menu.misc.disableq:get() then
+			if orb.combat.is_active() and (player.mana < 100 or menu.misc.level:get() > player.levelRef) then
+				orb.core.set_pause_attack(0)
+			end
+		end
+		if menu.stacke:get() and menu.stackingw:get() <= (player.mana / player.maxMana) * 100 then
+			if not player.buff["pyromania_particle"] and not player.isRecalling then
+				player:castSpell("pos", 2, player.pos)
+			end
+		end
+	
 	if menu.misc.Gap.GapA:get() then
 		WGapcloser()
 	end

@@ -1,3 +1,35 @@
+local avada_lib = module.lib("avada_lib")
+if not avada_lib then
+	print("")
+	console.set_color(79)
+	print("                                                                                        ")
+	print("-----------  " .. player.charName .. " - ( Support AIO by Kornis )  ------------        ")
+	print("You need to have Avada Lib in your community_libs folder to run this script!            ")
+	print("You can find it here:                                                                   ")
+	console.set_color(78)
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip                               ")
+	console.set_color(79)
+	print("                                                                                        ")
+	console.set_color(12)
+	local menuerror = menu("SupportAIO" .. player.charName, "Support AIO - " .. player.charName)
+	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
+	return
+elseif avada_lib.version < 1 then
+	print("")
+	console.set_color(79)
+	print("                                                                                        ")
+	print("-----------  " .. player.charName .. " - ( Support AIO by Kornis )  ------------        ")
+	print("You need to have Avada Lib in your community_libs folder to run this script!            ")
+	print("You can find it here:                                                                   ")
+	console.set_color(78)
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip                               ")
+	console.set_color(79)
+	print("                                                                                        ")
+	console.set_color(12)
+	local menuerror = menu("SupportAIO" .. player.charName, "Support AIO - " .. player.charName)
+	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
+	return
+end
 if player.charName == "Janna" then
 	module.load("SupportAIO" .. player.charName, "Janna")
 end

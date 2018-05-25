@@ -2,20 +2,34 @@ local version = "1.0"
 local evade = module.seek("evade")
 local avada_lib = module.lib("avada_lib")
 if not avada_lib then
+	print("")
+	console.set_color(79)
+	print("                                                                                        ")
+	print("----------- Irelia by Kornis -------------                                              ")
+	print("You need to have Avada Lib in your community_libs folder to run this script!            ")
+	print("You can find it here:                                                                   ")
+	console.set_color(78)
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip                               ")
+	console.set_color(79)
+	print("                                                                                        ")
 	console.set_color(12)
-	print("You need to have Avada Lib in your community_libs folder to run 'Irelia by Kornis'!")
-	print("You can find it here:")
-	console.set_color(11)
-	print("https://git.soontm.net/avada/avada_lib/archive/master.zip")
-	console.set_color(15)
+	local menuerror = menu("IreliaKornis", "Irelia By Kornis")
+	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
 	return
 elseif avada_lib.version < 1 then
+	print("")
+	console.set_color(79)
+	print("                                                                                        ")
+	print("----------- Irelia by Kornis -------------                                              ")
+	print("You need to have Avada Lib in your community_libs folder to run this script!            ")
+	print("You can find it here:                                                                   ")
+	console.set_color(78)
+	print("https://git.soontm.net/avada/avada_lib/archive/master.zip                               ")
+	console.set_color(79)
+	print("                                                                                        ")
 	console.set_color(12)
-	print("Your need to have Avada Lib updated to run 'Irelia by Kornis'!")
-	print("You can find it here:")
-	console.set_color(11)
-	print("https://git.soontm.net/avada/avada_lib/archive/master.zip")
-	console.set_color(15)
+	local menuerror = menu("IreliaKornis", "Irelia By Kornis")
+	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
 	return
 end
 
@@ -137,6 +151,9 @@ local dodgeWs = {
 	},
 	["renekton"] = {
 		{menuslot = "W", slot = 1}
+	},
+	["diana"] = {
+		{menuslot = "Third Auto Attack", slot = -1}
 	}
 }
 local Spells = {
@@ -1060,7 +1077,8 @@ local enemy = nil
 local function AutoInterrupt(spell) -- Thank you Dew for this <3
 	if
 		spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == player and
-			not (spell.name:find("BasicAttack") or spell.name:find("crit") and not spell.owner.charName == "Karthus")
+			not (spell.name:find("BasicAttack") or
+				spell.name:find("crit") and not (spell.owner.charName == "Karthus" or spell.owner.charName == "Diana"))
 	 then
 		if not player.buff["ireliawdefense"] then
 			local enemyName = string.lower(spell.owner.charName)
@@ -1082,6 +1100,24 @@ local function AutoInterrupt(spell) -- Thank you Dew for this <3
 						if spell.name == "RenektonExecute" then
 							player:castSpell("pos", 1, player.pos)
 						end
+					end
+				end
+			end
+		end
+	end
+	if
+		spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == player and
+			spell.name:find("BasicAttack3") and
+			spell.owner.charName == "Diana"
+	 then
+		if not player.buff["ireliawdefense"] then
+			local enemyName = string.lower(spell.owner.charName)
+			if dodgeWs[enemyName] then
+				for i = 1, #dodgeWs[enemyName] do
+					local spellCheck = dodgeWs[enemyName][i]
+
+					if menu.dodgew[spell.owner.charName .. spellCheck.menuslot]:get() and spell.owner.charName == "Diana" then
+						player:castSpell("pos", 1, player.pos)
 					end
 				end
 			end
