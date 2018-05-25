@@ -473,7 +473,10 @@ local PSpells = {
 	"CamilleQAttackEmpowered",
 	"CamilleQAttack",
 	"PowerFistAttack",
-	"AsheQAttack"
+	"AsheQAttack",
+	"jinxqattack",
+	"jinxqattack2",
+	"KogMawBioArcaneBarrage"
 }
 local function AutoInterrupt(spell)
 	if menu.boost.wset.enablee:get() then

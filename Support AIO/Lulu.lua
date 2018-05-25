@@ -121,17 +121,21 @@ menu:menu("combo", "Combo")
 
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
 menu.combo:boolean("useeq", "Use E > Q Extended", false)
-menu.combo:boolean("wcomboenemy", "Use W in Combo on Enemy", false)
-menu.combo:menu("wblacklist", "W Blacklist for Enemy")
+menu.combo:menu("settingsww", "W Settings")
+menu.combo.settingsww:header("uhhh", " -- W Enemy -- ")
+menu.combo.settingsww:boolean("wcomboenemy", "Use W in Combo on Enemy", false)
+menu.combo.settingsww:menu("wblacklist", "W Blacklist for Enemy")
 local enemy = common.GetEnemyHeroes()
 for i, allies in ipairs(enemy) do
-	menu.combo.wblacklist:boolean(allies.charName, "Block: " .. allies.charName, false)
+	menu.combo.settingsww.wblacklist:boolean(allies.charName, "Don't use on: " .. allies.charName, false)
 end
-menu.combo:boolean("wcombo", "Auto W on Ally", true)
-menu.combo:menu("wset", "W Priority")
-menu.combo.wset:boolean("enablew", "Enable W usage", true)
-menu.combo.wset:boolean("enablee", "Auto E together with W", false)
-menu.combo.wset:header("uhhh", "0 - Disabled, 1 - Biggest Priority, 5 - Lowest Priority")
+
+menu.combo.settingsww:header("uhhh", " -- W Ally -- ")
+menu.combo.settingsww:boolean("wcombo", "Auto W on Ally", true)
+menu.combo.settingsww:menu("wset", " ^- W Priority for Ally")
+menu.combo.settingsww.wset:boolean("enablew", "Enable W usage", true)
+menu.combo.settingsww.wset:boolean("enablee", "Enable E usage ", false)
+menu.combo.settingsww.wset:header("uhhh", "0 - Disabled, 1 - Biggest Priority, 5 - Lowest Priority")
 local enemy = common.GetAllyHeroes()
 for i, allies in ipairs(enemy) do
 	if
@@ -149,7 +153,7 @@ for i, allies in ipairs(enemy) do
 			allies.charName ~= "Jinx" and
 			allies.charName ~= "Ezreal"
 	 then
-		menu.combo.wset:slider(allies.charName, "Priority: " .. allies.charName, 0, 0, 5, 1)
+		menu.combo.settingsww.wset:slider(allies.charName, "Priority: " .. allies.charName, 0, 0, 5, 1)
 	end
 	if
 		allies.charName == "Twitch" or allies.charName == "KogMaw" or allies.charName == "Tristana" or
@@ -165,13 +169,13 @@ for i, allies in ipairs(enemy) do
 			allies.charName == "Jinx" or
 			allies.charName == "Ezreal"
 	 then
-		menu.combo.wset:slider(allies.charName, "Priority: " .. allies.charName, 1, 0, 5, 1)
+		menu.combo.settingsww.wset:slider(allies.charName, "Priority: " .. allies.charName, 1, 0, 5, 1)
 	end
 	if allies.charName == "Lulu" then
-		menu.combo.wset:slider(allies.charName, "Priority: " .. allies.charName, 0, 0, 5, 1)
+		menu.combo.settingsww.wset:slider(allies.charName, "Priority: " .. allies.charName, 0, 0, 5, 1)
 	end
 end
-menu.combo:dropdown("eusage", "E Usage", 2, {"Always", "Logic", "Never"})
+menu.combo:dropdown("eusage", "E Usage on Enemy", 2, {"Always", "Logic", "Never"})
 menu.combo:menu("rset", "R Settings")
 menu.combo.rset:boolean("rcombo", "Use R in Combo", true)
 menu.combo.rset:slider("hitr", " ^- if Knocks Up X Enemies", 2, 1, 5, 1)
@@ -243,7 +247,7 @@ menu.misc:boolean("GapAS", "Use W for Anti-Gapclose", true)
 menu.misc:menu("blacklist", "Anti-Gapclose Blacklist")
 local enemy = common.GetEnemyHeroes()
 for i, allies in ipairs(enemy) do
-	menu.misc.blacklist:boolean(allies.charName, "Block: " .. allies.charName, false)
+	menu.misc.blacklist:boolean(allies.charName, "Don't use on: " .. allies.charName, false)
 end
 menu.misc:menu("interrupt", "Interrupt Settings")
 menu.misc.interrupt:boolean("intw", "Use W to Interrupt", true)
@@ -281,7 +285,7 @@ end
 menu:menu("blacklist", "R Blacklist")
 local enemy = common.GetAllyHeroes()
 for i, allies in ipairs(enemy) do
-	menu.blacklist:boolean(allies.charName, "Block: " .. allies.charName, false)
+	menu.blacklist:boolean(allies.charName, "Don't use on: " .. allies.charName, false)
 end
 menu:menu("keys", "Key Settings")
 menu.keys:keybind("combokey", "Combo Key", "Space", nil)
@@ -295,7 +299,7 @@ menu.SpellsMenu:boolean("priority", "Priority Ally", true)
 menu.SpellsMenu:menu("blacklist", "Ally Shield Blacklist")
 local enemy = common.GetAllyHeroes()
 for i, allies in ipairs(enemy) do
-	menu.SpellsMenu.blacklist:boolean(allies.charName, "Block: " .. allies.charName, false)
+	menu.SpellsMenu.blacklist:boolean(allies.charName, "Don't use on: " .. allies.charName, false)
 end
 menu.SpellsMenu:header("hello", " -- Enemy Skillshots -- ")
 for _, i in pairs(database) do
@@ -352,12 +356,12 @@ local function PrioritizedAllyW()
 		local hero = objManager.allies[i]
 		if not player.isRecalling then
 			if
-				hero.team == TEAM_ALLY and not hero.isDead and menu.combo.wset[hero.charName]:get() > 0 and
+				hero.team == TEAM_ALLY and not hero.isDead and menu.combo.settingsww.wset[hero.charName]:get() > 0 and
 					hero.pos:dist(player.pos) <= spellW.range
 			 then
 				if heroTarget == nil then
 					heroTarget = hero
-				elseif menu.combo.wset[hero.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
+				elseif menu.combo.wset[hero.charName]:get() < menu.combo.settingsww.wset[heroTarget.charName]:get() then
 					heroTarget = hero
 				end
 			end
@@ -473,29 +477,32 @@ local PSpells = {
 	"CamilleQAttackEmpowered",
 	"CamilleQAttack",
 	"PowerFistAttack",
-	"AsheQAttack"
+	"AsheQAttack",
+	"jinxqattack",
+	"jinxqattack2",
+	"KogMawBioArcaneBarrage"
 }
 local function AutoInterrupt(spell)
 	--	print("int")
 
-	if menu.combo.wcombo:get() then
+	if menu.combo.settingsww.wcombo:get() then
 		local heroTarget = nil
 		if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY and spell.target.type == TYPE_HERO then
 			for i = 1, #PSpells do
 				if
 					spell.name:lower():find(PSpells[i]:lower()) and spell.owner.pos:dist(player.pos) <= spellW.range and
-						menu.combo.wset[spell.owner.charName]:get() > 0
+						menu.combo.settingsww.wset[spell.owner.charName]:get() > 0
 				 then
 					if heroTarget == nil then
 						heroTarget = spell.owner
-					elseif menu.combo.wset[hero.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
+					elseif menu.combo.settingsww.wset[hero.charName]:get() < menu.combo.settingsww.wset[heroTarget.charName]:get() then
 						heroTarget = spell.owner
 					end
 					if (heroTarget) then
-						if menu.combo.wset.enablew:get() then
+						if menu.combo.settingsww.wset.enablew:get() then
 							player:castSpell("obj", 1, heroTarget)
 						end
-						if menu.combo.wset.enablee:get() then
+						if menu.combo.settingsww.wset.enablee:get() then
 							player:castSpell("obj", 2, heroTarget)
 						end
 					end
@@ -503,18 +510,18 @@ local function AutoInterrupt(spell)
 			end
 			if
 				spell.name:find("BasicAttack") and spell.owner.pos:dist(player.pos) <= spellW.range and
-					menu.combo.wset[spell.owner.charName]:get() > 0
+					menu.combo.settingsww.wset[spell.owner.charName]:get() > 0
 			 then
 				if heroTarget == nil then
 					heroTarget = spell.owner
-				elseif menu.combo.wset[hero.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
+				elseif menu.combo.settingsww.wset[hero.charName]:get() < menu.combo.settingsww.wset[heroTarget.charName]:get() then
 					heroTarget = spell.owner
 				end
 				if (heroTarget) then
-					if menu.combo.wset.enablew:get() then
+					if menu.combo.settingsww.wset.enablew:get() then
 						player:castSpell("obj", 1, heroTarget)
 					end
-					if menu.combo.wset.enablee:get() then
+					if menu.combo.settingsww.wset.enablee:get() then
 						player:castSpell("obj", 2, heroTarget)
 					end
 				end
@@ -523,18 +530,18 @@ local function AutoInterrupt(spell)
 		if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY then
 			if
 				spell.name:find("KogMawBioArcaneBarrage") and spell.owner.pos:dist(player.pos) <= spellW.range and
-					menu.combo.wset[spell.owner.charName]:get() > 0
+					menu.combo.settingsww.wset[spell.owner.charName]:get() > 0
 			 then
 				if heroTarget == nil then
 					heroTarget = spell.owner
-				elseif menu.combo.wset[hero.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
+				elseif menu.combo.settingsww.wset[hero.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
 					heroTarget = spell.owner
 				end
 				if (heroTarget) then
-					if menu.combo.wset.enablew:get() then
+					if menu.combo.settingsww.wset.enablew:get() then
 						player:castSpell("obj", 1, heroTarget)
 					end
-					if menu.combo.wset.enablee:get() then
+					if menu.combo.settingsww.wset.enablee:get() then
 						player:castSpell("obj", 2, heroTarget)
 					end
 				end
@@ -739,18 +746,20 @@ local function AutoInterrupt(spell)
 end
 local function WGapcloser()
 	if player:spellSlot(1).state == 0 and menu.misc.GapAS:get() then
-		for i = 0, objManager.enemies_n - 1 do
-			local dasher = objManager.enemies[i]
-			if dasher.type == TYPE_HERO and dasher.team == TEAM_ENEMY then
-				if
-					dasher and common.IsValidTarget(dasher) and dasher.path.isActive and dasher.path.isDashing and
-						player.pos:dist(dasher.path.point[1]) < 650
-				 then
-					if menu.misc.blacklist[dasher.charName] and not menu.misc.blacklist[dasher.charName]:get() then
-						if player.pos2D:dist(dasher.path.point2D[1]) < player.pos2D:dist(dasher.path.point2D[0]) then
-							player:castSpell("obj", 1, dasher)
-						end
-					end
+		local target =
+			TS.get_result(
+			function(res, obj, dist)
+				if dist <= spellW.range and obj.path.isActive and obj.path.isDashing then --add invulnverabilty check
+					res.obj = obj
+					return true
+				end
+			end
+		).obj
+		if target then
+			local pred_pos = preds.core.lerp(target.path, network.latency, target.path.dashSpeed)
+			if pred_pos and pred_pos:dist(player.path.serverPos2D) <= spellW.range then
+				if menu.misc.blacklist[target.charName] and not menu.misc.blacklist[target.charName]:get() then
+					player:castSpell("obj", 1, target)
 				end
 			end
 		end
@@ -912,11 +921,11 @@ local function Harass()
 end
 
 local function Combo()
-	if menu.combo.wcomboenemy:get() then
+	if menu.combo.settingsww.wcomboenemy:get() then
 		local target = GetTargetQ()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) and target.pos:dist(player.pos) <= spellW.range then
-				if menu.combo.wblacklist[target.charName] and not menu.combo.wblacklist[target.charName]:get() then
+				if menu.combo.settingsww.wblacklist[target.charName] and not menu.combo.settingsww.wblacklist[target.charName]:get() then
 					player:castSpell("obj", 1, target)
 				end
 			end

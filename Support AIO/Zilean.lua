@@ -28,9 +28,9 @@ local common = avada_lib.common
 local dmglib = avada_lib.damageLib
 
 local spellQ = {
-	delay = 0.7,
-	radius = 140,
-	speed = 5000,
+	delay = 0.75,
+	radius = 130,
+	speed = math.huge,
 	range = 900,
 	boundingRadiusMod = 1
 }
@@ -281,7 +281,10 @@ local PSpells = {
 	"CamilleQAttackEmpowered",
 	"CamilleQAttack",
 	"PowerFistAttack",
-	"AsheQAttack"
+	"AsheQAttack",
+	"jinxqattack",
+	"jinxqattack2",
+	"KogMawBioArcaneBarrage"
 }
 local function AutoInterrupt(spell)
 	for i = 0, objManager.allies_n - 1 do
@@ -462,7 +465,6 @@ local function Harass()
 							local pos = preds.circular.get_prediction(spellQ, target)
 							if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
 								player:castSpell("self", 1)
-								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 							end
 						end
 					end
@@ -476,7 +478,6 @@ local function Harass()
 						local pos = preds.circular.get_prediction(spellQ, target)
 						if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
 							player:castSpell("self", 1)
-							player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 						end
 					end
 				end
@@ -519,8 +520,6 @@ local function Combo()
 									local pos = preds.circular.get_prediction(spellQ, target)
 									if pos and pos.startPos:dist(pos.endPos) <= spellQ.range then
 										player:castSpell("self", 1)
-
-										player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 									end
 								end
 							end
@@ -534,7 +533,6 @@ local function Combo()
 								local pos = preds.circular.get_prediction(spellQ, target)
 								if pos and pos.startPos:dist(pos.endPos) <= spellQ.range then
 									player:castSpell("self", 1)
-									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 								end
 							end
 						end
@@ -570,7 +568,6 @@ local function Combo()
 								local pos = preds.circular.get_prediction(spellQ, target)
 								if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
 									player:castSpell("self", 1)
-									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 								end
 							end
 						end
@@ -584,7 +581,6 @@ local function Combo()
 							local pos = preds.circular.get_prediction(spellQ, target)
 							if pos and pos.startPos:dist(pos.endPos) < spellQ.range then
 								player:castSpell("self", 1)
-								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 							end
 						end
 					end

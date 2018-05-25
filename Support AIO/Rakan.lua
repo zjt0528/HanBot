@@ -305,7 +305,10 @@ local PSpells = {
 	"CamilleQAttackEmpowered",
 	"CamilleQAttack",
 	"PowerFistAttack",
-	"AsheQAttack"
+	"AsheQAttack",
+	"jinxqattack",
+	"jinxqattack2",
+	"KogMawBioArcaneBarrage"
 }
 local function AutoInterrupt(spell)
 	if spell and spell.owner and spell.owner == player and spell.name == "RakanQ" then
