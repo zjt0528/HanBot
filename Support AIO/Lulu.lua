@@ -132,10 +132,9 @@ for i, allies in ipairs(enemy) do
 end
 
 menu.combo.settingsww:header("uhhh", " -- W Ally -- ")
-menu.combo.settingsww:boolean("wcombo", "Auto W on Ally", true)
-menu.combo.settingsww:menu("wset", " ^- W Priority for Ally")
-menu.combo.settingsww.wset:boolean("enablew", "Enable W usage", true)
-menu.combo.settingsww.wset:boolean("enablee", "Enable E usage ", false)
+menu.combo.settingsww:boolean("enablew", "Auto W on Ally Auto Attack", true)
+menu.combo.settingsww:boolean("enablee", "Auto E on Ally Auto Attacks", false)
+menu.combo.settingsww:menu("wset", "Ally Priority Settings")
 menu.combo.settingsww.wset:header("uhhh", "0 - Disabled, 1 - Biggest Priority, 5 - Lowest Priority")
 local enemy = common.GetAllyHeroes()
 for i, allies in ipairs(enemy) do
@@ -244,11 +243,25 @@ menu.draws:boolean("drawpix", "Draw Pix Position", true)
 menu.draws:boolean("drawrangespix", "Draw Ranges from Pix", true)
 
 menu:menu("misc", "Misc.")
-menu.misc:boolean("GapAS", "Use W for Anti-Gapclose", true)
-menu.misc:menu("blacklist", "Anti-Gapclose Blacklist")
+menu.misc:menu("antigap", "Anti-Gapclose settings")
+menu.misc.antigap:header("hello", " -- Enemy Dashes -- ")
+menu.misc.antigap:boolean("GapAS", "Use W for Anti-Gapclose on Dashes", true)
+menu.misc.antigap:menu("blacklist", "Anti-Gapclose Blacklist")
 local enemy = common.GetEnemyHeroes()
 for i, allies in ipairs(enemy) do
-	menu.misc.blacklist:boolean(allies.charName, "Don't use on: " .. allies.charName, false)
+	menu.misc.antigap.blacklist:boolean(allies.charName, "Don't use on: " .. allies.charName, false)
+end
+menu.misc.antigap:header("hello", " -- Distance Check -- ")
+menu.misc.antigap:boolean("GapASW", "Use W if Enemy is near Ally", false)
+menu.misc.antigap:menu("blacklistally", "Ally Blacklist")
+local enemy = common.GetAllyHeroes()
+for i, allies in ipairs(enemy) do
+	menu.misc.antigap.blacklistally:boolean(allies.charName, "Don't check from: " .. allies.charName, true)
+end
+menu.misc.antigap:menu("blacklistenemy", "Enemy Blacklist")
+local enemy = common.GetEnemyHeroes()
+for i, allies in ipairs(enemy) do
+	menu.misc.antigap.blacklistenemy:boolean(allies.charName, "Don't check: " .. allies.charName, false)
 end
 menu.misc:menu("interrupt", "Interrupt Settings")
 menu.misc.interrupt:boolean("intw", "Use W to Interrupt", true)
@@ -484,33 +497,77 @@ local PSpells = {
 	"KogMawBioArcaneBarrage"
 }
 local function AutoInterrupt(spell)
-	--	print("int")
-
-	if menu.combo.settingsww.wcombo:get() then
-		local heroTarget = nil
-		if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY and spell.target.type == TYPE_HERO then
-			for i = 1, #PSpells do
-				if
-					spell.name:lower():find(PSpells[i]:lower()) and spell.owner.pos:dist(player.pos) <= spellW.range and
-						menu.combo.settingsww.wset[spell.owner.charName]:get() > 0
-				 then
-					if heroTarget == nil then
-						heroTarget = spell.owner
-					elseif menu.combo.settingsww.wset[hero.charName]:get() < menu.combo.settingsww.wset[heroTarget.charName]:get() then
-						heroTarget = spell.owner
-					end
-					if (heroTarget) then
-						if menu.combo.settingsww.wset.enablew:get() then
-							player:castSpell("obj", 1, heroTarget)
-						end
-						if menu.combo.settingsww.wset.enablee:get() then
-							player:castSpell("obj", 2, heroTarget)
+	if player:spellSlot(1).state == 0 and menu.misc.antigap.GapASW:get() then
+		for i = 0, objManager.enemies_n - 1 do
+			local enemies = objManager.enemies[i]
+			if
+				enemies and not enemies.isDead and enemies.isVisible and enemies.isTargetable and
+					player.pos:dist(enemies) < spellW.range
+			 then
+				local allies = common.GetAllyHeroes()
+				for z, ally in ipairs(allies) do
+					if ally and not ally.isDead and ally.isVisible then
+						if
+							menu.misc.antigap.blacklistally[ally.charName] and not menu.misc.antigap.blacklistally[ally.charName]:get() and
+								ally.pos:dist(enemies.pos) <= 470
+						 then
+							if
+								menu.misc.antigap.blacklistenemy[enemies.charName] and
+									not menu.misc.antigap.blacklistenemy[enemies.charName]:get()
+							 then
+								if ally.pos2D:dist(enemies.path.point2D[1]) < ally.pos2D:dist(enemies.path.point2D[0]) then
+									player:castSpell("obj", 1, enemies)
+								end
+							end
 						end
 					end
 				end
 			end
+		end
+	end
+	if player:spellSlot(1).state == 0 and menu.misc.antigap.GapASW:get() then
+		local allies = common.GetAllyHeroes()
+		for z, ally in ipairs(allies) do
+			if ally then
+				if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
+					for i = 1, #PSpells do
+						if spell.name:lower():find(PSpells[i]:lower()) then
+							if
+								menu.misc.antigap.blacklistally[ally.charName] and not menu.misc.antigap.blacklistally[ally.charName]:get() and
+									spell.owner.pos:dist(player.pos) <= spellW.range
+							 then
+								if
+									menu.misc.antigap.blacklistenemy[spell.owner.charName] and
+										not menu.misc.antigap.blacklistenemy[spell.owner.charName]:get()
+								 then
+									player:castSpell("obj", 1, enemies)
+								end
+							end
+						end
+					end
+					if spell.name:find("BasicAttack") then
+						if
+							menu.misc.antigap.blacklistally[ally.charName] and not menu.misc.antigap.blacklistally[ally.charName]:get() and
+								spell.owner.pos:dist(player.pos) <= spellW.range
+						 then
+							if
+								menu.misc.antigap.blacklistenemy[spell.owner.charName] and
+									not menu.misc.antigap.blacklistenemy[spell.owner.charName]:get()
+							 then
+								player:castSpell("obj", 1, enemies)
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	local heroTarget = nil
+	if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY and spell.target.type == TYPE_HERO then
+		for i = 1, #PSpells do
 			if
-				spell.name:find("BasicAttack") and spell.owner.pos:dist(player.pos) <= spellW.range and
+				spell.name:lower():find(PSpells[i]:lower()) and spell.owner.pos:dist(player.pos) <= spellW.range and
 					menu.combo.settingsww.wset[spell.owner.charName]:get() > 0
 			 then
 				if heroTarget == nil then
@@ -519,36 +576,55 @@ local function AutoInterrupt(spell)
 					heroTarget = spell.owner
 				end
 				if (heroTarget) then
-					if menu.combo.settingsww.wset.enablew:get() then
+					if menu.combo.settingsww.enablew:get() then
 						player:castSpell("obj", 1, heroTarget)
 					end
-					if menu.combo.settingsww.wset.enablee:get() then
+					if menu.combo.settingsww.enablee:get() then
 						player:castSpell("obj", 2, heroTarget)
 					end
 				end
 			end
 		end
-		if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY then
-			if
-				spell.name:find("KogMawBioArcaneBarrage") and spell.owner.pos:dist(player.pos) <= spellW.range and
-					menu.combo.settingsww.wset[spell.owner.charName]:get() > 0
-			 then
-				if heroTarget == nil then
-					heroTarget = spell.owner
-				elseif menu.combo.settingsww.wset[hero.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
-					heroTarget = spell.owner
+		if
+			spell.name:find("BasicAttack") and spell.owner.pos:dist(player.pos) <= spellW.range and
+				menu.combo.settingsww.wset[spell.owner.charName]:get() > 0
+		 then
+			if heroTarget == nil then
+				heroTarget = spell.owner
+			elseif menu.combo.settingsww.wset[hero.charName]:get() < menu.combo.settingsww.wset[heroTarget.charName]:get() then
+				heroTarget = spell.owner
+			end
+			if (heroTarget) then
+				if menu.combo.settingsww.enablew:get() then
+					player:castSpell("obj", 1, heroTarget)
 				end
-				if (heroTarget) then
-					if menu.combo.settingsww.wset.enablew:get() then
-						player:castSpell("obj", 1, heroTarget)
-					end
-					if menu.combo.settingsww.wset.enablee:get() then
-						player:castSpell("obj", 2, heroTarget)
-					end
+				if menu.combo.settingsww.enablee:get() then
+					player:castSpell("obj", 2, heroTarget)
 				end
 			end
 		end
 	end
+	if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY then
+		if
+			spell.name:find("KogMawBioArcaneBarrage") and spell.owner.pos:dist(player.pos) <= spellW.range and
+				menu.combo.settingsww.wset[spell.owner.charName]:get() > 0
+		 then
+			if heroTarget == nil then
+				heroTarget = spell.owner
+			elseif menu.combo.settingsww.wset[hero.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
+				heroTarget = spell.owner
+			end
+			if (heroTarget) then
+				if menu.combo.settingsww.enablew:get() then
+					player:castSpell("obj", 1, heroTarget)
+				end
+				if menu.combo.settingsww.enablee:get() then
+					player:castSpell("obj", 2, heroTarget)
+				end
+			end
+		end
+	end
+
 	if menu.SpellsMenu.targeteteteteteed:get() then
 		local allies = common.GetAllyHeroes()
 		for z, ally in ipairs(allies) do
@@ -746,7 +822,7 @@ local function AutoInterrupt(spell)
 	end
 end
 local function WGapcloser()
-	if player:spellSlot(1).state == 0 and menu.misc.GapAS:get() then
+	if player:spellSlot(1).state == 0 and menu.misc.antigap.GapAS:get() then
 		local target =
 			TS.get_result(
 			function(res, obj, dist)
@@ -759,7 +835,7 @@ local function WGapcloser()
 		if target then
 			local pred_pos = preds.core.lerp(target.path, network.latency, target.path.dashSpeed)
 			if pred_pos and pred_pos:dist(player.path.serverPos2D) <= spellW.range then
-				if menu.misc.blacklist[target.charName] and not menu.misc.blacklist[target.charName]:get() then
+				if menu.misc.antigap.blacklist[target.charName] and not menu.misc.antigap.blacklist[target.charName]:get() then
 					player:castSpell("obj", 1, target)
 				end
 			end
