@@ -466,6 +466,7 @@ local PlvlDmg = {25, 37.5, 50}
 local PDamages = {68, 72, 77, 82, 89, 96, 103, 112, 121, 131, 142, 154, 166, 180, 194, 208, 224, 240}
 local function PDamage(target)
 	local damage = 0
+	local leveldamage = 0
 	if (player.levelRef >= 1 and player.levelRef < 6) then
 		leveldamage = 0.55
 	end
