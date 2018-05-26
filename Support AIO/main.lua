@@ -1,3 +1,4 @@
+
 local avada_lib = module.lib("avada_lib")
 if not avada_lib then
 	print("")
@@ -30,6 +31,7 @@ elseif avada_lib.version < 1 then
 	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
 	return
 end
+
 if player.charName == "Janna" then
 	module.load("SupportAIO" .. player.charName, "Janna")
 end

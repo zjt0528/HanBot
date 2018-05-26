@@ -185,6 +185,16 @@ menu:keybind("engage", "W Q Flash", "G", nil)
 menu:keybind("Insec", "Insec", "A", nil)
 
 local function AutoInterrupt(spell)
+	if menu.combo.qcombo:get() then
+		if
+			spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ALLY and spell.owner == player and
+				spell.target.team == TEAM_ENEMY
+		 then
+			if spell.name == "Headbutt" then
+				player:castSpell("self", 0)
+			end
+		end
+	end
 	if menu.misc.interrupt.intq:get() and player:spellSlot(0).state == 0 then
 		if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY then
 			local enemyName = string.lower(spell.owner.charName)
