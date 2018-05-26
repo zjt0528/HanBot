@@ -120,6 +120,7 @@ local menu = menu("SupportAIO" .. player.charName, "Support AIO - Lulu")
 menu:menu("combo", "Combo")
 
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
+menu.combo:slider("qrange", " ^- Max. Range", 700, 0, 925, 5)
 menu.combo:boolean("useeq", "Use E > Q Extended", false)
 menu.combo:menu("settingsww", "W Settings")
 menu.combo.settingsww:header("uhhh", " -- W Enemy -- ")
@@ -552,7 +553,7 @@ local function AutoInterrupt(spell)
 		local allies = common.GetAllyHeroes()
 		for z, ally in ipairs(allies) do
 			if ally then
-				if not menu.SpellsMenu.blacklist[ally.charName]:get() then
+				if menu.SpellsMenu.blacklist[ally.charName] and not menu.SpellsMenu.blacklist[ally.charName]:get() then
 					if spell and spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY and spell.target == ally then
 						if not spell.name:find("crit") then
 							if not spell.name:find("BasicAttack") then
@@ -840,12 +841,12 @@ local function Harass()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
 				local pos = preds.linear.get_prediction(spellQ, target)
-				if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
+				if pos and pos.startPos:dist(pos.endPos) < menu.combo.qrange:get() then
 					player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
 
 				local pos = preds.linear.get_prediction(spellQ, target)
-				if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
+				if pos and pos.startPos:dist(pos.endPos) < menu.combo.qrange:get() then
 					player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
 			end
@@ -936,12 +937,12 @@ local function Combo()
 		if target and target.isVisible then
 			if common.IsValidTarget(target) then
 				local pos = preds.linear.get_prediction(spellQ, target)
-				if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
+				if pos and pos.startPos:dist(pos.endPos) < menu.combo.qrange:get() then
 					player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
 
 				local pos = preds.linear.get_prediction(spellQ, target)
-				if pos and pos.startPos:dist(pos.endPos) < spellQ.range - 50 then
+				if pos and pos.startPos:dist(pos.endPos) < menu.combo.qrange:get() then
 					player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 				end
 			end
@@ -1430,7 +1431,7 @@ local function OnDraw()
 	--print("Drawing")
 	if player.isOnScreen then
 		if menu.draws.drawq:get() then
-			graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 100)
+			graphics.draw_circle(player.pos, menu.combo.qrange:get(), 2, menu.draws.colorq:get(), 100)
 		end
 		if menu.draws.drawe:get() then
 			graphics.draw_circle(player.pos, spellE.range, 2, menu.draws.colore:get(), 100)
