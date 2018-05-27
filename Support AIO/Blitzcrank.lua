@@ -125,6 +125,7 @@ local menu = menu("SupportAIO" .. player.charName, "Support AIO - Blitzcrank")
 menu:menu("combo", "Combo")
 
 menu.combo:boolean("qcombo", "Use Q in Combo", true)
+menu.combo:boolean("slowpredictions", " ^- Use Slow Predictions", false)
 menu.combo:boolean("ecombo", "Use E in Combo", true)
 menu.combo:boolean("rcombo", "Use R in Combo", true)
 menu.combo:slider("hitr", " ^- If Hits X Enemies", 2, 1, 5, 1)
@@ -298,6 +299,20 @@ local function count_enemies_in_range(pos, range)
 	return enemies_in_range
 end
 
+local trace_filter = function(input, segment, target)
+	if preds.trace.linear.hardlock(input, segment, target) then
+		return true
+	end
+	if preds.trace.linear.hardlockmove(input, segment, target) then
+		return true
+	end
+	if segment.startPos:dist(segment.endPos) <= 625 then
+		return true
+	end
+	if preds.trace.newpath(target, 0.033, 0.5) then
+		return true
+	end
+end
 local function Combo()
 	local target = GetTargetQ()
 	if target and target.isVisible then
@@ -308,7 +323,12 @@ local function Combo()
 					if not preds.collision.get_prediction(spellQ, pos, target) then
 						if target.pos:dist(player.pos) >= menu.qset.minq:get() then
 							if not menu.qset.blacklist[target.charName]:get() then
-								player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+								if menu.combo.slowpredictions:get() and trace_filter(spellQ, pos, target) then
+									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+								end
+								if not menu.combo.slowpredictions:get() then
+									player:castSpell("pos", 0, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
+								end
 							end
 						end
 					end
