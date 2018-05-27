@@ -592,7 +592,7 @@ end
 
 local allow = true
 local timer = 0
-local meowsomethinggggg
+local meowsomethinggggg = 0
 local function OnTick()
 	if not evade then
 		print(" ")
