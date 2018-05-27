@@ -548,8 +548,6 @@ local function KillSteal()
 	end
 end
 
-
-
 local function JungleClear()
 	if menu.laneclear.farmq:get() then
 		local enemyMinionsQ = common.GetMinionsInRange(spellQ.range, TEAM_NEUTRAL)
@@ -660,9 +658,6 @@ local function LastHit()
 	end
 end
 
-
-
-
 local function OnDraw()
 	if menu.draws.drawq:get() then
 		graphics.draw_circle(player.pos, spellQ.range, 2, menu.draws.colorq:get(), 100)
@@ -678,8 +673,8 @@ local function OnDraw()
 	--	graphics.draw_circle(player.pos, spellR.range + spellW.range-20, 2, menu.draws.colorwr:get(), 100)
 	--end
 	if menu.draws.drawgapclose:get() then
-		local minion = GetClosestMobToEnemy(targets)
-		local minions = GetClosestJungleEnemy(targets)
+		local minion = GetClosestMobToEnemy()
+		local minions = GetClosestJungleEnemy()
 
 		local targets = GetTargetGap()
 		if common.IsValidTarget(targets) then
