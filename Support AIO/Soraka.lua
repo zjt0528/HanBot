@@ -131,7 +131,6 @@ menu:menu("harass", "Harass")
 menu.harass:boolean("qcombo", "Use Q in Harass", true)
 menu.harass:boolean("ecombo", "Use E in Harass", true)
 
-
 menu:menu("wpriority", "Healing")
 menu.wpriority:header("something", " -- W Settings -- ")
 menu.wpriority:boolean("enable", "Enable Auto W", true)

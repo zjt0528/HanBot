@@ -489,7 +489,7 @@ local function AutoInterrupt(spell)
 				 then
 					if heroTarget == nil then
 						heroTarget = spell.owner
-					elseif menu.boost.wset[hero.charName]:get() < menu.boost.wset[heroTarget.charName]:get() then
+					elseif menu.boost.wset[spell.owner.charName]:get() < menu.boost.wset[heroTarget.charName]:get() then
 						heroTarget = spell.owner
 					end
 					if (heroTarget) then
@@ -503,7 +503,7 @@ local function AutoInterrupt(spell)
 			 then
 				if heroTarget == nil then
 					heroTarget = spell.owner
-				elseif menu.boost.wset[hero.charName]:get() < menu.boost.wset[heroTarget.charName]:get() then
+				elseif menu.boost.wset[spell.owner.charName]:get() < menu.boost.wset[heroTarget.charName]:get() then
 					heroTarget = spell.owner
 				end
 				if (heroTarget) then
