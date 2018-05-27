@@ -71,3 +71,11 @@ end
 if player.charName == "Bard" then
 	module.load("SupportAIO" .. player.charName, "Bard")
 end
+if player.charName == "Braum" then
+	module.load("SupportAIO" .. player.charName, "Braum")
+end
+if player.charName == "Taric" then
+	module.load("SupportAIO" .. player.charName, "Taric")
+end
+
+

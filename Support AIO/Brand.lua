@@ -30,7 +30,7 @@ local dmglib = avada_lib.damageLib
 local spellQ = {
 	range = 1050,
 	delay = 0.25,
-	width = 78,
+	width = 70,
 	speed = 1600,
 	boundingRadiusMod = 1,
 	collision = {
@@ -42,7 +42,7 @@ local spellQ = {
 local spellW = {
 	range = 900,
 	delay = 0.85,
-	radius = 200,
+	radius = 180,
 	speed = 2900,
 	boundingRadiusMod = 1
 }
@@ -766,6 +766,23 @@ local function OnTick()
 	Killsteal()
 	Toggle()
 	if menu.keys.combokey:get() then
+		if menu.combo.wcombo:get() then
+			local target =
+				TS.get_result(
+				function(res, obj, dist)
+					if dist <= spellW.range and obj.path.isActive and obj.path.isDashing then --add invulnverabilty check
+						res.obj = obj
+						return true
+					end
+				end
+			).obj
+			if target then
+				local pred_pos = preds.core.lerp(target.path, network.latency + spellW.delay, target.path.dashSpeed)
+				if pred_pos and pred_pos:dist(player.path.serverPos2D) <= spellW.range then
+					player:castSpell("pos", 1, vec3(pred_pos.x, target.y, pred_pos.y))
+				end
+			end
+		end
 		Combo()
 	end
 	if menu.keys.harasskey:get() then
