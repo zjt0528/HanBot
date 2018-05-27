@@ -483,13 +483,13 @@ local function PDamage(target)
 		if objs then
 			if target.pos:dist(objs.pos) < 450 then
 				local damage = 0
-
-				damage =
-					CalcMagicDmg(
-					target,
-					(PDamages[player.levelRef] + (common.GetBonusAD() - common.GetTotalAD() / 2) + (common.GetTotalAP() * leveldamage))
-				)
-
+				if player.levelRef <= 18 then
+					damage =
+						CalcMagicDmg(target, (PDamages[player.levelRef] + common.GetBonusAD() + (common.GetTotalAP() * leveldamage)))
+				end
+				if player.levelRef > 18 then
+					damage = CalcMagicDmg(target, (PDamages[18] + common.GetBonusAD() + (common.GetTotalAP() * leveldamage)))
+				end
 				return damage
 			end
 		end
