@@ -87,6 +87,7 @@ menu.draws:color("colore", "  ^- Color", 255, 233, 121, 121)
 menu.draws:boolean("draweally", "Draw E Range from Allies", true)
 menu.draws:boolean("drawwmax", "Draw W Max Range", true)
 menu:menu("miscc", "Misc.")
+menu.miscc:boolean("blockevade", "Disable Evade while using E", false)
 menu.miscc:menu("misc", "Anti-Gapclose Settings")
 menu.miscc.misc:boolean("GapA", "Use E for Anti-Gapclose", true)
 menu.miscc.misc:menu("blacklist", "Anti-Gapclose Blacklist")
@@ -229,12 +230,19 @@ local PSpells = {
 	"KogMawBioArcaneBarrage"
 }
 local blade = {}
+local echeck = false
 local function DeleteObj(object)
 	if object and object.name:find("W_buff_indicator") then
 		blade[object.ptr] = nil
 	end
+	if object and object.name:find("E_Indicator") then
+		echeck = false
+	end
 end
 local function CreateObj(object)
+	if object and object.name:find("E_Indicator") then
+		echeck = true
+	end
 	if object and object.name:find("W_buff_indicator") then
 		local enemy = common.GetAllyHeroes()
 		for i, allies in ipairs(enemy) do
@@ -753,6 +761,15 @@ local function PrioritizedAllyLow()
 end
 
 local function OnTick()
+	if menu.miscc.blockevade:get() then
+		if evade then
+			if echeck then
+				evade.core.set_pause(math.huge)
+			else
+				evade.core.set_pause(0)
+			end
+		end
+	end
 	if menu.combo.semir:get() then
 		if PrioritizedAllyLow() then
 			player:castSpell("obj", 1, PrioritizedAllyLow())
