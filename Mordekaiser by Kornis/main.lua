@@ -93,7 +93,9 @@ menu.harass:boolean("ecombo", "Use E in Harass", true)
 menu:menu("farming", "Farming")
 menu.farming:menu("laneclear", "Lane Clear")
 menu.farming.laneclear:boolean("farmq", "Use Q to Farm", true)
-menu.farming.laneclear:boolean("lastq", " ^-Only for Last Hit", true)
+menu.farming.laneclear:boolean("lastq", " ^- Only for Last Hit", true)
+menu.farming.laneclear:boolean("usew", "Use W in Lane Clear", true)
+menu.farming.laneclear:slider("chargew", " ^- Release After (seconds)", 2, 1, 5, 1)
 menu.farming.laneclear:boolean("farme", "Use E in Lane Clear", true)
 menu.farming.laneclear:slider("hitse", " ^- if Hits X Minions", 3, 1, 6, 1)
 menu.farming:menu("jungleclear", "Jungle Clear")
@@ -189,6 +191,7 @@ function GetExtraDamage(target)
 end
 local wtime = 0
 local wtimejungle = 0
+local wtimelane = 0
 local allow = true
 local function AutoInterrupt(spell)
 	if
@@ -202,6 +205,7 @@ local function AutoInterrupt(spell)
 	if spell.owner.charName == "Mordekaiser" then
 		if spell.name == "MordekaiserCreepingDeathCast" then
 			wtime = os.clock() + menu.combo.chargew:get()
+			wtimelane = os.clock() + menu.farming.laneclear.chargew:get()
 			wtimejungle = os.clock() + menu.farming.jungleclear.chargew:get()
 		end
 	end
@@ -620,6 +624,24 @@ local function LaneClear()
 								end
 							end
 						end
+					end
+				end
+			end
+		end
+		if menu.farming.jungleclear.usew:get() and player:spellSlot(1).state == 0 then
+			for i = 0, objManager.minions.size[TEAM_ENEMY] - 1 do
+				local minion = objManager.minions[TEAM_ENEMY][i]
+				if
+					minion and minion.isVisible and minion.moveSpeed > 0 and minion.isTargetable and not minion.isDead and
+						minion.pos:dist(player.pos) < 350
+				 then
+					if player.buff["mordekaiserwactive"] or player.buff["mordekaiserwinactive"] then
+						if minion.pos:dist(player.pos) < 300 and allow and os.clock() > wtimelane then
+							player:castSpell("self", 1)
+						end
+					end
+					if not player.buff["mordekaiserwactive"] and not player.buff["mordekaiserwinactive"] then
+						player:castSpell("self", 1)
 					end
 				end
 			end
