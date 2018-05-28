@@ -444,7 +444,7 @@ local function Harass()
 								if ally then
 									if ally.pos:dist(player.pos) < 1200 and ally.buff["taricwallybuff"] then
 										local pos = preds.linear.get_prediction(spellE, enemies, ally)
-										if target.pos:dist(player.path.point[1]) < target.pos:dist(player.path.point[0]) then
+										if enemies.pos:dist(player.path.point[1]) < enemies.pos:dist(player.path.point[0]) then
 											if pos and pos.startPos:dist(pos.endPos) < spellE.range + 100 then
 												player:castSpell("pos", 2, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 											end
@@ -607,7 +607,7 @@ local function Combo()
 								if ally then
 									if ally.pos:dist(player.pos) < 1200 and ally.buff["taricwallybuff"] then
 										local pos = preds.linear.get_prediction(spellE, enemies, ally)
-										if target.pos:dist(player.path.point[1]) < target.pos:dist(player.path.point[0]) then
+										if enemies.pos:dist(player.path.point[1]) < enemies.pos:dist(player.path.point[0]) then
 											if pos and pos.startPos:dist(pos.endPos) < spellE.range + 100 then
 												player:castSpell("pos", 2, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 											end
