@@ -375,7 +375,7 @@ local function PrioritizedAllyW()
 			 then
 				if heroTarget == nil then
 					heroTarget = hero
-				elseif menu.combo.wset[hero.charName]:get() < menu.combo.settingsww.wset[heroTarget.charName]:get() then
+				elseif menu.combo.settingsww.wset[hero.charName]:get() < menu.combo.settingsww.wset[heroTarget.charName]:get() then
 					heroTarget = hero
 				end
 			end
@@ -613,7 +613,9 @@ local function AutoInterrupt(spell)
 		 then
 			if heroTarget == nil then
 				heroTarget = spell.owner
-			elseif menu.combo.settingsww.wset[spell.owner.charName]:get() < menu.combo.wset[heroTarget.charName]:get() then
+			elseif
+				menu.combo.settingsww.wset[spell.owner.charName]:get() < menu.combo.settingsww.wsett[heroTarget.charName]:get()
+			 then
 				heroTarget = spell.owner
 			end
 			if (heroTarget) then
