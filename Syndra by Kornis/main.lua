@@ -98,9 +98,6 @@ local interruptableSpells = {
 		{menuslot = "W", slot = 1, spellname = "drain", channelduration = 5},
 		{menuslot = "R", slot = 3, spellname = "crowstorm", channelduration = 1.5}
 	},
-	["gragas"] = {
-		{menuslot = "W", slot = 1, spellname = "gragasw", channelduration = 0.75}
-	},
 	["janna"] = {
 		{menuslot = "R", slot = 3, spellname = "reapthewhirlwind", channelduration = 3}
 	},
@@ -137,12 +134,6 @@ local interruptableSpells = {
 	},
 	["twistedfate"] = {
 		{menuslot = "R", slot = 3, spellname = "gate", channelduration = 1.5}
-	},
-	["varus"] = {
-		{menuslot = "Q", slot = 0, spellname = "varusq", channelduration = 4}
-	},
-	["warwick"] = {
-		{menuslot = "R", slot = 3, spellname = "warwickr", channelduration = 1.5}
 	},
 	["xerath"] = {
 		{menuslot = "R", slot = 3, spellname = "xerathlocusofpower2", channelduration = 3}
@@ -239,7 +230,7 @@ menu.misc:boolean("logicaa", " ^- If every Spell on Cooldown, then Enable", true
 menu.misc:boolean("GapA", "Use E for Anti-Gapclose", true)
 menu.misc:slider("health", " ^-Only if my Health Percent < X", 50, 1, 100, 1)
 menu.misc:menu("interrupt", "Interrupt Settings")
-menu.misc.interrupt:boolean("inte", "Use E to Interrupt", true)
+menu.misc.interrupt:boolean("inte", "Use Q + E to Interrupt", true)
 menu.misc.interrupt:menu("interruptmenu", "Interrupt Settings")
 for i = 1, #common.GetEnemyHeroes() do
 	local enemy = common.GetEnemyHeroes()[i]
@@ -318,19 +309,23 @@ local Delays = 0
 
 local function WGapcloser()
 	if player:spellSlot(2).state == 0 and menu.misc.GapA:get() then
-		for i = 0, objManager.enemies_n - 1 do
-			local dasher = objManager.enemies[i]
-			if dasher.type == TYPE_HERO and dasher.team == TEAM_ENEMY then
-				if
-					dasher and common.IsValidTarget(dasher) and dasher.path.isActive and dasher.path.isDashing and
-						player.pos:dist(dasher.path.point[1]) < spellE.range
-				 then
-					if player.pos2D:dist(dasher.path.point2D[1]) < player.pos2D:dist(dasher.path.point2D[0]) then
-						if ((player.health / player.maxHealth) * 100 <= menu.misc.health:get()) then
-							player:castSpell("pos", 2, dasher.path.point2D[1])
-						end
-					end
+		local seg = {}
+		local target =
+			TS.get_result(
+			function(res, obj, dist)
+				if dist <= spellE.range and obj.path.isActive and obj.path.isDashing then --add invulnverabilty check
+					res.obj = obj
+					return true
 				end
+			end
+		).obj
+		if target then
+			local pred_pos = preds.core.lerp(target.path, network.latency + spellE.delay, target.path.dashSpeed)
+			if pred_pos and pred_pos:dist(player.path.serverPos2D) <= spellE.range then
+				seg.startPos = player.path.serverPos2D
+				seg.endPos = vec2(pred_pos.x, pred_pos.y)
+
+				player:castSpell("pos", 2, vec3(pred_pos.x, target.y, pred_pos.y))
 			end
 		end
 	end
@@ -417,7 +412,7 @@ local function CreateObj(object)
 	end
 end
 local function AutoInterrupt(spell)
-	if menu.misc.interrupt.inte:get() and player:spellSlot(2).state == 0 then
+	if menu.misc.interrupt.inte:get() and player:spellSlot(2).state == 0 and player:spellSlot(0).state == 0 then
 		if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY then
 			local enemyName = string.lower(spell.owner.charName)
 			if interruptableSpells[enemyName] then
@@ -425,13 +420,31 @@ local function AutoInterrupt(spell)
 					local spellCheck = interruptableSpells[enemyName][i]
 					if
 						menu.misc.interrupt.interruptmenu[spell.owner.charName .. spellCheck.menuslot]:get() and
+							player.pos2D:dist(spell.owner.pos2D) > spellE.range and
 							string.lower(spell.name) == spellCheck.spellname
 					 then
+						if player.pos2D:dist(spell.owner.pos2D) < spellQE.range and common.IsValidTarget(spell.owner) then
+							local pos = player.pos + 700 * (spell.owner - player.pos):norm()
+							player:castSpell("pos", 0, pos)
+							player:castSpell("pos", 2, pos)
+						end
+					end
+				end
+			end
+		end
+		if menu.misc.interrupt.inte:get() and player:spellSlot(2).state == 0 then
+			if spell.owner.type == TYPE_HERO and spell.owner.team == TEAM_ENEMY then
+				local enemyName = string.lower(spell.owner.charName)
+				if interruptableSpells[enemyName] then
+					for i = 1, #interruptableSpells[enemyName] do
+						local spellCheck = interruptableSpells[enemyName][i]
 						if
-							player.pos2D:dist(spell.owner.pos2D) < spellE.range and common.IsValidTarget(spell.owner) and
-								player:spellSlot(2).state == 0
+							menu.misc.interrupt.interruptmenu[spell.owner.charName .. spellCheck.menuslot]:get() and
+								string.lower(spell.name) == spellCheck.spellname
 						 then
-							player:castSpell("obj", 2, spell.owner)
+							if player.pos2D:dist(spell.owner.pos2D) < spellE.range and common.IsValidTarget(spell.owner) then
+								player:castSpell("obj", 2, spell.owner)
+							end
 						end
 					end
 				end
