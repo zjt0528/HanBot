@@ -1,4 +1,3 @@
-
 local avada_lib = module.lib("avada_lib")
 if not avada_lib then
 	print("")
@@ -31,7 +30,10 @@ elseif avada_lib.version < 1 then
 	menuerror:header("error", "ERROR: You need Avada Lib! Check Console.")
 	return
 end
-
+local version = tonumber(io.open(hanbot.luapath .. "/support_aio/version", "r"):read("*a"))
+if hanbot.user ~= "Kornis" then
+	avada_lib.updater.avada_update("support_aio", version, hanbot.luapath, "Kornis")
+end
 if player.charName == "Janna" then
 	module.load("SupportAIO" .. player.charName, "Janna")
 end
@@ -77,5 +79,3 @@ end
 if player.charName == "Taric" then
 	module.load("SupportAIO" .. player.charName, "Taric")
 end
-
-
