@@ -365,7 +365,10 @@ local function Combo()
 			if menu.combo.rset.rusage:get() == 1 and player:spellSlot(3).state == 0 then
 				if (target.health / target.maxHealth) * 100 > menu.combo.rset.waster:get() then
 					if (target.health / target.maxHealth) * 100 <= menu.combo.rset.hpr:get() then
-						if not (menu.combo.rset.wait:get()) and not menu.blacklist[target.charName]:get() then
+						if
+							not (menu.combo.rset.wait:get()) and menu.blacklist[target.charName] and
+								not menu.blacklist[target.charName]:get()
+						 then
 							if menu.combo.wusage:get() == 3 and menu.combo.wcombo:get() then
 								if target.pos:dist(player.pos) < spellW.range then
 									local pos = preds.circular.get_prediction(spellW, target)
