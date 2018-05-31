@@ -1816,7 +1816,6 @@ local function Combo()
 							local pos = preds.linear.get_prediction(spellE, target, vec2(objsq.x, objsq.z))
 
 							if pos and player:spellSlot(2).name == "IreliaE2" and helooooooooooooo < os.clock() then
-							
 								local meowmeowwa = 0
 								if target.path.isActive then
 									if player.pos:dist(target.path.point[1]) > player.pos:dist(target.path.point[0]) then
@@ -2012,33 +2011,31 @@ local function JungleClear()
 				local minionPos = vec3(minion.x, minion.y, minion.z)
 				if minionPos:dist(player.pos) <= spellE.range then
 					if aaaaaaaaaa < os.clock() and player:spellSlot(2).name == "IreliaE" and player:spellSlot(2).state == 0 then
-						if menu.combo.eset.emode:get() == 2 then
-							-- Thanks to asdf. ♡
-							if not minion.path.isActive then
-								if minion.pos:dist(player.pos) <= 900 then
-									local cast1 = player.pos + (minion.pos - player.pos):norm() * 900
+						-- Thanks to asdf. ♡
+						if not minion.path.isActive then
+							if minion.pos:dist(player.pos) <= 900 then
+								local cast1 = player.pos + (minion.pos - player.pos):norm() * 900
 
-									player:castSpell("pos", 2, cast1)
-								end
-							else
-								local pathStartPos = minion.path.point[0]
-								local pathEndPos = minion.path.point[minion.path.count]
-								local pathNorm = (pathEndPos - pathStartPos):norm()
-								local tempPred = common.GetPredictedPos(minion, 1.2)
-								if tempPred then
-									local dist1 = player.pos:dist(tempPred)
-									if dist1 <= 900 then
-										local dist2 = player.pos:dist(minion.pos)
-										if dist1 < dist2 then
-											pathNorm = pathNorm * -1
-										end
-										local cast2 = RaySetDist(minion.pos, pathNorm, player.pos, 900)
-										player:castSpell("pos", 2, cast2)
+								player:castSpell("pos", 2, cast1)
+							end
+						else
+							local pathStartPos = minion.path.point[0]
+							local pathEndPos = minion.path.point[minion.path.count]
+							local pathNorm = (pathEndPos - pathStartPos):norm()
+							local tempPred = common.GetPredictedPos(minion, 1.2)
+							if tempPred then
+								local dist1 = player.pos:dist(tempPred)
+								if dist1 <= 900 then
+									local dist2 = player.pos:dist(minion.pos)
+									if dist1 < dist2 then
+										pathNorm = pathNorm * -1
 									end
+									local cast2 = RaySetDist(minion.pos, pathNorm, player.pos, 900)
+									player:castSpell("pos", 2, cast2)
 								end
 							end
-							delayyyyyyy = os.clock() + 0.5
 						end
+						delayyyyyyy = os.clock() + 0.5
 					end
 
 					for _, objsq in pairs(blade) do
