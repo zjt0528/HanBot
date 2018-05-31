@@ -379,7 +379,7 @@ local function Combo()
 								player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 							end
 						end
-						if (menu.combo.rset.wait:get()) and not menu.blacklist[target.charName]:get() then
+						if (menu.combo.rset.wait:get()) and menu.blacklist[target.charName] and not menu.blacklist[target.charName]:get() then
 							if (player:spellSlot(0).state == 0 or player:spellSlot(2).state == 0) then
 								if menu.combo.wusage:get() == 3 and menu.combo.wcombo:get() then
 									if target.pos:dist(player.pos) < spellW.range then
@@ -405,7 +405,10 @@ local function Combo()
 							dmglib.GetSpellDamage(0, target) + dmglib.GetSpellDamage(2, target) + dmglib.GetSpellDamage(3, target) +
 								dmglib.GetSpellDamage(3, target, 2) * menu.combo.rset.rtick:get())
 					 then
-						if not (menu.combo.rset.wait:get()) and not menu.blacklist[target.charName]:get() then
+						if
+							not (menu.combo.rset.wait:get()) and menu.blacklist[target.charName] and
+								not menu.blacklist[target.charName]:get()
+						 then
 							if menu.combo.wusage:get() == 3 and menu.combo.wcombo:get() then
 								if target.pos:dist(player.pos) < spellW.range then
 									local pos = preds.circular.get_prediction(spellW, target)
@@ -419,7 +422,7 @@ local function Combo()
 								player:castSpell("pos", 3, vec3(pos.endPos.x, mousePos.y, pos.endPos.y))
 							end
 						end
-						if (menu.combo.rset.wait:get()) and not menu.blacklist[target.charName]:get() then
+						if (menu.combo.rset.wait:get()) and menu.blacklist[target.charName] and not menu.blacklist[target.charName]:get() then
 							if (player:spellSlot(0).state == 0 or player:spellSlot(2).state == 0) then
 								if menu.combo.wusage:get() == 3 and menu.combo.wcombo:get() then
 									if target.pos:dist(player.pos) < spellW.range then
