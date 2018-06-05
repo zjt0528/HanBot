@@ -615,33 +615,21 @@ function Objects()
 		end
 	end
 end
-function CalcMagicDmg(target, amount, from)
-	local from = from or player
-	local target = target or orb.combat.target
-	local amount = amount or 0
-	local targetMR = target.spellBlock * math.ceil(from.percentMagicPenetration) - from.flatMagicPenetration
-	local dmgMul = 100 / (100 + targetMR)
-	if dmgMul < 0 then
-		dmgMul = 2 - (100 / (100 - magicResist))
-	end
-	amount = amount * dmgMul
-	return math.floor(amount)
-end
 local MainRDamage = {90, 135, 180}
 function RDamage(target)
 	local damage = 0
 	local calculate = 0
 	if player:spellSlot(3).level > 0 then
 		if (player:spellSlot(3).stacks <= 3) then
-			calculate = (MainRDamage[player:spellSlot(3).level] + (common.GetTotalAP() * 0.2)) * 3
+			calculate = (MainRDamage[player:spellSlot(3).level] + (common.GetTotalAP() * 0.2)) * 4
 		end
 		if (player:spellSlot(3).stacks > 3) then
-			calculate = (MainRDamage[player:spellSlot(3).level] + (common.GetTotalAP() * 0.2)) * player:spellSlot(3).stacks
+			calculate = (MainRDamage[player:spellSlot(3).level] + (common.GetTotalAP() * 0.2)) * (player:spellSlot(3).stacks + 1)
 		end
 
-		damage = CalcMagicDmg(target, calculate)
+		damage = common.CalculateMagicDamage(target, calculate)
 	end
-	return damage
+	return damage - 20
 end
 
 local function Killsteal()
