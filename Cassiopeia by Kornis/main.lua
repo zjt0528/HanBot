@@ -281,6 +281,8 @@ menu.keys:keybind("combokey", "Combo Key", "Space", nil)
 menu.keys:keybind("harasskey", "Harass Key", "C", nil)
 menu.keys:keybind("clearkey", "Lane Clear Key", "V", nil)
 menu.keys:keybind("lastkey", "Last Hit", "X", nil)
+menu:header("uhh", "If you have Last Hit issues")
+menu:header("uhh", "change E Delay in Misc. Menu")
 TS.load_to_menu(menu)
 
 local TargetSelection = function(res, obj, dist)
